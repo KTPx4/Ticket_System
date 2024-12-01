@@ -1,5 +1,5 @@
-const ArtistModel = require('../../models/ArtistModel')
-const UploadIMG = require('../UploadImage')
+const ArtistModel = require('../models/ArtistModel')
+const UploadIMG = require('./Upload')
 const fs = require("fs");
 
 module.exports.GetAll = async(req, res)=>{
@@ -17,7 +17,7 @@ module.exports.Create = async(req, res)=>{
             name,
             desc
         })
-        return res.status(200).json({
+        return res.status(201).json({
             status: "create artist success",
             message: "Tạo nghệ sĩ thành công",
             data: art

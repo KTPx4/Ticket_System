@@ -5,7 +5,7 @@ const multer = require('multer')
 const StaffAuth = require('../middlewares/staffs/Staff')
 
 const ArtistValidator = require('../middlewares/artist/Artist')
-const ArtisController = require('../controllers/Staff/ArtistController')
+const ArtisController = require('../controllers/ArtistController')
 const ImageValidator = require('../middlewares/ImageValidator')
 
 _APP.get('/', ArtisController.GetAll)

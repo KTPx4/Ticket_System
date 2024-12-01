@@ -4,7 +4,7 @@ const multer = require('multer')
 
 const StaffAuth = require('../middlewares/staffs/Staff')
 const Validator = require('../middlewares/staffs/Validator')
-const Controller = require('../controllers/Staff/StaffController')
+const Controller = require('../controllers/StaffController')
 const ImageValidator = require("../middlewares/ImageValidator");
 
 

@@ -1,5 +1,5 @@
-const StaffModel = require('../../models/StaffModel')
-const UploadIMG = require('../UploadImage')
+const StaffModel = require('../models/StaffModel')
+const UploadIMG = require('./Upload')
 const fs = require('fs');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
@@ -24,7 +24,7 @@ module.exports.register = async (req, res)=>{
 
                 createFolder(root, Account._id, Account.image) ? null : console.log(`Can't create folder for Account: '${Account._id}' - '${Account.user}'`);
 
-                return res.status(200).json({
+                return res.status(201).json({
                     message: 'Register Success',
                     data: {
                         account: account
