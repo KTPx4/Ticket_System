@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const {Schema} = mongoose
+// Thư viện để định dạng ngày tháng
+const moment = require('moment');
 
 const EventSchema = new mongoose.Schema({
     name: String,
@@ -9,9 +11,19 @@ const EventSchema = new mongoose.Schema({
     },  
     type: [{type: String}],
     tag: [{type: String}],
+    priceRange: {
+        min: {type: Number, default: 0},
+        max: {type: Number, default: 0}
+    },
     date:{
-        start: {type: Date},
-        end: {type: Date}
+        start: {
+            type: Date,
+            get: (v) => moment(v).format('DD/MM/YYYY HH:mm') // Getter định dạng
+        },
+        end: {
+            type: Date,
+            get: (v) => moment(v).format('DD/MM/YYYY HH:mm') // Getter định dạng
+        }
     },
     isHotEvent: {type: Boolean, default: true},
     follower: [{
@@ -37,7 +49,7 @@ const EventSchema = new mongoose.Schema({
             ref: 'news'
         }
     ],
-    accJoin: [
+    accJoins: [
         {
             type: Schema.Types.ObjectId,
             ref: 'accounts'
@@ -49,5 +61,8 @@ const EventSchema = new mongoose.Schema({
             url: {type: String, default: null}
         }
     ]
+}, {
+    toJSON: { getters: true }, // Bật chế độ dùng getter khi convert sang JSON
+    toObject: { getters: true } // Bật chế độ dùng getter khi convert sang Object
 })
 module.exports = mongoose.model('events', EventSchema)

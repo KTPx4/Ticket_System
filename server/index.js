@@ -6,6 +6,7 @@ require('dotenv').config()
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
+const EventRouter = require('./routes/EventRouter')
 const fs = require("fs");
 const StaffAuth = require("./middlewares/staffs/Staff");
 // variable
@@ -16,7 +17,7 @@ const _PORT = process.env.PORT || 3003
 _APP.use(express.json())
 _APP.use(express.urlencoded({extended: true}))
 _APP.use(cors())
-_APP.use('/images', express.static(path.join(__dirname, 'public')))
+_APP.use('/public', express.static(path.join(__dirname, 'public')))
 _APP.use((req, res, next)=>{
     req.vars = {root: __dirname}
     next()
@@ -26,6 +27,13 @@ _APP.use((req, res, next)=>{
 
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
+_APP.use('/api/v1/event', EventRouter(__dirname))
+_APP.use("/*",(req, res)=>{
+    return res.status(404).json({
+        status: "notfound",
+        message: "Endpoint không hợp lệ"
+    })
+})
 
 const createFolder = async()=>{
     var root = path.join(__dirname, "public")
@@ -33,6 +41,7 @@ const createFolder = async()=>{
     var listFolder = [
         `${root}/account`,
         `${root}/artist`,
+        `${root}/event`,
     ]
 
     listFolder.forEach(path=>{
