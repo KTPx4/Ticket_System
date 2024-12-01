@@ -1,5 +1,5 @@
 const StaffModel = require('../../models/StaffModel')
-
+const UploadIMG = require('../UploadImage')
 const fs = require('fs');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
@@ -66,14 +66,16 @@ module.exports.login = async( req, res) =>{
 
 }
 
-module.exports.UpdateImage =async(req, res) =>{
+module.exports.UpdateImage = async(req, res) =>{
     try
     {
         // console.log("1 request");
         let {root}  = req.vars
         var Staff = req.vars.Staff
 
-        let newNameAVT = await upLoadAvt(req.file, root,  Staff)
+        const currentPath = `${root}/public/account/${Staff._id}`
+
+        let newNameAVT = await UploadIMG.uploadSingle(req.file, currentPath,  Staff._id)
 
         var newAccount = await StaffModel.findOneAndUpdate({_id: Staff._id}, {
             image: `${newNameAVT}`
@@ -98,41 +100,6 @@ module.exports.ticket = (req, res) =>{
     return res.status(200).json({
         message: "Ok"
     })
-}
-const upLoadAvt =async (file, root, AccUser)=>{
-    //console.log("Upload Avt call");
-    let id = AccUser._id
-
-    const currentPath = `${root}/public/account/${id}`
-
-    if(file)
-    {
-        if(!fs.existsSync(currentPath))
-        {
-            fs.mkdir(currentPath, (error) =>
-            {
-                if (error)
-                {
-                    console.log("Error at create Folder Upload: ", error.message);
-                }
-            });
-        }
-
-
-        let name = file.originalname
-        let temp = name.split('.')
-        let extension = temp[temp.length - 1]
-
-
-        let newFilePath = currentPath + '/' +  `${id}.${extension}`
-
-        fs.renameSync(file.path, newFilePath)
-
-        return `${id}.${extension}`
-    }
-
-    return undefined
-
 }
 
 const createFolder = (root, idUser, nameAvt)=>

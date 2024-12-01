@@ -1,17 +1,7 @@
 const StaffModel = require('../../models/StaffModel')
 const bcrypt = require('bcrypt')
 
-module.exports.UpdateImage = async(req, res, next)=>
-{
-    let file = req.file
-    if(!file)
-    {
-        return res.status(400).json({
-            message: "Vui lòng cung cấp ảnh: 'image'"
-        })
-    }
-    return next()
-}
+
 
 module.exports.register = async(req, res, next)=>{
     let {user, email, name}= req.body

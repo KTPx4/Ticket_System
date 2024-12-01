@@ -6,6 +6,8 @@ require('dotenv').config()
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
+const fs = require("fs");
+const StaffAuth = require("./middlewares/staffs/Staff");
 // variable
 const _APP = express()
 const _PORT = process.env.PORT || 3003
@@ -23,9 +25,33 @@ _APP.use((req, res, next)=>{
 
 
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
-_APP.use('/api/v1/artist', ArtistRouter(__dirname))
+_APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 
+const createFolder = async()=>{
+    var root = path.join(__dirname, "public")
+
+    var listFolder = [
+        `${root}/account`,
+        `${root}/artist`,
+    ]
+
+    listFolder.forEach(path=>{
+        if(!fs.existsSync(path))
+        {
+            fs.mkdir(path, (error) =>
+            {
+                if (error)
+                {
+                    console.log("Index.js - Error at create Folder: ", error.message);
+                }
+            });
+        }
+    })
+
+}
 const StartProgram = async()=>{
+    await createFolder()
+
     await require('./models/DB')
         .then(async()=>{
             console.log("Connect DB Success");
@@ -38,4 +64,5 @@ const StartProgram = async()=>{
         })
 
 }
+
 StartProgram()

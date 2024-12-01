@@ -6,20 +6,15 @@ const ArtistSchema = new mongoose.Schema({
     desc: {
         birthDay: String,
         originName: String,
-        artisName: String,
+        artistName: String,
         duration: String,
         more: {type: String, default: ""}
     },
     image: {
         type: String,
-        get: v=> `${root}/${v}`
-    },
-    file:[
-        {
-            typeFile: {type: String, default: "image"},
-            url: {type: String, default: null}
-        }
-    ]
+        default: " "
+        // get: v=> `${root}/${v}`
+    }
 })
 
 ArtistSchema.pre('save', function (next) {
