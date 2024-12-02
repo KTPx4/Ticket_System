@@ -52,12 +52,28 @@ module.exports.Register = async(req, res)=>{
 
                 createFolder(root, Account._id, Account.image) ? null : console.log(`Can't create folder for Account: '${Account._id}' - '${Account.user}'`);
 
-                return res.status(201).json({
-                    message: 'Register Success',
-                    data: {
-                        account: account
-                    }
+                var data = {
+                    name: account.name,
+                    email: account.email,
+                    image: account.image,
+                    pass: account.pass
+                }
+
+                await jwt.sign(data, SECRET_LOGIN, {expiresIn: "7d"}, (err, tokenLogin)=>{
+                    if(err) throw err
+                    return res.status(200).json({
+                        status: "Login success",
+                        message: "Đăng ký thành công",
+                        data: tokenLogin
+                    })
                 })
+
+                // return res.status(201).json({
+                //     message: 'Register Success',
+                //     data: {
+                //         account: account
+                //     }
+                // })
             })
 
 

@@ -45,6 +45,7 @@
                     android:textAlignment="center"
                     android:textStyle="bold"/>
                 <EditText
+                    android:visibility="gone"
                     android:id="@+id/register_name"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -54,6 +55,7 @@
                     android:drawableLeft="@drawable/username"
                     android:drawablePadding="8dp"
                     android:hint="Full Name"/>
+
                 <EditText
                     android:id="@+id/register_email"
                     android:layout_width="match_parent"
@@ -74,7 +76,10 @@
                     android:drawableLeft="@drawable/password"
                     android:drawablePadding="8dp"
                     android:hint="Password"/>
+
                 <EditText
+                    android:visibility="gone"
+
                     android:id="@+id/register_phone"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -85,6 +90,7 @@
                     android:drawablePadding="8dp"
                     android:hint="Phone"/>
                 <EditText
+                    android:visibility="gone"
                     android:id="@+id/register_address"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
