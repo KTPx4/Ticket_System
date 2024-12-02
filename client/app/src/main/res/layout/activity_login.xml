@@ -39,7 +39,7 @@
                 android:padding="8dp"
                 android:drawableLeft="@drawable/email"
                 android:drawablePadding="8dp"
-                android:hint="Email"/>
+                android:hint="Email/User"/>
             <EditText
                 android:id="@+id/login_password"
                 android:layout_width="match_parent"
@@ -50,7 +50,9 @@
                 android:drawableLeft="@drawable/password"
                 android:drawablePadding="8dp"
                 android:hint="Password"/>
+
             <Button
+                android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:text="Login"
@@ -73,11 +75,12 @@
             android:textSize="14sp"/>
 
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/login_btn_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Register"
             android:textColor="@color/blue"
             android:background="@android:color/transparent"/>
+
     </LinearLayout>
 </LinearLayout>
