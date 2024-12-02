@@ -15,6 +15,7 @@ const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
 const EventRouter = require('./routes/EventRouter')
 const AccountRouter = require('./routes/AccountRouter')
+const NewsRouter = require('./routes/NewsRouter')
 const fs = require("fs");
 const StaffAuth = require("./middlewares/staffs/Staff");
 // variable
@@ -37,6 +38,7 @@ _APP.use((req, res, next)=>{
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 _APP.use('/api/v1/event', EventRouter(__dirname))
+_APP.use('/api/v1/news', NewsRouter)
 _APP.use('/api/v1/account', AccountRouter(__dirname))
 
 _APP.use("/*",(req, res)=>{
