@@ -13,6 +13,8 @@ _APP.get('/', EventController.GetAll)
 _APP.post('/', StaffAuth.AuthStaff , EventValidator.Create, EventController.Create)
 
 // patch info other field
+_APP.get('/:id' , EventValidator.IsExistEvent, EventController.GetByID)
+_APP.delete('/:id' , StaffAuth.AuthStaff, EventValidator.IsExistEvent, EventController.DeleteByID)
 _APP.patch('/:id' ,  StaffAuth.AuthStaff , EventValidator.IsExistEvent, EventValidator.Update, EventController.Update)
 
 _APP.post('/:id/follow', EventValidator.IsExistEvent, AccountAuth.AuthAccount, AccountController.FollowEvent ) // account follow + use auth account -> get id of account
@@ -32,7 +34,7 @@ _APP.post('/:id/after',  StaffAuth.AuthStaff , EventValidator.IsExistEvent) // u
 _APP.delete('/:id/after',  StaffAuth.AuthStaff , EventValidator.IsExistEvent) // delete buy position in query string ?p=
 
 // Get news
-_APP.get('/:id/news', EventValidator.IsExistEvent ) // get all news of this event
+_APP.get('/:id/news', EventValidator.IsExistEvent, EventController.getNews ) // get all news of this event
 
 module.exports = (root) =>{
 

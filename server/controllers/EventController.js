@@ -5,7 +5,10 @@ module.exports.GetAll = async(req, res)=>{
         var data = await EventModel.find()
             .populate('followers')
             .populate('artists')
-            .populate('news')
+            .populate({
+                path: 'news', // Tên tham chiếu tới bảng `news`
+                options: { sort: { createdAt: -1 } } // Sắp xếp theo `createdAt` giảm dần
+            })
             .populate('accJoins')
         return res.status(200).json({
             message: "Lấy dữ liệu sự kiện thành công",
@@ -21,19 +24,43 @@ module.exports.GetAll = async(req, res)=>{
     }
 
 }
+module.exports.GetByID= async (req, res)=>{
+    try{
+       var {Event} = req.vars
+        return res.status(200).json({
+            message: "Lấy dữ liệu sự kiện thành công",
+            data: Event
+        })
+    }
+    catch (e)
+    {
+        console.log("Error at EventController - GetAll: ", e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
+        })
+    }
+}
 module.exports.Create = async(req, res)=>{
     try {
-        const { name, location, desc, type, date, priceRange } = req.body;
-
+        const { name, location, desc, type, date, priceRange, isTicketPosition } = req.body;
+        var isPosition = false
+        if(isTicketPosition && isTicketPosition === true)
+        {
+            isPosition = true
+        }
         const newEvent = await EventModel.create({
             name,
             location,
             desc,
             type,
             date,
-            priceRange
+            priceRange,
+            isTicketPosition: isPosition
         });
+        if(isPosition)
+        {
 
+        }
         return res.status(201).json({ message: "Sự kiện đã được tạo thành công", data: newEvent });
 
     }
@@ -95,6 +122,42 @@ module.exports.PutTrailer = async(req, res)=>{
             status: "Update trailer event failed",
             message: "Sửa trailer thất bại. Thử lại sau",
             data: null
+        })
+    }
+}
+
+module.exports.DeleteByID= async(req, res)=>{
+    var {Event} = req.vars
+    try{
+        var id = Event._id
+        // Xóa sự kiện
+        await EventModel.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            message: "Xóa sự kiện thành công.",
+            data: Event
+        });
+
+    }
+    catch (e) {
+        console.log("Error at EventController - DeleteByID: ", e)
+        return res.status(500).json({
+            message: "Xóa sự kiện thất bại, thử lại sau"
+        })
+    }
+}
+module.exports.getNews = async(req, res)=>{
+    try{
+        var {Event} = req.vars
+        return res.status(200).json({
+            message: "Lấy dữ liệu thành công",
+            data: Event.news
+        })
+    }
+    catch (e) {
+        console.log("Error at EventController - GetAll: ", e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
         })
     }
 }

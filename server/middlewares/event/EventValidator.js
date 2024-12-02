@@ -65,6 +65,11 @@ const isExistId = async (req, res, next) =>{
         });
     }
     var event = await EventModel.findOne({_id: id})
+        .populate({
+            path: 'news', // Tên tham chiếu tới bảng `news`
+            options: { sort: { createdAt: -1 } } // Sắp xếp theo `createdAt` giảm dần
+        });
+
     if(!event)
     {
         return res.status(400).json({
@@ -97,6 +102,11 @@ const updateEvent = async(req, res, next)=>{
             }
 
         }
+
+        // if(body.isTicketPosition && (typeof body.isTicketPosition === "boolean"))
+        // {
+        //     updateData.isTicketPosition = body.isTicketPosition
+        // }
 
         try {
             var {start, end} = body.date
