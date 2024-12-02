@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,8 +17,13 @@ import services.AccountService;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private boolean isUser = true;
     private EditText loginEmail, loginPassword;
+    private TextView txtLogin;
     private String loginToken;
+    private ImageButton btnBack;
+    private LinearLayout layoutRegister;
+
     AccountService accountService ;
+    // lưu token vào SharedPreferences thông qua LocalStorageManager
     LocalStorageManager localStorageManager;
 
     @Override
@@ -26,6 +34,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         localStorageManager = new LocalStorageManager(this);
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
+        layoutRegister = findViewById(R.id.login_layout_resigter);
+        txtLogin = findViewById(R.id.txtLogin);
+        findViewById(R.id.back_button).setOnClickListener(this);
         findViewById(R.id.login_button).setOnClickListener(this);
         findViewById(R.id.login_btn_register).setOnClickListener(this);
         getFromIntent();
@@ -41,18 +52,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(loginOption.equals("user"))
         {
             isUser = true;
+            layoutRegister.setVisibility(View.VISIBLE);
+            txtLogin.setText("Login");
         }
-        else {
+        else if(loginOption.equals("staff")){
             isUser = false;
+            layoutRegister.setVisibility(View.GONE);
+            txtLogin.setText("Welcom Staff");
+
         }
     }
 
     void checkIsLogin()
     {
+
+
         if(loginToken != null && !loginToken.isEmpty())
         {
             // check verify token . if true -> main screen
             // else clear token -> login screen
+
 
             if (isUser) {
                 accountService.verifyUser(loginToken, new AccountService.OnVerifyCallback() {
@@ -71,21 +90,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         runOnUiThread(() -> {
                             Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
                         });
+                        localStorageManager.clearLoginToken();
                     }
                 });
             }
 
             else{
-                accountService.verifyStaff(loginToken, new AccountService.OnRegisterCallback() {
+                accountService.verifyStaff(loginToken, new AccountService.ResponseCallback() {
 
                     @Override
                     public void onSuccess(String message) {
+                        // Chuyển sang screen cho staff
 
                     }
 
                     @Override
                     public void onFailure(String error) {
-
+                        // Token không hợp lệ, hiển thị lỗi
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                        });
+                        localStorageManager.clearLoginToken();
                     }
                 });
             }
@@ -99,32 +124,82 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (id == R.id.login_button) {
             String email = loginEmail.getText().toString().trim();
             String password = loginPassword.getText().toString().trim();
-
-            // Gọi API login user
-            accountService.loginUser(email, password, new AccountService.OnRegisterCallback() {
-                @Override
-                public void onSuccess(String token) {
-                    // Lưu token vào SharedPreferences thông qua LocalStorageManager
-                    localStorageManager.saveLoginToken(token); // Lưu token
-                    loginToken = token;
-
-                    // Chuyển sang MainActivity và hiển thị token
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("login-token", token);
-                    startActivity(intent);
-                    finish(); // Đóng LoginActivity
+            if(email.isEmpty() || password.isEmpty())
+            {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                if(email.isEmpty())
+                {
+                    loginEmail.requestFocus();
                 }
-
-                @Override
-                public void onFailure(String error) {
-                    // Hiển thị lỗi đăng nhập (có thể dùng Toast hoặc Dialog)
-                    runOnUiThread(() -> {
-                        Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
-                    });
+                else{
+                    loginPassword.requestFocus();
                 }
-            });
-        } else if (id == R.id.login_btn_register) {
+                return;
+            }
+
+            if(isUser)
+            {
+                // Gọi API login user
+                accountService.loginUser(email, password, new AccountService.ResponseCallback() {
+                    @Override
+                    public void onSuccess(String token) {
+                        // Lưu token vào SharedPreferences thông qua LocalStorageManager
+                        localStorageManager.saveLoginToken(token); // Lưu token
+                        loginToken = token;
+
+                        // Chuyển sang MainActivity và hiển thị token
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("login-token", token);
+                        startActivity(intent);
+                        finish(); // Đóng LoginActivity
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        // Hiển thị lỗi đăng nhập (có thể dùng Toast hoặc Dialog)
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+            }
+            else{
+                accountService.loginStaff(email, password, new AccountService.ResponseCallback() {
+                    @Override
+                    public void onSuccess(String token) {
+                        // Lưu token vào SharedPreferences thông qua LocalStorageManager
+                        localStorageManager.saveLoginToken(token); // Lưu token
+                        loginToken = token;
+
+                        // Chuyển sang Screen cho staff
+//                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                        intent.putExtra("login-token", token);
+//                        startActivity(intent);
+//                        finish(); // Đóng LoginActivity
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        // Hiển thị lỗi đăng nhập (có thể dùng Toast hoặc Dialog)
+                        runOnUiThread(() -> {
+                            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+            }
+
+
+
+        }
+        else if (id == R.id.login_btn_register) {
             Intent intent = new Intent(this, RegisterActivity.class);
+            startActivity(intent);
+//            finish();
+        }
+        else if(id == R.id.back_button)
+        {
+            localStorageManager.clearLoginOption();
+            Intent intent = new Intent(this, IntroActivity.class);
             startActivity(intent);
             finish();
         }

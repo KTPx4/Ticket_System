@@ -9,7 +9,6 @@ import com.example.ticketbooking.R;
 import org.json.JSONObject;
 
 import okhttp3.FormBody;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -25,7 +24,7 @@ public class AccountService {
         this.SERVER = context.getString(R.string.server_url);
     }
 
-    public void registerAccount(String email, String password, OnRegisterCallback callback) {
+    public void registerAccount(String email, String password, ResponseCallback callback) {
         new Thread(() -> {
             try {
                 // Kiểm tra đầu vào
@@ -73,7 +72,8 @@ public class AccountService {
                     String token  =jsonResponse.optString("data", "");
                     callback.onSuccess(token);
 
-                } else {
+                }
+                else {
                     if(response.code() == 400)
                     {
 
@@ -93,7 +93,7 @@ public class AccountService {
         }).start();
     }
 
-    public void loginUser(String email, String password, OnRegisterCallback callback) {
+    public void loginUser(String email, String password, ResponseCallback callback) {
         new Thread(() -> {
             try {
                 // Kiểm tra đầu vào
@@ -123,6 +123,21 @@ public class AccountService {
 
                 // Xử lý kết quả
                 JSONObject jsonResponse = new JSONObject(responseBody);
+
+                // Log thông tin phản hồi
+                StringBuilder logMessage = new StringBuilder();
+                logMessage.append("Status Code: ").append(response.code()).append("\n");
+                logMessage.append("Headers: ").append(response.headers()).append("\n");
+                logMessage.append("Body: ");
+                if (response.body() != null) {
+                    logMessage.append(responseBody);
+                } else {
+                    logMessage.append("No body");
+                }
+
+                // Ghi log
+                Log.d("HTTP Response", logMessage.toString());
+
                 if (response.isSuccessful()) {
                     String token = jsonResponse.optString("data", ""); // Token từ server
                     callback.onSuccess(token);
@@ -138,11 +153,11 @@ public class AccountService {
     }
 
 
-    public void loginStaff(String user, String password, OnRegisterCallback callback) {
+    public void loginStaff(String user, String password, ResponseCallback callback) {
 
     }
 
-    public void verifyStaff(String token, OnRegisterCallback callback) {
+    public void verifyStaff(String token, ResponseCallback callback) {
 
     }
 
@@ -173,7 +188,7 @@ public class AccountService {
     }
 
     // Interface callback để xử lý kết quả
-    public interface OnRegisterCallback {
+    public interface ResponseCallback {
         void onSuccess(String message);
 
         void onFailure(String error);
