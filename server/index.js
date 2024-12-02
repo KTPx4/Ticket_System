@@ -24,10 +24,12 @@ _APP.use((req, res, next)=>{
 })
 
 
+// need account router - login - register
 
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 _APP.use('/api/v1/event', EventRouter(__dirname))
+
 _APP.use("/*",(req, res)=>{
     return res.status(404).json({
         status: "notfound",

@@ -1,4 +1,6 @@
 const EventModel = require('../../models/EventModel')
+const AccountModel = require('../../models/AccountModel')
+const ArtistModel = require('../../models/ArtistModel')
 const mongoose = require("mongoose");
 
 const validateEvent = (req, res, next) => {
@@ -113,11 +115,46 @@ const updateEvent = async(req, res, next)=>{
         }
 
 
-
         if (body.isHotEvent != null && (typeof body.isHotEvent === 'boolean')) updateData.isHotEvent = body.isHotEvent;
 
-        if (Array.isArray(body.follower)) updateData.follower = body.follower;
-        if (Array.isArray(body.artists)) updateData.artists = body.artists;
+
+
+        // if (Array.isArray(body.followers))
+        // {
+        //
+        //     // Lọc ra các follower hợp lệ
+        //     const validFollowers = [];
+        //     for (const followerId of body.followers) {
+        //         if (mongoose.Types.ObjectId.isValid(followerId)) {
+        //             const accountExists = await AccountModel.exists({ _id: followerId });
+        //             if (accountExists) {
+        //                 validFollowers.push(followerId);
+        //             }
+        //         }
+        //     }
+        //
+        //     if (validFollowers.length > 0) {
+        //         updateData.followers = validFollowers;
+        //     }
+        // }
+
+        if (Array.isArray(body.artists))
+        {
+            // updateData.artists = body.artists;
+            const validArtist = []
+            for (const artist of body.artists) {
+                if (mongoose.Types.ObjectId.isValid(artist)) {
+                    const accountExists = await ArtistModel.exists({ _id: artist });
+                    if (accountExists) {
+                        validArtist.push(artist);
+                    }
+                }
+            }
+
+            if (validArtist.length > 0) {
+                updateData.artists = validArtist;
+            }
+        }
 
 
         req.vars.updateData = updateData

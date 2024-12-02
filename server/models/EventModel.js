@@ -26,7 +26,7 @@ const EventSchema = new mongoose.Schema({
         }
     },
     isHotEvent: {type: Boolean, default: true},
-    follower: [{
+    followers: [{
         type: Schema.Types.ObjectId,
         ref: 'accounts'
     }],
