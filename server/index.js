@@ -3,10 +3,18 @@ const cors = require('cors')
 const path = require('path')
 require('dotenv').config()
 
+// Call model
+require('./models/NewsModel')
+require('./models/EventModel')
+require('./models/AccountModel')
+require('./models/ArtistModel')
+require('./models/StaffModel')
+
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
 const EventRouter = require('./routes/EventRouter')
+const AccountRouter = require('./routes/AccountRouter')
 const fs = require("fs");
 const StaffAuth = require("./middlewares/staffs/Staff");
 // variable
@@ -29,6 +37,7 @@ _APP.use((req, res, next)=>{
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 _APP.use('/api/v1/event', EventRouter(__dirname))
+_APP.use('/api/v1/account', AccountRouter(__dirname))
 
 _APP.use("/*",(req, res)=>{
     return res.status(404).json({
@@ -36,7 +45,6 @@ _APP.use("/*",(req, res)=>{
         message: "Endpoint không hợp lệ"
     })
 })
-
 const createFolder = async()=>{
     var root = path.join(__dirname, "public")
 

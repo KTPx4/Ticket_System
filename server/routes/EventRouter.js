@@ -5,6 +5,8 @@ const multer = require('multer')
 const StaffAuth = require("../middlewares/staffs/Staff");
 const ImageValidator = require("../middlewares/ImageValidator");
 const EventValidator = require('../middlewares/event/EventValidator')
+const AccountAuth = require('../middlewares/account/Account')
+const AccountController = require('../controllers/AccountController')
 const EventController = require('../controllers/EventController')
 
 _APP.get('/', EventController.GetAll)
@@ -13,9 +15,10 @@ _APP.post('/', StaffAuth.AuthStaff , EventValidator.Create, EventController.Crea
 // patch info other field
 _APP.patch('/:id' ,  StaffAuth.AuthStaff , EventValidator.IsExistEvent, EventValidator.Update, EventController.Update)
 
-_APP.post('/:id/follow'  ) // account follow + use auth account -> get id of account
-_APP.delete('/:id/follow' ) // account unfollow + use auth account -> get id of account
+_APP.post('/:id/follow', EventValidator.IsExistEvent, AccountAuth.AuthAccount, AccountController.FollowEvent ) // account follow + use auth account -> get id of account
+_APP.delete('/:id/follow' , EventValidator.IsExistEvent, AccountAuth.AuthAccount, AccountController.UnFollowEvent ) // account unfollow + use auth account -> get id of account
 //-----------------
+
 // update location ,date
 _APP.put('/:id/location', StaffAuth.AuthStaff ,  EventValidator.IsExistEvent)
 _APP.put('/:id/date',  StaffAuth.AuthStaff , EventValidator.IsExistEvent)

@@ -71,6 +71,7 @@ const isExistId = async (req, res, next) =>{
             message: "Sự kiện không tồn tại"
         })
     }
+    req.vars.Event = event
     return next()
 }
 

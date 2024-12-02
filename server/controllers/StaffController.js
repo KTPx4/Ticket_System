@@ -36,7 +36,7 @@ module.exports.register = async (req, res)=>{
     }
     catch(err)
     {
-        console.log("Error At AccountController - Register: ", err);
+        console.log("Error At StaffController - Register: ", err);
         return res.status(500).json({
             message: 'Error At Server',
             data: {}
@@ -128,7 +128,7 @@ const createFolder = (root, idUser, nameAvt)=>
     }
     catch(err)
     {
-        console.log("Error at AccounController - Create Folder Img For User: ", err);
+        console.log("Error at StaffController - Create Folder Img For User: ", err);
         return false;
     }
     return true;

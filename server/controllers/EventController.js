@@ -1,12 +1,25 @@
 const EventModel = require('../models/EventModel')
 const Upload = require("./Upload");
-
 module.exports.GetAll = async(req, res)=>{
-    var data = await EventModel.find()
-    return res.status(200).json({
-        message: "Lấy dữ liệu sự kiện thành công",
-        data: data
-    })
+    try{
+        var data = await EventModel.find()
+            .populate('followers')
+            .populate('artists')
+            .populate('news')
+            .populate('accJoins')
+        return res.status(200).json({
+            message: "Lấy dữ liệu sự kiện thành công",
+            data: data
+        })
+    }
+    catch (e)
+    {
+        console.log("Error at EventController - GetAll: ", e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
+        })
+    }
+
 }
 module.exports.Create = async(req, res)=>{
     try {

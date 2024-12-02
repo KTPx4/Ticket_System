@@ -5,15 +5,14 @@ var root = process.env.IMG || 'localhost:3001/images'
 var AccountSchema = new mongoose.Schema({
     name: String,
     address: String,
-
     pass: { type: String, required: true },
-    phone: { type: String, unique: true, required: true },
-    email: { type: String, required: true},
+    // phone: { type: String, unique: true, required: true },
+    email: { type: String, unique: true, required: true},
     point: { type: Number, default: 0 },
     isDeleted: {type: Boolean, default: false},
     image: {
         type: String,
-        get: v=> `${root}/${v}`
+        // get: v=> `${root}/${v}`
     },
     follows:{
         event: [
@@ -73,4 +72,11 @@ var AccountSchema = new mongoose.Schema({
     ]
 
 })
+AccountSchema.pre('save', function (next) {
+    // Nếu giá trị của 'NameAvt' là null hoặc không được xác định, đặt giá trị mặc định là '_id.png'
+    if (!this.image || this.image === null) {
+        this.image = this._id + '.png';
+    }
+    next();
+});
 module.exports = mongoose.model('accounts', AccountSchema)

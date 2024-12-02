@@ -3,7 +3,7 @@ const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
 const bcrypt = require('bcrypt')
 const AccountModel = require('../../models/AccountModel')
 
-const AuthAccount = async (req, res, next) =>{
+module.exports.AuthAccount = async (req, res, next) =>{
     try{
         // Get token from header or body
         let tokenFromHeader =  req.header('Authorization')
@@ -36,7 +36,7 @@ const AuthAccount = async (req, res, next) =>{
                 })
             }
 
-            let userU = data.user?.toLowerCase()
+            let userU = data.email?.toLowerCase()
             var pass = data.pass
 
             let account
@@ -50,7 +50,7 @@ const AuthAccount = async (req, res, next) =>{
             }
 
             account = await AccountModel.findOne({
-                user: userU,
+                email: userU,
             })
 
             if(!account || account.isDeleted === true)
@@ -88,4 +88,50 @@ const AuthAccount = async (req, res, next) =>{
 
 
 
+}
+
+module.exports.Register = async(req, res, next)=>{
+    let {pass , email} = req.body
+    if(!pass || !email)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp đủ thông tin 'email' 'pass'"
+        })
+    }
+    var acc = await AccountModel.findOne({email: email})
+    if(acc)
+    {
+        return res.status(400).json({
+            message: "Email này đã đăng ký tài khoản"
+        })
+    }
+    return next()
+}
+
+module.exports.Login = async(req, res, next)=>{
+    let {email, pass} = req.body
+    if(!email || !pass)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp đủ thông tin 'email' 'pass'"
+        })
+    }
+    var acc = await AccountModel.findOne({email: email})
+    if(!acc)
+    {
+        return res.status(400).json({
+            message: "Tài khoản không tồn tại"
+        })
+    }
+
+    var passMatch = await bcrypt.compare(pass, acc.pass)
+    if(!passMatch)
+    {
+        return res.status(400).json({
+            message: "Mật khẩu không đúng"
+        })
+    }
+
+    req.vars.User = acc
+    return next()
 }
