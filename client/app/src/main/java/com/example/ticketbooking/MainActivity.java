@@ -27,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
         localStorageManager = new LocalStorageManager(this);
 
         // Lấy token từ Intent
-        String token = getIntent().getStringExtra("login-token");
+//        String token = getIntent().getStringExtra("login-token");
+
+        String token = localStorageManager.getLoginToken();
+
         TextView tokenView = findViewById(R.id.token_view);
         tokenView.setText("Token của bạn: " + token);
 
