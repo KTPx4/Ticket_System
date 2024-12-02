@@ -94,8 +94,49 @@ public class AccountService {
     }
 
     public void loginUser(String email, String password, OnRegisterCallback callback) {
+        new Thread(() -> {
+            try {
+                // Kiểm tra đầu vào
+                if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+                    callback.onFailure("Email hoặc mật khẩu không được để trống");
+                    return;
+                }
 
+                // Tạo RequestBody dạng form
+                RequestBody formBody = new FormBody.Builder()
+                        .add("email", email)
+                        .add("pass", password)
+                        .build();
+
+                // URL API
+                String url = SERVER + "/api/v1/account/login";
+
+                // Tạo Request
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(formBody)
+                        .build();
+
+                // Gửi Request và nhận Response
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body() != null ? response.body().string() : "";
+
+                // Xử lý kết quả
+                JSONObject jsonResponse = new JSONObject(responseBody);
+                if (response.isSuccessful()) {
+                    String token = jsonResponse.optString("data", ""); // Token từ server
+                    callback.onSuccess(token);
+                } else {
+                    String error = jsonResponse.optString("message", "Đăng nhập thất bại!");
+                    callback.onFailure(error);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Đã xảy ra lỗi: " + e.getMessage());
+            }
+        }).start();
     }
+
 
     public void loginStaff(String user, String password, OnRegisterCallback callback) {
 
@@ -104,14 +145,42 @@ public class AccountService {
     public void verifyStaff(String token, OnRegisterCallback callback) {
 
     }
-    public void verifyUser(String token, OnRegisterCallback callback) {
 
+    public void verifyUser(String token, OnVerifyCallback callback) {
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/account/verify";
+
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure("Token is not valid for user.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Verification failed: " + e.getMessage());
+            }
+        }).start();
     }
 
     // Interface callback để xử lý kết quả
     public interface OnRegisterCallback {
         void onSuccess(String message);
 
+        void onFailure(String error);
+    }
+
+    public interface OnVerifyCallback {
+        void onSuccess();
         void onFailure(String error);
     }
 }
