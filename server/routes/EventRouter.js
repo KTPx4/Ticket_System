@@ -13,6 +13,8 @@ _APP.post('/', StaffAuth.AuthStaff , EventValidator.Create, EventController.Crea
 // patch info other field
 _APP.patch('/:id' ,  StaffAuth.AuthStaff , EventValidator.IsExistEvent, EventValidator.Update, EventController.Update)
 
+_APP.post('/:id/follow'  ) // account follow + use auth account -> get id of account
+_APP.delete('/:id/follow' ) // account unfollow + use auth account -> get id of account
 //-----------------
 // update location ,date
 _APP.put('/:id/location', StaffAuth.AuthStaff ,  EventValidator.IsExistEvent)
