@@ -1,4 +1,8 @@
 const EventModel = require('../models/EventModel')
+const TicketTypeModel = require('../models/TicketTypeModel')
+const TicketModel = require('../models/TicketModel')
+const mongoose = require('mongoose')
+
 const Upload = require("./Upload");
 module.exports.GetAll = async(req, res)=>{
     try{
@@ -57,10 +61,10 @@ module.exports.Create = async(req, res)=>{
             priceRange,
             isTicketPosition: isPosition
         });
-        if(isPosition)
-        {
 
-        }
+        // create ticket for event
+        await createTicket(newEvent)
+
         return res.status(201).json({ message: "Sự kiện đã được tạo thành công", data: newEvent });
 
     }
@@ -69,7 +73,166 @@ module.exports.Create = async(req, res)=>{
         return res.status(500).json({ message: "Có lỗi xảy ra khi tạo sự kiện", error: error.message });
     }
 }
+const createTicket = async(newEvent)=>{
+    try {
+        const locations = ["A", "B", "C"]; // Danh sách các khu vực
+        const types = ["Vip 1", "Vip 2", "Normal"]; // Danh sách các loại vé
 
+        // Tạo mảng chứa tất cả các loại vé cần tạo
+        const ticketTypes = locations.flatMap(location =>
+            types.map(type => ({
+                event: newEvent._id,
+                typeTicket: type,
+                location: location,
+            }))
+        );
+
+        // Thêm toàn bộ ticket types vào database một lần
+        const insertedTicketTypes = await TicketTypeModel.insertMany(ticketTypes);
+        console.log("Đã tạo các loại vé thành công:", insertedTicketTypes);
+
+        // Tạo 20 ticket cho mỗi ticket type
+        for (const ticketType of insertedTicketTypes) {
+            const tickets = [];
+
+            for (let i = 1; i <= 20; i++) {
+                tickets.push({
+                    event: newEvent._id,
+                    position: i,
+                    desc: `Vé vị trí ${i} cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`,
+                    info: ticketType._id,
+                    isAvailable: true,
+                });
+            }
+            // Thêm tất cả ticket cho ticket type hiện tại
+            await TicketModel.insertMany(tickets);
+         //   console.log(`Đã tạo 20 vé cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`);
+        }
+    //    console.log("Đã tạo các loại vé thành công:", result);
+
+    } catch (error) {
+        console.error("Lỗi khi tạo loại vé:", error);
+    }
+}
+module.exports.getTicket = async(req, res)=>{
+    try {
+        var eventId = req.vars.Event._id
+        var {type, location} = req.query
+
+        // Xây dựng bộ lọc động
+        const matchFilter = { event: new mongoose.Types.ObjectId(eventId) };
+        if (type) {
+            matchFilter['ticketType.typeTicket'] = type; // Lọc theo type
+        }
+        if (location) {
+            matchFilter['ticketType.location'] = location; // Lọc theo location
+        }
+
+/*
+        var typeByLocation = await TicketTypeModel.aggregate([
+            {
+                $match: { event: eventId} // Lọc theo eventId
+            },
+            {
+                $group: {
+                    _id: "$location", // Gom nhóm theo location
+                    types: {
+                        $push: {
+                            typeTicket: "$typeTicket",
+                            price: "$price"
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0, // Loại bỏ _id mặc định của MongoDB
+                    location: "$_id", // Chuyển _id thành location
+                    types: 1 // Giữ nguyên danh sách types
+                }
+            }
+        ]);
+        */
+        const result = await TicketModel.aggregate([
+            {
+                $match: { event: new mongoose.Types.ObjectId(eventId) }
+            },
+            {
+                $lookup: {
+                    from: 'ticket_types',
+                    localField: 'info',
+                    foreignField: '_id',
+                    as: 'ticketType'
+                }
+            },
+            {
+                $unwind: '$ticketType'
+            },
+            // Áp dụng bộ lọc động sau khi join
+            {
+                $match: matchFilter
+            },
+            {
+                $group: {
+                    _id: {
+                        location: '$ticketType.location',
+                        typeTicket: '$ticketType.typeTicket'
+                    },
+                    tickets: {
+                        $push: {
+                            _id: '$_id',
+                            name: '$name',
+                            position: '$position',
+                            desc: '$desc',
+                            isAvailable: '$isAvailable',
+                            accBuy: '$accBuy',
+                            expiresAt: '$expiresAt'
+                        }
+                    },
+                    price: { $first: '$ticketType.price' } // Lấy giá trị price từ ticketType
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id.location',
+                    types: {
+                        $push: {
+                            type: '$_id.typeTicket',
+                            tickets: '$tickets',
+                            price: '$price' // Bao gồm giá trị price trong kết quả
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    location: '$_id',
+                    types: 1
+                }
+            }
+        ]);
+
+
+        return res.status(200).json({
+            data: result
+        });
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách ticket:", error);
+        throw error;
+    }
+}
+
+module.exports.UpdateTicketPrice = async (req, res)=>{
+    var {location, type} =req.query
+    var {price} = req.body
+    var {id} = req.params
+    var typeTicket = await  TicketTypeModel.findOneAndUpdate({event: id, typeTicket: type, location: location }, {price: price} ,{new: true})
+    return res.status(200).json({
+        message: "Yêu cầu sửa giá được duyệt",
+        data: typeTicket
+    })
+}
 module.exports.Update = async(req, res)=>{
     var {updateData}= req.vars // get update from validator
     var {id} = req.params

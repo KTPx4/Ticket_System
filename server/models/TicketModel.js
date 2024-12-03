@@ -10,11 +10,12 @@ const TicketSchema = new mongoose.Schema({
         ref:"events"
     },
     name:{type: String},
-    typeTicket:{type: String, default:"Vip 1"}, // Vip 1, Vip 2, Normal
-    location: {type: String, default: "A"}, // A, B, C
     position: Number, // 1 -> 60
     desc: String,
-    price: {type: Number, default: 0},
+    info: {
+      type: Schema.Types.ObjectId,
+      ref: 'ticket_types'
+    },
     isAvailable: {type: Boolean, default: true},
     accBuy: {
         type: Schema.Types.ObjectId,
