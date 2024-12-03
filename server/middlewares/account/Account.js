@@ -107,6 +107,32 @@ module.exports.Register = async(req, res, next)=>{
     }
     return next()
 }
+module.exports.Update = async(req, res, next)=>{
+    let {name ,address} = req.body
+    var UpdateVar = {}
+    if(name) UpdateVar.name = name
+    if(address) UpdateVar.address = address
+    req.vars.updateData = UpdateVar
+}
+module.exports.Password = async(req, res, next)=>{
+    var {oldPass, newPass} = req.body
+    var {User} = req.vars
+    if(!oldPass || !newPass)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp đủ thông tin 'oldPass' 'newPass'"
+        })
+    }
+    var passMatch = await bcrypt.compare(oldPass, User.pass)
+    if(!passMatch)
+    {
+        return res.status(400).json({
+            message: "Mật khẩu cũ không đúng"
+        })
+    }
+
+    return next()
+}
 
 module.exports.Login = async(req, res, next)=>{
     let {email, pass} = req.body

@@ -12,7 +12,10 @@ const AccountController = require('../controllers/AccountController')
 
 _APP.get('/', AccountValidator.AuthAccount, AccountController.GetMyAccount)
 _APP.post('/', AccountValidator.Register, AccountController.Register)
+_APP.patch('/', AccountValidator.AuthAccount, AccountValidator.Update, AccountController.Update)
+_APP.put('/password', AccountValidator.AuthAccount, AccountValidator.Password, AccountController.ChangePass)
 _APP.post('/login',  AccountValidator.Login, AccountController.Login)
+
 _APP.get('/verify', AccountValidator.AuthAccount, (req, res)=>{
     return res.status(200).json({
         message: "Token hợp lệ"

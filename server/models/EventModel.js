@@ -34,6 +34,10 @@ const EventSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'accounts'
     }],
+    image: {
+        type: String,
+        // get: v=> `${root}/${v}`
+    },
     file: [
         {
             typeFile: {type: String, default: "image"},
@@ -69,4 +73,11 @@ const EventSchema = new mongoose.Schema({
     toJSON: { getters: true }, // Bật chế độ dùng getter khi convert sang JSON
     toObject: { getters: true } // Bật chế độ dùng getter khi convert sang Object
 })
+EventSchema.pre('save', function (next) {
+    // Nếu giá trị của 'NameAvt' là null hoặc không được xác định, đặt giá trị mặc định là '_id.png'
+    if (!this.image || this.image === null) {
+        this.image = this._id + '.png';
+    }
+    next();
+});
 module.exports = mongoose.model('events', EventSchema)

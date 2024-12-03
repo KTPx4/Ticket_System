@@ -87,7 +87,52 @@ module.exports.Register = async(req, res)=>{
         })
     }
 }
+module.exports.ChangePass = async(req,res)=>{
+    var {oldPass, newPass} = req.body
+    var {User} = req.vars
+    try{
+        bcrypt.hash(newPass, 10)
+            .then(async(hashed) =>{
 
+                const Account = await AccountModel.findOneAndUpdate({_id: User._id}, {pass: hashed}, {new: true})
+
+                account = Account
+
+                var data = {
+                    name: account.name,
+                    email: account.email,
+                    image: account.image,
+                    pass: account.pass
+                }
+
+                await jwt.sign(data, SECRET_LOGIN, {expiresIn: "7d"}, (err, tokenLogin)=>{
+                    if(err) throw err
+                    return res.status(200).json({
+                        status: "Login success",
+                        message: "Đổi mật khẩu thành công",
+                        data: tokenLogin
+                    })
+                })
+
+                // return res.status(201).json({
+                //     message: 'Register Success',
+                //     data: {
+                //         account: account
+                //     }
+                // })
+            })
+
+
+    }
+    catch(err)
+    {
+        console.log("Error At AccountController - Register: ", err);
+        return res.status(500).json({
+            message: 'Error At Server',
+            data: {}
+        })
+    }
+}
 module.exports.Login = async (req, res)=>{
 
     let {root, User} = req.vars
@@ -205,6 +250,27 @@ module.exports.UnFollowEvent = async(req, res)=>{
     }
 
 
+}
+
+module.exports.Update = async(req, res)=>{
+    var {updateData, User}= req.vars // get update from validator
+    var id = User._id
+
+    // Cập nhật tài liệu
+    // Nếu không có trường hợp lệ nào để cập nhật
+    if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'Không có giá trị để sửa' });
+    }
+    const updatedEvent = await AccountModel.findByIdAndUpdate(
+        id,
+        { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
+        { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
+    );
+
+    res.status(200).json({
+        message: "Chỉnh sửa sự kiện thành công",
+        data: updatedEvent
+    });
 }
 
 const createFolder = (root, idUser, nameAvt)=>
