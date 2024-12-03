@@ -11,6 +11,10 @@ const EventSchema = new mongoose.Schema({
     },  
     type: [{type: String}],
     tag: [{type: String}],
+    isTicketPosition:{
+        type: Boolean,
+        default: false
+    },
     priceRange: {
         min: {type: Number, default: 0},
         max: {type: Number, default: 0}

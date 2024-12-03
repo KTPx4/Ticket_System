@@ -15,9 +15,13 @@ const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
 const EventRouter = require('./routes/EventRouter')
 const AccountRouter = require('./routes/AccountRouter')
+const StaffAuth = require("./middlewares/staffs/Staff");
 const NewsRouter = require('./routes/NewsRouter')
 const fs = require("fs");
-const StaffAuth = require("./middlewares/staffs/Staff");
+
+// Import cron job
+const ticketCronJob = require('./modules/CheckingTicket'); // Import cron job
+
 // variable
 const _APP = express()
 const _PORT = process.env.PORT || 3003
@@ -47,6 +51,7 @@ _APP.use("/*",(req, res)=>{
         message: "Endpoint không hợp lệ"
     })
 })
+
 const createFolder = async()=>{
     var root = path.join(__dirname, "public")
 
@@ -79,6 +84,10 @@ const StartProgram = async()=>{
             _APP.listen(_PORT, () => {
                 console.log("App listen at: http://localhost:" + _PORT);
             })
+
+            // Khởi chạy cron job
+            ticketCronJob();
+
         })
         .catch((err)=>{
             console.log("Connect DB failed: ", err)

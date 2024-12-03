@@ -10,10 +10,12 @@ module.exports.GetNewsByEvent = async(req, res)=>{
        if(event && mongoose.Types.ObjectId.isValid(event))
        {
            data = await NewsModel.find({event: event})
+               .sort({ createdAt: -1 }) // Sắp xếp theo `createdAt` giảm dần (mới nhất trước)
                .populate('event')
        }
        else{
            data = await NewsModel.find()
+               .sort({ createdAt: -1 }) // Sắp xếp theo `createdAt` giảm dần (mới nhất trước)
                .populate('event')
        }
 
