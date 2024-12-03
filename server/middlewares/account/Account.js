@@ -108,11 +108,54 @@ module.exports.Register = async(req, res, next)=>{
     return next()
 }
 module.exports.Update = async(req, res, next)=>{
-    let {name ,address} = req.body
+    let {name ,address, email} = req.body
     var UpdateVar = {}
     if(name) UpdateVar.name = name
     if(address) UpdateVar.address = address
+    if(email)
+    {
+        var acc = await AccountModel.findOne({email: email})
+        if(acc)
+        {
+            return res.status(400).json({
+                message: "Email đã đăng ký tài khoản"
+            })
+        }
+        UpdateVar.email = email
+
+    }
+
     req.vars.updateData = UpdateVar
+    return next()
+}
+module.exports.SendReset = async(req, res, next)=>{
+    var {email} = req.body
+    if(!email)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp đủ thông tin 'email'"
+        })
+    }
+    var acc = await AccountModel.findOne({email: email})
+    if(!acc)
+    {
+        return res.status(400).json({
+            message: "Account không tồn tại"
+        })
+    }
+    req.vars.User = acc
+    return next()
+}
+module.exports.GetReset = async(req, res, next)=>{
+    var {token} = req.query
+    if(!token)
+    {
+        return res.status(400).json({
+            message: "Token không hợp lệ"
+        })
+    }
+
+    return next()
 }
 module.exports.Password = async(req, res, next)=>{
     var {oldPass, newPass} = req.body
