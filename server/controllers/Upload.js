@@ -14,6 +14,7 @@ module.exports.uploadSingle = async (file, currentPath, id) => {
             await fs.rename(file.path, newFilePath);
 
             return `${id}.${extension}`;
+
         }
         return undefined;
     } catch (error) {

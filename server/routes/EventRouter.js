@@ -53,6 +53,15 @@ module.exports = (root) =>{
             EventController.PutTrailer
         ) // upload trailer
 
+    // image of event
+    _APP.put('/:id/image',
+            uploader.single('image'),
+            StaffAuth.AuthStaff ,
+            EventValidator.IsExistEvent,
+            ImageValidator.Single,
+            EventController.PutImage
+        ) // upload trailer
+
     // _APP.put('/:id/image',
     //     StaffAuth.AuthRole(['admin', 'manager']),
     //     uploader.single('image'),

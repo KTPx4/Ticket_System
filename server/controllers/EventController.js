@@ -4,9 +4,18 @@ const TicketModel = require('../models/TicketModel')
 const mongoose = require('mongoose')
 
 const Upload = require("./Upload");
+const fs = require("fs");
 module.exports.GetAll = async(req, res)=>{
     try{
-        var data = await EventModel.find()
+        // Lấy type từ query
+        const { type } = req.query;
+        // Khởi tạo điều kiện tìm kiếm
+        const query = {};
+        if (type) {
+            query.type = { $regex: new RegExp(type, 'i') }; // Không phân biệt hoa thường
+        }
+
+        var data = await EventModel.find(query)
             .populate('followers')
             .populate('artists')
             .populate({
@@ -47,6 +56,7 @@ module.exports.GetByID= async (req, res)=>{
 module.exports.Create = async(req, res)=>{
     try {
         const { name, location, desc, type, date, priceRange, isTicketPosition } = req.body;
+        var {root} = req.vars
         var isPosition = false
         if(isTicketPosition && isTicketPosition === true)
         {
@@ -64,6 +74,7 @@ module.exports.Create = async(req, res)=>{
 
         // create ticket for event
         await createTicket(newEvent)
+        await createFolder(root, newEvent._id, newEvent.image)
 
         return res.status(201).json({ message: "Sự kiện đã được tạo thành công", data: newEvent });
 
@@ -89,7 +100,7 @@ const createTicket = async(newEvent)=>{
 
         // Thêm toàn bộ ticket types vào database một lần
         const insertedTicketTypes = await TicketTypeModel.insertMany(ticketTypes);
-        console.log("Đã tạo các loại vé thành công:", insertedTicketTypes);
+        // console.log("Đã tạo các loại vé thành công:", insertedTicketTypes);
 
         // Tạo 20 ticket cho mỗi ticket type
         for (const ticketType of insertedTicketTypes) {
@@ -114,6 +125,7 @@ const createTicket = async(newEvent)=>{
         console.error("Lỗi khi tạo loại vé:", error);
     }
 }
+
 module.exports.getTicket = async(req, res)=>{
     try {
         var eventId = req.vars.Event._id
@@ -289,6 +301,40 @@ module.exports.PutTrailer = async(req, res)=>{
     }
 }
 
+module.exports.PutImage = async(req, res)=>{
+    try{
+        let {id} = req.params
+        let {root}  = req.vars
+        let {file} = req
+        var path = `${root}/public/event/${id}`
+
+        var nameImg = await Upload.uploadSingle(file, path, id)
+        if(nameImg)
+        {
+            var art = await EventModel.findOneAndUpdate({_id: id}, {image: nameImg}, {new: true})
+            return res.status(200).json({
+                message: "Cập nhật trailer thành công",
+                data: art
+            })
+        }
+        else{
+            return res.status(400).json({
+                message: "Cập nhật trailer thất bại",
+                data: null
+            })
+        }
+    }
+    catch (e)
+    {
+        console.log("Error at Event Controller - UpdateImage: ", e)
+        return res.status(500).json({
+            status: "Update trailer event failed",
+            message: "Sửa trailer thất bại. Thử lại sau",
+            data: null
+        })
+    }
+}
+
 module.exports.DeleteByID= async(req, res)=>{
     var {Event} = req.vars
     try{
@@ -323,4 +369,36 @@ module.exports.getNews = async(req, res)=>{
             message: "Lấy thông tin thất bại, thử lại sau"
         })
     }
+}
+const createFolder = (root, id, nameAvt)=>
+{
+
+    const ROOT_AVT = root + "/public/event"
+
+    let defaultAvt = `${ROOT_AVT}/default.png`
+
+    let folderAccount = ROOT_AVT + "/" + id
+
+    let UserAvt = `${ROOT_AVT}/${id}/${nameAvt}`
+
+    try
+    {
+        if (!fs.existsSync(folderAccount))
+        {
+            fs.mkdirSync(folderAccount);
+        }
+
+        if(!fs.existsSync(UserAvt) && fs.existsSync(defaultAvt))
+        {
+            // console.log("ok, ", UserAvt);
+            fs.copyFileSync(defaultAvt, UserAvt)
+        }
+    }
+    catch(err)
+    {
+        console.log("Error at EventController - Create Folder Img  ", err);
+        return false;
+    }
+    return true;
+    // Kiểm tra xem tệp tin nguồn tồn tại hay không
 }
