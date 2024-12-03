@@ -36,6 +36,10 @@ _APP.delete('/:id/after',  StaffAuth.AuthStaff , EventValidator.IsExistEvent) //
 // Get news
 _APP.get('/:id/news', EventValidator.IsExistEvent, EventController.getNews ) // get all news of this event
 
+// ticket
+_APP.get('/:id/ticket', EventValidator.IsExistEvent, EventController.getTicket ) // get all news of this event
+_APP.put('/:id/ticket', StaffAuth.AuthStaff, EventValidator.IsExistEvent, EventValidator.UpdateTicketPrice, EventController.UpdateTicketPrice) // get all news of this event
+
 module.exports = (root) =>{
 
     const uploader = multer({dest: root +'/uploads/'})

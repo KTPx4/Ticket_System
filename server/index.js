@@ -9,7 +9,8 @@ require('./models/EventModel')
 require('./models/AccountModel')
 require('./models/ArtistModel')
 require('./models/StaffModel')
-
+require('./models/TicketTypeModel')
+require('./models/TicketModel')
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')

@@ -184,6 +184,26 @@ const parseDateTime = (input) => {
     return new Date(year, month - 1, day, hour, minute);
 };
 
+const UpdateTicketPrice = async(req, res, next)=>{
+
+    var {location, type} =req.query
+    var {price} = req.body
+    if(!location && !type)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp query 'location' 'type'"
+        })
+    }
+    if(!price || typeof price !== 'number' || price <= 0)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp body 'price' và price phải là số > 0 "
+        })
+    }
+    return next()
+}
 module.exports.Create = validateEvent;
 module.exports.IsExistEvent = isExistId;
 module.exports.Update = updateEvent;
+module.exports.UpdateTicketPrice = UpdateTicketPrice;
+
