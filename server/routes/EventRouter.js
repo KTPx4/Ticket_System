@@ -19,7 +19,9 @@ _APP.patch('/:id' ,  StaffAuth.AuthStaff , EventValidator.IsExistEvent, EventVal
 
 _APP.post('/:id/follow', EventValidator.IsExistEvent, AccountAuth.AuthAccount, AccountController.FollowEvent ) // account follow + use auth account -> get id of account
 _APP.delete('/:id/follow' , EventValidator.IsExistEvent, AccountAuth.AuthAccount, AccountController.UnFollowEvent ) // account unfollow + use auth account -> get id of account
+
 //-----------------
+
 
 // update location ,date
 _APP.put('/:id/location', StaffAuth.AuthStaff ,  EventValidator.IsExistEvent)

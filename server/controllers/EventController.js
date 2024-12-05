@@ -1,6 +1,7 @@
 const EventModel = require('../models/EventModel')
 const TicketTypeModel = require('../models/TicketTypeModel')
 const TicketModel = require('../models/TicketModel')
+const NewsModel = require('../models/NewsModel')
 const mongoose = require('mongoose')
 
 const Upload = require("./Upload");
@@ -339,6 +340,11 @@ module.exports.DeleteByID= async(req, res)=>{
     var {Event} = req.vars
     try{
         var id = Event._id
+        // Delete news, ticket type, ticket
+        await TicketModel.deleteMany({event: id})
+        await TicketTypeModel.deleteMany({event: id})
+        await NewsModel.deleteMany({event: id})
+
         // Xóa sự kiện
         await EventModel.findByIdAndDelete(id);
 
