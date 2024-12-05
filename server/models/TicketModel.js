@@ -7,7 +7,7 @@ const moment = require('moment');
 const TicketSchema = new mongoose.Schema({
     event:{
         type: Schema.Types.ObjectId,
-        ref:"events"
+        ref: "events"
     },
     name:{type: String},
     position: Number, // 1 -> 60

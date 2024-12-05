@@ -11,11 +11,17 @@ require('./models/ArtistModel')
 require('./models/StaffModel')
 require('./models/TicketTypeModel')
 require('./models/TicketModel')
+require('./models/CouponModel')
+require('./models/DiscountModel')
+require('./models/PaymentModel')
+require('./models/TicketInfoModel')
+require('./models/BuyTicket')
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
 const EventRouter = require('./routes/EventRouter')
 const AccountRouter = require('./routes/AccountRouter')
+const OrderRouter = require('./routes/OrderRouter')
 const StaffAuth = require("./middlewares/staffs/Staff");
 const NewsRouter = require('./routes/NewsRouter')
 const fs = require("fs");
@@ -45,7 +51,7 @@ _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 _APP.use('/api/v1/event', EventRouter(__dirname))
 _APP.use('/api/v1/news', NewsRouter)
 _APP.use('/api/v1/account', AccountRouter(__dirname))
-
+_APP.use('/api/v1/order', OrderRouter)
 _APP.use("/*",(req, res)=>{
     return res.status(404).json({
         status: "notfound",
