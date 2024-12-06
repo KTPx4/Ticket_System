@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Ticket Booking</string>
     <string name="server_url">https://ticket-system-l5j0.onrender.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--    <string name="server_url">http://10.0.2.2:3001</string>-->
 </resources>
