@@ -27,8 +27,8 @@ public class CheckOutActivity extends AppCompatActivity {
     private String amount = "10000";
     private String fee = "0";
     int environment = 0;//developer default
-    private String merchantName = "Thanh toán đặt vé";
-    private String merchantCode = "SCB01";
+    private String merchantName = "Tên doanh nghiệp SDK4ME";
+    private String merchantCode = "MOMONPMB20210629";
     private String merchantNameLabel = "Nhà cung cấp";
     private String description = "Thanh toán đặt vé";
 
@@ -59,12 +59,14 @@ public class CheckOutActivity extends AppCompatActivity {
 //            amount = edAmount.getText().toString().trim();
 
         Map<String, Object> eventValue = new HashMap<>();
+        String ipnUrl = this.getString(R.string.server_url) + "/api/v1/order/orderId123456789/valid";
         //client Required
         eventValue.put("merchantname", merchantName); //Tên đối tác. được đăng ký tại https://business.momo.vn. VD: Google, Apple, Tiki , CGV Cinemas
         eventValue.put("merchantcode", merchantCode); //Mã đối tác, được cung cấp bởi MoMo tại https://business.momo.vn
         eventValue.put("amount", amount); //Kiểu integer
         eventValue.put("orderId", "orderId123456789"); //uniqueue id cho Bill order, giá trị duy nhất cho mỗi đơn hàng
         eventValue.put("orderLabel", "Mã đơn hàng"); //gán nhãn
+        eventValue.put("ipnUrl", ipnUrl); //gán nhãn
 
         //client Optional - bill info
         eventValue.put("merchantnamelabel", "Dịch vụ");//gán nhãn

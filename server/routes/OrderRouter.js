@@ -22,7 +22,14 @@ _APP.put('/:id' , AuthAcc.AuthAccount, EventValidator.IsExistEvent, Validator.Up
 // -> post /valid check code of payment with api
 // -> get money, code from api payment gateway to check with payment detail
 _APP.post('/:id/checkout', AuthAcc.AuthAccount, )
-_APP.post('/:id/valid', AuthAcc.AuthAccount, )
+
+_APP.post('/:id/valid', (req, res) =>{
+    console.log("id: ", req.params.id)
+    console.log("Respone from momo: \n", req.body)
+    return res.status(200).json({
+        message:"ok"
+    })
+} )
 
 
 module.exports = _APP
