@@ -120,16 +120,17 @@ module.exports.Create = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("OrderController - Create: ",error);
+        console.error("OrderController - Create: ", error);
         return res.status(500).json({
             message: "Đã xảy ra lỗi khi tạo đơn.",
             error: error.message,
         });
-};
+    }
+}
 
-module.exports.Update = async(req, res)=>{
-    try{
-        const { Event, User, Update } = req.vars;
+module.exports.Update = async(req, res)=> {
+    try {
+        const {Event, User, Update} = req.vars;
 
         const userId = User._id;
         const eventId = Event._id;
@@ -139,20 +140,20 @@ module.exports.Update = async(req, res)=>{
                 accCreate: userId,
                 event: eventId
             },
-            { $set: Update }, // Cập nhật chỉ các trường hợp lệ
-            { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
+            {$set: Update}, // Cập nhật chỉ các trường hợp lệ
+            {new: true, runValidators: true} // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
         );
         return res.status(200).json({
             message: "Chỉnh sửa thành công",
             data: updatedEvent,
         });
 
-    }catch (error) {
-        console.error("OrderController - Update: ",error);
+    } catch (error) {
+        console.error("OrderController - Update: ", error);
         return res.status(500).json({
             message: "Đã xảy ra lỗi khi tạo đơn.",
             error: error.message,
         });
     }
-    }
+
 }

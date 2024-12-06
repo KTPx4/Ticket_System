@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Ticket Booking</string>
     <string name="server_url">https://ticket-system-l5j0.onrender.com</string>
-<!--    <string name="server_url">http://10.0.2.2:3001</string>-->
+    <!--    <string name="server_url">http://10.0.2.2:3001</string>-->
 </resources>
