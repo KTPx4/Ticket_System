@@ -5,7 +5,6 @@
     <color name="red">#AD2629</color>
     <color name="gray">#888888</color>
     <color name="Deep_Plum">#4C1D3D</color>
-    <color name="Wine_Red">#852E4E</color>
     <color name="Berry_Crush">#A33757</color>
     <color name="Peach_Glow">#FFBB94</color>
     <color name="Blush_Pink">#FB9590</color>
@@ -13,7 +12,6 @@
     <color name="green">#7ED957</color>
     <color name="blue">#459CED</color>
 
-    <color name="gray_background">#808080</color>
 
     <color name="grey">#EEB8B8B8</color>
     <color name="gray_background">#EBEBEB</color>
