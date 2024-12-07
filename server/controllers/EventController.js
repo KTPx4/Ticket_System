@@ -9,11 +9,16 @@ const fs = require("fs");
 module.exports.GetAll = async(req, res)=>{
     try{
         // Lấy type từ query
-        const { type } = req.query;
+        const { type , name } = req.query;
         // Khởi tạo điều kiện tìm kiếm
         const query = {};
         if (type) {
             query.type = { $regex: new RegExp(type, 'i') }; // Không phân biệt hoa thường
+        }
+
+        // Thêm điều kiện tìm kiếm theo name nếu có
+        if (name) {
+            query.name = { $regex: new RegExp(name, 'i') }; // Không phân biệt hoa thường
         }
 
         var data = await EventModel.find(query)
@@ -26,6 +31,7 @@ module.exports.GetAll = async(req, res)=>{
             .populate('accJoins')
         return res.status(200).json({
             message: "Lấy dữ liệu sự kiện thành công",
+            length: data.length,
             data: data
         })
     }
