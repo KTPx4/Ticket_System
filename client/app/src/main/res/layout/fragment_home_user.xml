@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/gray">
+    android:background="@color/gray_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
             android:text="Sự kiện đặc biệt"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:padding="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Âm nhạc"
             android:textSize="18sp"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:padding="16dp"/>
 
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nghệ thuật"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:padding="16dp"/>
@@ -74,7 +74,7 @@
             android:text="Hài kịch"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:padding="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
