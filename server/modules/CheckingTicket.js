@@ -4,7 +4,7 @@ const Ticket = require('../models/TicketModel')
 // Định nghĩa cron job
 const ticketCronJob = () => {
     cron.schedule('* * * * *', async () => { // Chạy mỗi phút
-        console.log("Running ticket cron job...");
+        // console.log("Running ticket cron job...");
         const now = new Date();
         try {
             const tickets = await Ticket.find({

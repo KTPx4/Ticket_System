@@ -1,13 +1,14 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
-
+const sendEmail = require('../modules/Mailer')
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 const UploadIMG = require("./Upload");
 const StaffModel = require("../models/StaffModel");
 const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
-
+const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret_reset"; // Khóa bí mật cho JWT
+const SERVER = process.env.SERVER
 module.exports.GetMyAccount= async (req, res)=>{
     try{
         var {User} = req.vars
@@ -133,6 +134,7 @@ module.exports.ChangePass = async(req,res)=>{
         })
     }
 }
+
 module.exports.Login = async (req, res)=>{
 
     let {root, User} = req.vars
@@ -155,6 +157,82 @@ module.exports.Login = async (req, res)=>{
     })
 }
 
+module.exports.SendReset = async(req, res)=>{
+
+    try{
+        var Account = req.vars.User
+        var email = Account.email
+        // Tạo mật khẩu tạm thời
+        const tempPassword = Math.random().toString(36).slice(-8); // Random password (8 ký tự)
+        // Tạo JWT
+        const token = jwt.sign(
+            { email, tempPassword },
+            JWT_SECRET,
+            { expiresIn: "5m" } // Token hết hạn sau 15 phút
+        );
+        // Tạo URL khôi phục
+        const resetURL = `${SERVER}/api/v1/account/reset?token=${token}`;
+
+        // Gửi email khôi phục
+        const emailSubject = "Khôi phục mật khẩu";
+        const emailBody = `
+            <p>Chào bạn,</p>
+            <p>Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn.</p>
+            <p>Mật khẩu tạm thời của bạn: <strong>${tempPassword}</strong></p>
+            <p>Nhấn vào đường dẫn dưới đây để xác nhận và thiết lập mật khẩu mới:</p>
+            <a href="${resetURL}" target="_blank" style="color: blue; text-decoration: underline;">Tại đây</a>
+            <p>Liên kết này sẽ hết hạn sau 5 phút.</p>
+        `;
+
+        await sendEmail(email, emailSubject, emailBody);
+
+        res.status(200).json({
+            message: "Email khôi phục mật khẩu đã được gửi.",
+        });
+    }
+    catch (error) {
+        console.error("Error in SendReset:", error);
+        res.status(500).json({
+            message: "Có lỗi xảy ra. Vui lòng thử lại sau.",
+        });
+    }
+}
+module.exports.GetReset = async(req, res)=>{
+    var {token} = req.query
+    try {
+        // Giải mã JWT
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const { email, tempPassword } = decoded;
+
+        // Tìm tài khoản theo email
+        const account = await AccountModel.findOne({ email });
+        if (!account) {
+            return res.status(404).json({ message: "Tài khoản không tồn tại." });
+        }
+
+        bcrypt.hash(tempPassword, 10)
+            .then(async(hashed) =>{
+                account.pass = hashed
+                await account.save();
+            })
+
+        res.status(200).json({
+            message: "Mật khẩu đã được cập nhật thành công.",
+        });
+
+    } catch (error) {
+        console.error("Error in ResetPassword:", error);
+
+        if (error.name === "TokenExpiredError") {
+            return res.status(400).json({ message: "Liên kết khôi phục đã hết hạn." });
+        }
+
+        res.status(500).json({
+            message: "Có lỗi xảy ra. Vui lòng thử lại sau.",
+        });
+    }
+}
 module.exports.UpdateImage = async(req, res) =>{
     try
     {
