@@ -297,9 +297,10 @@ module.exports.FollowEvent = async(req, res)=>{
 
 }
 
-module.exports.GetMyTicket = async (req, res)=>{
-    try{
-        var {User} = req.vars
+module.exports.GetMyTicket = async (req, res) => {
+    try {
+        var { User } = req.vars;
+
         const tickets = await TicketModel.aggregate([
             {
                 $match: { accBuy: User._id } // Lọc các ticket theo `accBuy`
@@ -316,17 +317,31 @@ module.exports.GetMyTicket = async (req, res)=>{
                 $unwind: '$eventDetails' // Giải nén mảng `eventDetails` thành object
             },
             {
+                $lookup: { // Thêm lookup để lấy thông tin từ `ticket_types`
+                    from: 'ticket_types',  // Tên collection chứa thông tin ticket loại vé
+                    localField: 'info',  // Trường info chứa ID của loại vé
+                    foreignField: '_id',
+                    as: 'ticketInfo'  // Kết quả sẽ lưu vào trường `ticketInfo`
+                }
+            },
+            {
+                $unwind: { // Giải nén mảng `ticketInfo` thành object
+                    path: '$ticketInfo',
+                    preserveNullAndEmptyArrays: true // Đảm bảo ticketInfo vẫn là null nếu không có dữ liệu
+                }
+            },
+            {
                 $group: { // Group theo sự kiện
-                    _id: '$event',
-                    eventDetails: { $first: '$eventDetails' },
+                    _id: '$event', // Group theo event ID
+                    eventDetails: { $first: '$eventDetails' }, // Lấy thông tin sự kiện đầu tiên
                     tickets: { $push: '$$ROOT' } // Đưa tất cả các ticket vào mảng
                 }
             },
             {
                 $project: { // Định dạng lại kết quả
                     _id: 0, // Không hiển thị `_id` trong kết quả
-                    event: '$eventDetails',
-                    tickets: 1
+                    event: '$eventDetails',  // Thông tin sự kiện
+                    tickets: 1 // Các vé trong sự kiện
                 }
             }
         ]);
@@ -335,13 +350,13 @@ module.exports.GetMyTicket = async (req, res)=>{
             message: "Lấy thành công",
             length: tickets.length ?? 0,
             data: tickets
-        })
+        });
+    } catch (e) {
+        console.log("AccountController - GetMyTicket:", e);
+        res.status(500).json({ message: "Server error" });
     }
-    catch (e) {
-        console.log("AccountController - GetMyTicket:", e)
-        res.status(500).json({ message: "Server error"});
-    }
-}
+};
+
 
 module.exports.UnFollowEvent = async(req, res)=>{
     try {
