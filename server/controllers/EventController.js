@@ -3,6 +3,7 @@ const TicketTypeModel = require('../models/TicketTypeModel')
 const TicketModel = require('../models/TicketModel')
 const NewsModel = require('../models/NewsModel')
 const mongoose = require('mongoose')
+const moment = require('moment');
 
 const Upload = require("./Upload");
 const fs = require("fs");
@@ -13,17 +14,41 @@ const JWT_SCAN_SECRECT = process.env.KEY_SECRET_SCAN_TICKET ?? ""
 module.exports.GetAll = async(req, res)=>{
     try{
         // Lấy type từ query
-        const { type , name } = req.query;
+        const { type , name, date, location } = req.query;
         // Khởi tạo điều kiện tìm kiếm
         const query = {};
         if (type) {
             query.type = { $regex: new RegExp(type, 'i') }; // Không phân biệt hoa thường
+        }
+        if (location) {
+            query.location = { $regex: new RegExp(location, 'i') }; // Không phân biệt hoa thường
         }
 
         // Thêm điều kiện tìm kiếm theo name nếu có
         if (name) {
             query.name = { $regex: new RegExp(name, 'i') }; // Không phân biệt hoa thường
         }
+
+        // Tìm kiếm theo date nếu có
+        if (date) {
+            const parsedDate = moment(date, 'DD/MM/YYYY'); // Chuyển đổi date sang Moment
+            if (parsedDate.isValid()) {
+                // Lấy ngày bắt đầu và kết thúc
+                const startOfDay = parsedDate.startOf('day').toDate();
+                const endOfDay = parsedDate.endOf('day').toDate();
+
+                // Thêm điều kiện tìm kiếm ngày
+                query['date.start'] = {
+                    $gte: startOfDay, // Lớn hơn hoặc bằng ngày bắt đầu
+                    $lte: endOfDay   // Nhỏ hơn hoặc bằng ngày kết thúc
+                };
+            } else {
+                return res.status(400).json({
+                    message: 'Ngày không hợp lệ. Định dạng đúng là DD/MM/YYYY.'
+                });
+            }
+        }
+
 
         var data = await EventModel.find(query)
             .populate('followers')
@@ -387,31 +412,82 @@ module.exports.getNews = async(req, res)=>{
     }
 }
 module.exports.ScanTicket = async(req, res)=>{
-    var {token} = req.body
-    if(!JWT_SCAN_SECRECT)
-    {
-        return res.status(400).json({
-            message: "Thiếu biến môi trường JWT_SCAN_SECRECT"
-        })
-    }
-    await jwt.verify(token, JWT_SCAN_SECRECT, async(err, data)=>{
-        if(err)
+    try{
+        var {token} = req.body
+        var idEvent = req.params.id
+        var {Event}= req.vars
+
+        if(!JWT_SCAN_SECRECT)
         {
             return res.status(400).json({
-                status: 'Invalid Token',
-                message: 'Token lỗi hoặc hết hạn'
+                message: "Thiếu biến môi trường JWT_SCAN_SECRECT"
             })
         }
-        console.log(data)
-        var {idUser, idTicket} = data
+        await jwt.verify(token, JWT_SCAN_SECRECT, async(err, data)=>{
+            if(err)
+            {
+                return res.status(400).json({
+                    status: 'Invalid Token',
+                    message: 'Token lỗi hoặc hết hạn'
+                })
+            }
+            // console.log(data)
+            var {idUser, idTicket} = data
 
+            if(!idUser || !idTicket)
+            {
+                return res.status(400).json({
+                    status: 'Invalid Token',
+                    message: 'Token không đúng định dạng'
+                })
+            }
 
+            var Ticket = await TicketModel.findOne({
+                _id: idTicket,
+                accBuy: idUser,
+                isValid: true
+            })
+            var Account = await AccountModel.findOne({
+                _id: idUser
+            })
 
-        return res.status(200).json({
-            message: "Quét thành công"
+            if(!Ticket || !Account || Ticket.event.toString() !== Event._id.toString())
+            {
+                // console.log(Ticket, Account,  Event._id ,Ticket.event !== Event._id)
+                return res.status(400).json({
+                    status: 'Invalid Ticket',
+                    message: 'Vé không hợp lệ'
+                })
+            }
+
+            // Kiểm tra nếu idUser đã tồn tại trong accJoins
+            // if (Event.accJoins.includes(idUser)) {
+            //     return res.status(400).json({
+            //         status: 'User Already Joined',
+            //         message: 'Người dùng đã tham gia sự kiện'
+            //     });
+            // }
+
+            Ticket.isValid = false
+            await Ticket.save()
+
+            // Thêm idUser vào accJoins nếu chưa tồn tại
+            await EventModel.updateOne(
+                { _id: idEvent },
+                { $addToSet: { accJoins: idUser } }
+            );
+
+            return res.status(200).json({
+                message: "Quét thành công"
+            })
         })
-    })
-
+    }
+    catch (e) {
+        console.log("EventController-Scan: ", e)
+        return res.status(500).json({
+            message: "Thử lại sau!"
+        })
+    }
 
 }
 const createFolder = (root, id, nameAvt)=>

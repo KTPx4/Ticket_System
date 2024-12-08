@@ -15,6 +15,7 @@ import com.example.ticketbooking.R;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,7 +43,7 @@ public class ScanTicketActivity extends AppCompatActivity {
     private TicketAdapter adapter;
     private List<String> scannedTickets;
     private EventService eventService;
-    private static String idEvent= "6753135fbb6630356315742" ;
+    private static String idEvent= "6753135fbb66303563157426" ;
 
     private String lastScannedCode = "";
     private long lastScanTime = 0;
@@ -84,7 +85,10 @@ public class ScanTicketActivity extends AppCompatActivity {
         // Khởi tạo RecyclerView
         scannedTickets = new ArrayList<>();
         recyclerView = findViewById(R.id.staff_scan_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);  // Hiển thị ngược
+        layoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(layoutManager);
         adapter = new TicketAdapter(scannedTickets);
         recyclerView.setAdapter(adapter);
 
@@ -120,14 +124,30 @@ public class ScanTicketActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String success) {
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), success, Toast.LENGTH_SHORT).show();
+//                    scannedTickets.add(0, success); // Thêm phần tử vào đầu danh sách
+//                    adapter.notifyItemInserted(0); // Thông báo adapter về phần tử mới ở vị trí 0
+//                    recyclerView.scrollToPosition(0); // Cuộn RecyclerView tới vị trí đầu
+
+                    scannedTickets.add(success);
+                    adapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(scannedTickets.size() - 1); // Cuộn tới cuối danh sách
+
+//                    Toast.makeText(getApplicationContext(), success, Toast.LENGTH_SHORT).show();
                 });
             }
 
             @Override
             public void onFailure(String error) {
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+//                    scannedTickets.add(0, error); // Thêm phần tử vào đầu danh sách
+//                    adapter.notifyItemInserted(0); // Thông báo adapter về phần tử mới ở vị trí 0
+//                    recyclerView.scrollToPosition(0); // Cuộn RecyclerView tới vị trí đầu
+
+                    scannedTickets.add(error);
+                    adapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(scannedTickets.size() - 1); // Cuộn tới cuối danh sách
+
+//                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
                 });
             }
         });
