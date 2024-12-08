@@ -79,7 +79,17 @@ const isExistId = async (req, res, next) =>{
     req.vars.Event = event
     return next()
 }
+const Scan = async (req, res, next)=>{
+    var {token} = req.body
+    if(!token)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp 'token'"
+        })
+    }
 
+    return next()
+}
 const updateEvent = async(req, res, next)=>{
     try {
         const { id } = req.params; // Lấy id của sự kiện từ URL
@@ -206,4 +216,4 @@ module.exports.Create = validateEvent;
 module.exports.IsExistEvent = isExistId;
 module.exports.Update = updateEvent;
 module.exports.UpdateTicketPrice = UpdateTicketPrice;
-
+module.exports.Scan = Scan;

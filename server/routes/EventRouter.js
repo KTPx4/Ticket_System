@@ -42,6 +42,9 @@ _APP.get('/:id/news', EventValidator.IsExistEvent, EventController.getNews ) // 
 _APP.get('/:id/ticket', EventValidator.IsExistEvent, EventController.getTicket ) // get all news of this event
 _APP.put('/:id/ticket', StaffAuth.AuthStaff, EventValidator.IsExistEvent, EventValidator.UpdateTicketPrice, EventController.UpdateTicketPrice) // get all news of this event
 
+// scan ticket
+_APP.post('/:id/scan',  EventValidator.IsExistEvent, EventValidator.Scan, EventController.ScanTicket )
+
 module.exports = (root) =>{
 
     const uploader = multer({dest: root +'/uploads/'})

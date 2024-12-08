@@ -1,12 +1,20 @@
 package com.example.ticketbooking.ticket.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ticketbooking.R;
@@ -39,7 +47,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         // Set the TicketItemAdapter for the nested RecyclerView (listTicket)
         TicketItemAdapter ticketItemAdapter = new TicketItemAdapter(context, myTicket.getTickets());
+        holder.listTicket.setLayoutManager(new LinearLayoutManager(context));
         holder.listTicket.setAdapter(ticketItemAdapter);
+        ticketItemAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -50,12 +60,103 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView tvEventName, tvEventDate;
         RecyclerView listTicket;
-
+        ImageButton btnDrop;
+        LinearLayout layoutTickets;
         public EventViewHolder(View itemView) {
             super(itemView);
             tvEventName = itemView.findViewById(R.id.tvName);
             tvEventDate = itemView.findViewById(R.id.tvDate);
             listTicket = itemView.findViewById(R.id.listTicket);
+            btnDrop = itemView.findViewById(R.id.btnDrop);
+
+            layoutTickets = itemView.findViewById(R.id.layoutTicket);
+            setupLayoutTransition((ViewGroup) layoutTickets.getParent());
+
+            btnDrop = itemView.findViewById(R.id.btnDrop);
+
+            btnDrop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (layoutTickets.getVisibility() == View.GONE) {
+                        expand(layoutTickets);
+                        btnDrop.setImageResource(R.drawable.ic_drop_down);
+                    } else {
+                        collapse(layoutTickets);
+                        btnDrop.setImageResource(R.drawable.ic_drop_up);
+
+                    }
+                }
+            });
+            tvEventName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("CLICK", "onClick: " + tvEventName.getText().toString());
+                }
+            });
+
         }
+
+        private void expand(final View view) {
+            // Đo chiều cao chính xác
+            view.measure(View.MeasureSpec.makeMeasureSpec(view.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+            int targetHeight = view.getMeasuredHeight();
+
+            // Đặt chiều cao ban đầu cho RecyclerView (nếu bên trong)
+            if (view instanceof RecyclerView) {
+                RecyclerView recyclerView = (RecyclerView) view;
+                recyclerView.getLayoutParams().height = targetHeight;
+                recyclerView.requestLayout();
+            }
+
+            // Animation từ 0 đến chiều cao đo được
+            view.getLayoutParams().height = 0;
+            view.setVisibility(View.VISIBLE);
+            ValueAnimator animator = slideAnimator(0, targetHeight);
+            animator.start();
+        }
+
+
+        private void collapse(final View view) {
+            final int initialHeight = view.getHeight();
+
+            // Animation từ chiều cao ban đầu về 0
+            ValueAnimator animator = slideAnimator(initialHeight, 0);
+            animator.addUpdateListener(valueAnimator -> {
+                int value = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                layoutParams.height = value;
+                view.setLayoutParams(layoutParams);
+            });
+
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    // Đặt visibility thành GONE sau khi animation kết thúc
+                    view.setVisibility(View.GONE);
+                }
+            });
+            animator.start();
+        }
+
+        private ValueAnimator slideAnimator(int start, int end) {
+            ValueAnimator animator = ValueAnimator.ofInt(start, end);
+            animator.setDuration(300);
+            return animator;
+        }
+
+
+        private void setupLayoutTransition(ViewGroup viewGroup) {
+            LayoutTransition transition = new LayoutTransition();
+            transition.enableTransitionType(LayoutTransition.CHANGING);
+            transition.setDuration(400);
+            viewGroup.setLayoutTransition(transition);
+        }
+
+
     }
+
 }
+
+

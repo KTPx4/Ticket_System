@@ -1,5 +1,7 @@
 package model.event;
 
+import modules.DateConverter;
+
 public class DateRange {
     private String start;
     private String end;
@@ -13,7 +15,7 @@ public class DateRange {
     }
 
     public String getStart() {
-        return start;
+        return DateConverter.convertToHCM(start);
     }
 
     public void setStart(String start) {
@@ -21,7 +23,8 @@ public class DateRange {
     }
 
     public String getEnd() {
-        return end;
+        return DateConverter.convertToHCM(end);
+//        return end;
     }
 
     public void setEnd(String end) {

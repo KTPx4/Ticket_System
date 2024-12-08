@@ -394,26 +394,70 @@ module.exports.UnFollowEvent = async(req, res)=>{
 }
 
 module.exports.Update = async(req, res)=>{
-    var {updateData, User}= req.vars // get update from validator
-    var id = User._id
+    try{
+        var {updateData, User}= req.vars // get update from validator
+        var id = User._id
 
-    // Cập nhật tài liệu
-    // Nếu không có trường hợp lệ nào để cập nhật
-    if (Object.keys(updateData).length === 0) {
-        return res.status(400).json({ message: 'Không có giá trị để sửa' });
+        // Cập nhật tài liệu
+        // Nếu không có trường hợp lệ nào để cập nhật
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'Không có giá trị để sửa' });
+        }
+        const updatedEvent = await AccountModel.findByIdAndUpdate(
+            id,
+            { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
+            { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
+        );
+
+        res.status(200).json({
+            message: "Chỉnh sửa sự kiện thành công",
+            data: updatedEvent
+        });
     }
-    const updatedEvent = await AccountModel.findByIdAndUpdate(
-        id,
-        { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
-        { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
-    );
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
 
-    res.status(200).json({
-        message: "Chỉnh sửa sự kiện thành công",
-        data: updatedEvent
-    });
 }
+module.exports.AddHistory = async(req, res)=>{
+    try{
+        var {search} = req.body
+        var {User} = req.vars
+        User.hisSearch.push(search)
+        User = await User.save();
+        res.status(200).json({
+            message: "Thêm lịch sử thành công",
+            data: User
+        });
+    }
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
+}
+module.exports.DeleteHistory = async(req, res)=>{
+    try{
 
+        var {User} = req.vars
+        User.hisSearch = []
+        User = await User.save();
+        res.status(200).json({
+            message: "Xóa lịch sử thành công",
+            data: User
+        });
+    }
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
+}
 const createFolder = (root, idUser, nameAvt)=>
 {
 
