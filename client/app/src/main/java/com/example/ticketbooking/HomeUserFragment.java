@@ -18,6 +18,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.ticketbooking.ticket.adapter.EventAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

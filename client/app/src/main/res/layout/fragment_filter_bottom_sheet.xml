@@ -1,0 +1,172 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bộ lọc"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vị trí"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- RadioGroup for Locations -->
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="18dp"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_Hanoi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hà Nội"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_HCM"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hồ Chí Minh"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_Dalat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đà Lạt"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vị trí khác"
+            android:textSize="14sp"/>
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thể loại"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+
+    <!-- RadioGroup for Categories -->
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="18dp"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_music"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Âm nhạc"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_comedy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hài kịch"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_art"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nghệ Thuật"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_special"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sự kiện đặc biệt"
+            android:textSize="14sp" />
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thời gian"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+    <EditText
+        android:id="@+id/edt_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/calendar"
+        android:drawableTint="@color/grey"
+        android:drawablePadding="8dp"
+        android:hint="Ngày/Tháng/Năm"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnCancelFilters"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Hủy bộ lọc"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="#AAAAAA"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnApplyFilters"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Áp dụng"
+            android:backgroundTint="#333333"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="8dp" />
+    </LinearLayout>
+
+</LinearLayout>
