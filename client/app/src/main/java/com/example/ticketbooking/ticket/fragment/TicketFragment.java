@@ -3,6 +3,7 @@ package com.example.ticketbooking.ticket.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -69,6 +70,7 @@ public class TicketFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.ticket_fragment_tickets, container, false);
         listEvent = view.findViewById(R.id.listEvent);
+        listEvent.setLayoutManager(new LinearLayoutManager(getContext()));
         edSearch = view.findViewById(R.id.edSearch);
         proLoading = view.findViewById(R.id.proLoading);
 
@@ -78,9 +80,16 @@ public class TicketFragment extends Fragment{
             @Override
             public void onSuccess(List<MyTicket> MyTicket) {
                 // Set the data to RecyclerView with adapter
-                EventAdapter ticketAdapter = new EventAdapter(getContext(), MyTicket);
-                listEvent.setAdapter(ticketAdapter);
-                proLoading.setVisibility(View.GONE); // Hide the progress bar when data is loaded
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        EventAdapter ticketAdapter = new EventAdapter(getContext(), MyTicket);
+                        listEvent.setAdapter(ticketAdapter);
+                        proLoading.setVisibility(View.GONE); // Hide the progress bar when data is loaded
+                        ticketAdapter.notifyDataSetChanged();
+                    }
+                });
+
             }
 
             @Override

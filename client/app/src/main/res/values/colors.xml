@@ -11,6 +11,7 @@
     <color name="Rose_Passion">#DC586D</color>
     <color name="green">#7ED957</color>
     <color name="blue">#459CED</color>
+    <color name="transparent">@android:color/transparent</color>
 
 
     <color name="grey">#EEB8B8B8</color>

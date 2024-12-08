@@ -8,6 +8,7 @@ import com.example.ticketbooking.R;
 
 import org.json.JSONObject;
 
+import modules.LocalStorageManager;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,10 +19,12 @@ public class AccountService {
     private Context context;
     String SERVER = "";
     private final OkHttpClient client;
+    private LocalStorageManager localStorageManager;
     public AccountService(Context context) {
         client = new OkHttpClient();
         this.context = context;
         this.SERVER = context.getString(R.string.server_url);
+        this.localStorageManager = new LocalStorageManager(context);
     }
 
     public void registerAccount(String email, String password, ResponseCallback callback) {
@@ -140,6 +143,17 @@ public class AccountService {
 
                 if (response.isSuccessful()) {
                     String token = jsonResponse.optString("data", ""); // Token từ server
+                    verifyUser(token, new OnVerifyCallback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+
+                        }
+                    });
                     callback.onSuccess(token);
                 } else {
                     String error = jsonResponse.optString("message", "Đăng nhập thất bại!");
@@ -175,7 +189,13 @@ public class AccountService {
                 // Send request and get response
                 Response response = client.newCall(request).execute();
 
+                String responseBody = response.body() != null ? response.body().string() : "";
+// Xử lý kết quả
+                JSONObject jsonResponse = new JSONObject(responseBody);
+
                 if (response.isSuccessful()) {
+                    String id = jsonResponse.optString("data", ""); // Token từ server
+                    localStorageManager.saveIdUser(id);
                     callback.onSuccess();
                 } else {
                     callback.onFailure("Token is not valid for user.");

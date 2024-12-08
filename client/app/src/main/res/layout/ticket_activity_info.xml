@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ticket.TicketInfoActivity">
+    <Toolbar
+        android:id="@+id/ticket_toolbar"
+        android:title="QR Code"
+        android:background="@color/tabBack"
+        android:textAlignment="center"
+        android:titleTextColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:visibility="gone"
+        android:layout_marginTop="50dp"
+        android:id="@+id/tv1"
+
+        app:layout_constraintTop_toBottomOf="@+id/ticket_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="QR CODE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/ticket_tvId"
+        android:text="@string/ex_text_id"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/text_hint"
+        app:layout_constraintTop_toBottomOf="@+id/tv1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/ticket_tvType"
+        android:text="@string/ex_text_types"
+        app:layout_constraintTop_toBottomOf="@+id/ticket_tvId"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/ticket_tvLocation"
+        android:text="@string/ex_text_location"
+        app:layout_constraintTop_toBottomOf="@+id/ticket_tvType"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/ticket_tvPosition"
+        android:text="@string/ex_text_position"
+        app:layout_constraintTop_toBottomOf="@+id/ticket_tvLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/ticket_ivQrCode"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintTop_toBottomOf="@+id/ticket_tvPosition"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp" />
+    <TextView
+        android:id="@+id/ticket_tvTime"
+        android:layout_marginTop="30dp"
+        android:text="QR hết hạn sau: 120s"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ticket_ivQrCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/ticket_btnGenerate"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/Dark_Rose"
+        android:text="Tạo lại"
+        app:layout_constraintBottom_toTopOf="@+id/ticket_btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/ticket_btnClose"
+        android:text="Đóng"
+        android:layout_marginBottom="40dp"
+        android:backgroundTint="@color/Dark_Raspberry"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

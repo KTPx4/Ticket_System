@@ -1,6 +1,7 @@
 package com.example.ticketbooking.ticket.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.ticket.TicketInfoActivity;
+import com.example.ticketbooking.ticket.viewcustom.TicketView;
+
 import model.ticket.*;
 import java.util.List;
 
@@ -31,9 +35,10 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
     public void onBindViewHolder(@NonNull TicketViewHolder holder, int position) {
         Ticket ticket = ticketList.get(position);
         holder.tvId.setText(ticket.get_id());
-        holder.tvType.setText(ticket.getInfo().getTypeTicket());
-        holder.tvLocation.setText(ticket.getInfo().getLocation());
-        holder.tvPosition.setText(ticket.getPosition());
+        holder.tvType.setText("Loại vé: "+ticket.getTicketInfo().getTypeTicket());
+        holder.tvLocation.setText("Vị trí: "+ticket.getTicketInfo().getLocation());
+        holder.tvPosition.setText("Số ghế: "+ ticket.getPosition());
+        holder.bind(context, ticket);
     }
 
     @Override
@@ -43,6 +48,7 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
 
     public static class TicketViewHolder extends RecyclerView.ViewHolder {
         TextView tvId, tvType, tvLocation, tvPosition;
+        TicketView ticketView;
 
         public TicketViewHolder(View itemView) {
             super(itemView);
@@ -50,6 +56,33 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
             tvType = itemView.findViewById(R.id.tvType);
             tvLocation = itemView.findViewById(R.id.tvLocation);
             tvPosition = itemView.findViewById(R.id.tvPosition);
+            ticketView = itemView.findViewById(R.id.item_ticket);
+        }
+
+        public void bind(Context context, Ticket ticket) {
+            // Gắn dữ liệu vào View
+            tvId.setText(ticket.get_id());
+            tvType.setText("Loại vé: " + ticket.getTicketInfo().getTypeTicket());
+            tvLocation.setText("Vị trí: " + ticket.getTicketInfo().getLocation());
+            tvPosition.setText("Số ghế: " + ticket.getPosition());
+
+            // Set sự kiện click
+            ticketView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, TicketInfoActivity.class);
+
+                    // Truyền dữ liệu qua Intent
+                    intent.putExtra("ticketId", ticket.get_id());
+                    intent.putExtra("type", ticket.getTicketInfo().getTypeTicket());
+                    intent.putExtra("location", ticket.getTicketInfo().getLocation());
+                    intent.putExtra("position", ticket.getPosition() + "");
+
+                    // Khởi chạy Activity
+                    context.startActivity(intent);
+                }
+            });
         }
     }
+
 }

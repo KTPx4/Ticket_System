@@ -6,6 +6,10 @@ const mongoose = require('mongoose')
 
 const Upload = require("./Upload");
 const fs = require("fs");
+const jwt = require("jsonwebtoken");
+const AccountModel = require("../models/AccountModel");
+const JWT_SCAN_SECRECT = process.env.KEY_SECRET_SCAN_TICKET ?? ""
+
 module.exports.GetAll = async(req, res)=>{
     try{
         // Lấy type từ query
@@ -381,6 +385,34 @@ module.exports.getNews = async(req, res)=>{
             message: "Lấy thông tin thất bại, thử lại sau"
         })
     }
+}
+module.exports.ScanTicket = async(req, res)=>{
+    var {token} = req.body
+    if(!JWT_SCAN_SECRECT)
+    {
+        return res.status(400).json({
+            message: "Thiếu biến môi trường JWT_SCAN_SECRECT"
+        })
+    }
+    await jwt.verify(token, JWT_SCAN_SECRECT, async(err, data)=>{
+        if(err)
+        {
+            return res.status(400).json({
+                status: 'Invalid Token',
+                message: 'Token lỗi hoặc hết hạn'
+            })
+        }
+        console.log(data)
+        var {idUser, idTicket} = data
+
+
+
+        return res.status(200).json({
+            message: "Quét thành công"
+        })
+    })
+
+
 }
 const createFolder = (root, id, nameAvt)=>
 {

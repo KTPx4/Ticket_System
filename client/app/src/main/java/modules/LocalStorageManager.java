@@ -37,11 +37,29 @@ public class LocalStorageManager {
         return sharedPreferences.getString("login-token", ""); // Giá trị mặc định là ""
     }
 
+    public void saveIdUser(String id)
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("id-user", id);
+        editor.apply(); // Lưu dữ liệu không đồng bộ
+    }
+
+    public String getIdUser() {
+        return sharedPreferences.getString("id-user", ""); // Giá trị mặc định là ""
+    }
+
+    public void clearIdUser()
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("id-user");
+        editor.apply(); // Lưu dữ liệu không đồng bộ
+    }
     // Xóa login option
     public void clearLoginOption() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("login-option");
         editor.apply(); // Lưu dữ liệu không đồng bộ
+        clearIdUser();
     }
 
     // Xóa login token
@@ -49,5 +67,7 @@ public class LocalStorageManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("login-token");
         editor.apply(); // Lưu dữ liệu không đồng bộ
+        clearIdUser();
     }
+
 }

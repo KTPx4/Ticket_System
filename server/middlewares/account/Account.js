@@ -107,6 +107,7 @@ module.exports.Register = async(req, res, next)=>{
     }
     return next()
 }
+
 module.exports.Update = async(req, res, next)=>{
     let {name ,address, email} = req.body
     var UpdateVar = {}
@@ -128,6 +129,7 @@ module.exports.Update = async(req, res, next)=>{
     req.vars.updateData = UpdateVar
     return next()
 }
+
 module.exports.SendReset = async(req, res, next)=>{
     var {email} = req.body
     if(!email)
@@ -146,6 +148,7 @@ module.exports.SendReset = async(req, res, next)=>{
     req.vars.User = acc
     return next()
 }
+
 module.exports.GetReset = async(req, res, next)=>{
     var {token} = req.query
     if(!token)
@@ -157,6 +160,18 @@ module.exports.GetReset = async(req, res, next)=>{
 
     return next()
 }
+
+module.exports.History = async (req, res, next)=>{
+    var {search} = req.body
+    if(!search)
+    {
+        return res.status(400).json({
+            message:"Vui lòng cung cấp 'search'"
+        })
+    }
+    return next()
+}
+
 module.exports.Password = async(req, res, next)=>{
     var {oldPass, newPass} = req.body
     var {User} = req.vars

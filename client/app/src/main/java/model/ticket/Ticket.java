@@ -7,7 +7,7 @@ public class Ticket {
     private String event;
     private int position;
     private String desc;
-    private TicketInfo info;
+    private TicketInfo ticketInfo;
     private boolean isAvailable;
     private String accBuy;
     private String expiresAt;
@@ -16,12 +16,12 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(String _id, String event, int position, String desc, TicketInfo info, boolean isAvailable, String accBuy, String expiresAt, EventDetails eventDetails) {
+    public Ticket(String _id, String event, int position, String desc, TicketInfo ticketInfo, boolean isAvailable, String accBuy, String expiresAt, EventDetails eventDetails) {
         this._id = _id;
         this.event = event;
         this.position = position;
         this.desc = desc;
-        this.info = info;
+        this.ticketInfo = ticketInfo;
         this.isAvailable = isAvailable;
         this.accBuy = accBuy;
         this.expiresAt = expiresAt;
@@ -60,12 +60,12 @@ public class Ticket {
         this.desc = desc;
     }
 
-    public TicketInfo getInfo() {
-        return info;
+    public TicketInfo getTicketInfo() {
+        return ticketInfo;
     }
 
-    public void setInfo(TicketInfo info) {
-        this.info = info;
+    public void setTicketInfo(TicketInfo ticketInfo) {
+        this.ticketInfo = ticketInfo;
     }
 
     public boolean isAvailable() {
