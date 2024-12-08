@@ -35,7 +35,11 @@
 
             android:name=".IntroActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
@@ -50,17 +54,10 @@
             android:name=".order.CheckOutActivity"
                    android:exported="true" />
 
-            android:exported="true">
-
-        </activity>
         <activity
             android:name=".SearchUserActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
     </application>
