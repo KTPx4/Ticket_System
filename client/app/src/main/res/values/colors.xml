@@ -11,6 +11,7 @@
     <color name="Rose_Passion">#DC586D</color>
     <color name="green">#7ED957</color>
     <color name="blue">#459CED</color>
+    <color name="transparent">@android:color/transparent</color>
 
 
     <color name="grey">#EEB8B8B8</color>
@@ -29,6 +30,9 @@
     <color name="tabInd">#FFFFFFFF</color>
     <color name="tabText">#FFBB94</color>
     <color name="tabSelect">#FFFFFFFF</color>
+
+
+    <color name="text_hint">#F6B8B8B8</color>
 
 
 </resources>

@@ -1,5 +1,7 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
+const TicketModel = require('../models/TicketModel')
+
 const sendEmail = require('../modules/Mailer')
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -295,6 +297,67 @@ module.exports.FollowEvent = async(req, res)=>{
 
 }
 
+module.exports.GetMyTicket = async (req, res) => {
+    try {
+        var { User } = req.vars;
+
+        const tickets = await TicketModel.aggregate([
+            {
+                $match: { accBuy: User._id } // Lọc các ticket theo `accBuy`
+            },
+            {
+                $lookup: { // Join với collection `events`
+                    from: 'events',
+                    localField: 'event',
+                    foreignField: '_id',
+                    as: 'eventDetails'
+                }
+            },
+            {
+                $unwind: '$eventDetails' // Giải nén mảng `eventDetails` thành object
+            },
+            {
+                $lookup: { // Thêm lookup để lấy thông tin từ `ticket_types`
+                    from: 'ticket_types',  // Tên collection chứa thông tin ticket loại vé
+                    localField: 'info',  // Trường info chứa ID của loại vé
+                    foreignField: '_id',
+                    as: 'ticketInfo'  // Kết quả sẽ lưu vào trường `ticketInfo`
+                }
+            },
+            {
+                $unwind: { // Giải nén mảng `ticketInfo` thành object
+                    path: '$ticketInfo',
+                    preserveNullAndEmptyArrays: true // Đảm bảo ticketInfo vẫn là null nếu không có dữ liệu
+                }
+            },
+            {
+                $group: { // Group theo sự kiện
+                    _id: '$event', // Group theo event ID
+                    eventDetails: { $first: '$eventDetails' }, // Lấy thông tin sự kiện đầu tiên
+                    tickets: { $push: '$$ROOT' } // Đưa tất cả các ticket vào mảng
+                }
+            },
+            {
+                $project: { // Định dạng lại kết quả
+                    _id: 0, // Không hiển thị `_id` trong kết quả
+                    event: '$eventDetails',  // Thông tin sự kiện
+                    tickets: 1 // Các vé trong sự kiện
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: tickets.length ?? 0,
+            data: tickets
+        });
+    } catch (e) {
+        console.log("AccountController - GetMyTicket:", e);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
 module.exports.UnFollowEvent = async(req, res)=>{
     try {
         const { User, Event } = req.vars;
@@ -331,26 +394,70 @@ module.exports.UnFollowEvent = async(req, res)=>{
 }
 
 module.exports.Update = async(req, res)=>{
-    var {updateData, User}= req.vars // get update from validator
-    var id = User._id
+    try{
+        var {updateData, User}= req.vars // get update from validator
+        var id = User._id
 
-    // Cập nhật tài liệu
-    // Nếu không có trường hợp lệ nào để cập nhật
-    if (Object.keys(updateData).length === 0) {
-        return res.status(400).json({ message: 'Không có giá trị để sửa' });
+        // Cập nhật tài liệu
+        // Nếu không có trường hợp lệ nào để cập nhật
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'Không có giá trị để sửa' });
+        }
+        const updatedEvent = await AccountModel.findByIdAndUpdate(
+            id,
+            { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
+            { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
+        );
+
+        res.status(200).json({
+            message: "Chỉnh sửa sự kiện thành công",
+            data: updatedEvent
+        });
     }
-    const updatedEvent = await AccountModel.findByIdAndUpdate(
-        id,
-        { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
-        { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
-    );
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
 
-    res.status(200).json({
-        message: "Chỉnh sửa sự kiện thành công",
-        data: updatedEvent
-    });
 }
+module.exports.AddHistory = async(req, res)=>{
+    try{
+        var {search} = req.body
+        var {User} = req.vars
+        User.hisSearch.push(search)
+        User = await User.save();
+        res.status(200).json({
+            message: "Thêm lịch sử thành công",
+            data: User
+        });
+    }
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
+}
+module.exports.DeleteHistory = async(req, res)=>{
+    try{
 
+        var {User} = req.vars
+        User.hisSearch = []
+        User = await User.save();
+        res.status(200).json({
+            message: "Xóa lịch sử thành công",
+            data: User
+        });
+    }
+    catch (e) {
+        console.log("Acc Controller - Update: ", e)
+        return res.status(500).json({
+            message: "Lỗi, thử lại sau"
+        })
+    }
+}
 const createFolder = (root, idUser, nameAvt)=>
 {
 

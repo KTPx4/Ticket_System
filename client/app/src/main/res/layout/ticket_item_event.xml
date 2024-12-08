@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.cardview.widget.CardView
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_height="wrap_content" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="8dp"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/layoutName"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvName"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/ex_text_name"
+                    android:textSize="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content" />
+
+                <ImageButton
+                    android:id="@+id/btnDrop"
+                    android:background="@color/transparent"
+                    android:src="@drawable/ic_drop_up"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="5dp"
+                android:textStyle="italic"
+                android:textColor="@color/text_hint"
+                android:id="@+id/tvDate"
+                android:text="@string/ex_text_date"
+                app:layout_constraintTop_toBottomOf="@+id/layoutName"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/layoutTicket"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <view class="androidx.recyclerview.widget.RecyclerView"
+                    android:id="@+id/listTicket"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </view>
+            </LinearLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

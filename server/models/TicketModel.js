@@ -22,8 +22,8 @@ const TicketSchema = new mongoose.Schema({
         ref: "accounts",
         default: null
     },
-    expiresAt: { type: Date, default: null } // Thời gian hết hạn
-
+    expiresAt: { type: Date, default: null }, // Thời gian hết hạn
+    isValid: {type: Boolean, default: true}
 })
 // Middleware tự động tạo giá trị cho `name`
 TicketSchema.pre('save', async function (next) {

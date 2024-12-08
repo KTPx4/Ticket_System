@@ -16,12 +16,18 @@ _APP.patch('/', AccountValidator.AuthAccount, AccountValidator.Update, AccountCo
 _APP.put('/password', AccountValidator.AuthAccount, AccountValidator.Password, AccountController.ChangePass)
 _APP.post('/login',  AccountValidator.Login, AccountController.Login)
 
+_APP.post('/history' , AccountValidator.AuthAccount, AccountValidator.History, AccountController.AddHistory )
+_APP.delete('/history' , AccountValidator.AuthAccount, AccountController.DeleteHistory )
+
+_APP.get('/ticket', AccountValidator.AuthAccount, AccountController.GetMyTicket)
+
 _APP.get('/reset', AccountValidator.GetReset ,AccountController.GetReset)
 _APP.post('/reset', AccountValidator.SendReset ,AccountController.SendReset)
 
 _APP.get('/verify', AccountValidator.AuthAccount, (req, res)=>{
     return res.status(200).json({
-        message: "Token hợp lệ"
+        message: "Token hợp lệ",
+        data: req.vars.User._id ?? ""
     })
 })
 

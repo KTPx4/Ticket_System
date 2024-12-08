@@ -18,8 +18,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/Rose_Passion"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
+        android:background="@color/tabBack"
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemTextColor="@color/bottom_nav_icon_color"
+        app:itemRippleColor="@color/tabText"
         app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

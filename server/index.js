@@ -25,7 +25,7 @@ const OrderRouter = require('./routes/OrderRouter')
 const StaffAuth = require("./middlewares/staffs/Staff");
 const NewsRouter = require('./routes/NewsRouter')
 const fs = require("fs");
-
+const Generate = require('./modules/Generate')
 // Import cron job
 const ticketCronJob = require('./modules/CheckingTicket'); // Import cron job
 
@@ -85,6 +85,7 @@ const createFolder = async()=>{
 const StartProgram = async()=>{
     await createFolder()
 
+
     await require('./models/DB')
         .then(async()=>{
             console.log("Connect DB Success");
@@ -94,6 +95,9 @@ const StartProgram = async()=>{
 
             // Khởi chạy cron job
             ticketCronJob();
+
+            // tạo folder, copy ảnh default cho event
+            await Generate.AddImageEvent(__dirname)
 
         })
         .catch((err)=>{
