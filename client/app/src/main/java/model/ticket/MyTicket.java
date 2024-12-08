@@ -1,50 +1,34 @@
 package model.ticket;
 
+import java.util.List;
+
+import model.event.Event;
+
 public class MyTicket {
-    private String id;
-    private String type;
-    private String location;
-    private String position;
+    private List<Ticket> tickets;
+    private Event event;
 
     public MyTicket() {
     }
 
-    public MyTicket(String id, String type, String location, String position) {
-        this.id = id;
-        this.type = type;
-        this.location = location;
-        this.position = position;
+    public MyTicket(List<Ticket> tickets, Event event) {
+        this.tickets = tickets;
+        this.event = event;
     }
 
-    public String getId() {
-        return id;
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
-    public String getType() {
-        return type;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 }

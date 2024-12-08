@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +13,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.ticket.adapter.EventAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import model.ticket.MyEvent;
+import model.ticket.MyTicket;
 import services.TicketService;
 
 /**
@@ -71,8 +73,21 @@ public class TicketFragment extends Fragment{
         proLoading = view.findViewById(R.id.proLoading);
 
         TicketService ticketService = new TicketService(getContext());
-        final List<MyEvent>[] listEvent = new List[]{new ArrayList<>()};
 
+        ticketService.GetMyTicket( new TicketService.ResponseCallback() {
+            @Override
+            public void onSuccess(List<MyTicket> MyTicket) {
+                // Set the data to RecyclerView with adapter
+                EventAdapter ticketAdapter = new EventAdapter(getContext(), MyTicket);
+                listEvent.setAdapter(ticketAdapter);
+                proLoading.setVisibility(View.GONE); // Hide the progress bar when data is loaded
+            }
+
+            @Override
+            public void onFailure(String error) {
+
+            }
+        });
 
 
 
