@@ -1,5 +1,7 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
+const TicketModel = require('../models/TicketModel')
+
 const sendEmail = require('../modules/Mailer')
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -293,6 +295,52 @@ module.exports.FollowEvent = async(req, res)=>{
     }
 
 
+}
+
+module.exports.GetMyTicket = async (req, res)=>{
+    try{
+        var {User} = req.vars
+        const tickets = await TicketModel.aggregate([
+            {
+                $match: { accBuy: User._id } // Lọc các ticket theo `accBuy`
+            },
+            {
+                $lookup: { // Join với collection `events`
+                    from: 'events',
+                    localField: 'event',
+                    foreignField: '_id',
+                    as: 'eventDetails'
+                }
+            },
+            {
+                $unwind: '$eventDetails' // Giải nén mảng `eventDetails` thành object
+            },
+            {
+                $group: { // Group theo sự kiện
+                    _id: '$event',
+                    eventDetails: { $first: '$eventDetails' },
+                    tickets: { $push: '$$ROOT' } // Đưa tất cả các ticket vào mảng
+                }
+            },
+            {
+                $project: { // Định dạng lại kết quả
+                    _id: 0, // Không hiển thị `_id` trong kết quả
+                    event: '$eventDetails',
+                    tickets: 1
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: tickets.length ?? 0,
+            data: tickets
+        })
+    }
+    catch (e) {
+        console.log("AccountController - GetMyTicket:", e)
+        res.status(500).json({ message: "Server error"});
+    }
 }
 
 module.exports.UnFollowEvent = async(req, res)=>{

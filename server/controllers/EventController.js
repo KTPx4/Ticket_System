@@ -31,7 +31,7 @@ module.exports.GetAll = async(req, res)=>{
             .populate('accJoins')
         return res.status(200).json({
             message: "Lấy dữ liệu sự kiện thành công",
-            length: data.length,
+            length: data.length ?? 0,
             data: data
         })
     }

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 var root = process.env.IMG || 'localhost:3001/images'
-
+const {Schema} = mongoose
 const ArtistSchema = new mongoose.Schema({
     name: String,
     desc: {
@@ -14,7 +14,13 @@ const ArtistSchema = new mongoose.Schema({
         type: String,
         default: " "
         // get: v=> `${root}/${v}`
-    }
+    },
+    followers:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'accounts'
+        }
+    ]
 })
 
 ArtistSchema.pre('save', function (next) {
