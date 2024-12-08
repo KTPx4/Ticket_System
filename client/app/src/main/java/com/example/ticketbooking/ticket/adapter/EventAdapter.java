@@ -1,5 +1,6 @@
-package com.example.ticketbooking;
+package com.example.ticketbooking.ticket.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.ticketbooking.Event;
+import com.example.ticketbooking.R;
 
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private List<Event> eventList;
+    private int nameTextColor = Color.BLACK;
 
     public EventAdapter(List<Event> eventList) {
         this.eventList = eventList;
@@ -27,6 +31,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return new EventViewHolder(view);
     }
 
+    public void setNameTextColor(int color) {
+        this.nameTextColor = color;
+    }
+
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = eventList.get(position);
@@ -34,6 +42,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         String formattedPrice = String.format("%,d", event.getMinPrice());
         holder.eventPriceRange.setText("Từ " + formattedPrice + " đ ");
         holder.eventDate.setText(event.getStartDate());
+
+        holder.eventName.setTextColor(nameTextColor);
 
         String imageUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + event.getId() + "/" + event.getImage();
 
