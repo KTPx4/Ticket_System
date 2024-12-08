@@ -1,6 +1,7 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
 const TicketModel = require('../models/TicketModel')
+const mongoose = require('mongoose')
 
 const sendEmail = require('../modules/Mailer')
 const jwt = require("jsonwebtoken");
@@ -356,6 +357,60 @@ module.exports.GetMyTicket = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+module.exports.GetOrderPending = async (req, res) => {
+    try {
+        const { User } = req.vars;
+
+        // Tìm các BuyTicket phù hợp
+        const buyTickets = await mongoose.model('buy_tickets').find({
+            $or: [
+                { members: User._id },
+                { accCreate: User._id }
+            ]
+        })
+            .populate({
+                path: 'members', // Liên kết members
+                select: '-password' // Không trả về trường password nếu có
+            })
+            .populate({
+                path: 'accCreate', // Liên kết accCreate
+                select: '-password'
+            })
+            .populate('event') // Liên kết event
+            .populate('discount') // Liên kết discount
+            .populate('coupon') // Liên kết coupon
+            .populate('payment') // Liên kết payment
+            .populate('accPay') // Liên kết accPay
+            .populate({
+                path: 'ticketInfo', // Liên kết ticketInfo
+                match: {
+                    $or: [
+                        { accPay: { $exists: false } }, // ticketInfo không có accPay
+                        { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                    ]
+                },
+                populate: {
+                    path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
+                    populate: {
+                        path: 'info', // Liên kết tiếp tới info trong ticket
+                        model: 'ticket_types'
+                    }
+                }
+            })
+            .lean(); // Trả về plain object để dễ thao tác hơn
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: buyTickets.length,
+            data: buyTickets
+        });
+    } catch (e) {
+        console.error("AccountController - GetOrderPending:", e);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 
 module.exports.UnFollowEvent = async(req, res)=>{

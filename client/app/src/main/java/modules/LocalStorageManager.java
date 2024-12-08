@@ -12,6 +12,16 @@ public class LocalStorageManager {
     public LocalStorageManager(Context context) {
         this.sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
+// lưu connection state
+    public void saveInternetState(String value)
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("internet-state", value);
+        editor.apply(); // Lưu dữ liệu không đồng bộ
+    }
+    public String getInternetState() {
+        return sharedPreferences.getString("internet-state", ""); // Giá trị mặc định là ""
+    }
 
     // Lưu login option
     public void saveLoginOption(String value) {
