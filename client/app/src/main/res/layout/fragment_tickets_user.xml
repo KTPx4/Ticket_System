@@ -14,7 +14,7 @@
         android:title="Vé của tôi"
         android:background="@color/Dark_Raspberry"
         android:titleTextColor="@color/white"
-        android:layout_height="wrap_content" />
+        android:layout_height="?attr/actionBarSize" />
 
     <com.google.android.material.tabs.TabLayout
 
