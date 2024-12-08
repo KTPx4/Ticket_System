@@ -9,6 +9,7 @@ public class Ticket {
     private String desc;
     private TicketInfo ticketInfo;
     private boolean isAvailable;
+    private boolean isValid;
     private String accBuy;
     private String expiresAt;
     private EventDetails eventDetails;
@@ -16,16 +17,25 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(String _id, String event, int position, String desc, TicketInfo ticketInfo, boolean isAvailable, String accBuy, String expiresAt, EventDetails eventDetails) {
+    public Ticket(String _id, String event, int position, String desc, TicketInfo ticketInfo, boolean isAvailable, boolean isValid, String accBuy, String expiresAt, EventDetails eventDetails) {
         this._id = _id;
         this.event = event;
         this.position = position;
         this.desc = desc;
         this.ticketInfo = ticketInfo;
         this.isAvailable = isAvailable;
+        this.isValid = isValid;
         this.accBuy = accBuy;
         this.expiresAt = expiresAt;
         this.eventDetails = eventDetails;
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    public void setValid(boolean valid) {
+        isValid = valid;
     }
 
     public String get_id() {

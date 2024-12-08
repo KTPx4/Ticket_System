@@ -26,7 +26,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
 
     @Override
     public void onBindViewHolder(@NonNull TicketViewHolder holder, int position) {
-        holder.ticketTextView.setText(tickets.get(position));
+        holder.ticketTextView.setText( (position + 1) +": "+ tickets.get(position));
     }
 
     @Override

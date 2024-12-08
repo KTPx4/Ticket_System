@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ticketbooking.R;
@@ -57,6 +59,7 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
             tvLocation = itemView.findViewById(R.id.tvLocation);
             tvPosition = itemView.findViewById(R.id.tvPosition);
             ticketView = itemView.findViewById(R.id.item_ticket);
+
         }
 
         public void bind(Context context, Ticket ticket) {
@@ -65,11 +68,19 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
             tvType.setText("Loại vé: " + ticket.getTicketInfo().getTypeTicket());
             tvLocation.setText("Vị trí: " + ticket.getTicketInfo().getLocation());
             tvPosition.setText("Số ghế: " + ticket.getPosition());
-
+            if(!ticket.isValid())
+            {
+                ticketView.setBackgroundColor(context.getColor(R.color.Dark_Rose));
+            }
             // Set sự kiện click
             ticketView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if(!ticket.isValid())
+                    {
+                        Toast.makeText(context, "Vé này đã được sử dụng", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     Intent intent = new Intent(context, TicketInfoActivity.class);
 
                     // Truyền dữ liệu qua Intent

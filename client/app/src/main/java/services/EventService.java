@@ -6,6 +6,8 @@ import android.util.Log;
 import com.example.ticketbooking.R;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 import model.ticket.MyTicket;
@@ -52,12 +54,17 @@ public class EventService {
                 Response response = client.newCall(request).execute();
 
                 try {
+                    String responseBody = response.body() != null ? response.body().string() : "";
+                    Log.d("ScanTicket", "Response Body: " + responseBody);
+
+                    // Xử lý kết quả
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String message = jsonResponse.optString("message", "Quét thất bại!");
+
                     if (response.isSuccessful()) {
-                        String responseBody = response.body().string();
-                        Log.d("ScanTicket", "Response Body: " + responseBody);
-                        callback.onSuccess(responseBody);
+                        callback.onSuccess(message);
                     } else {
-                        callback.onFailure("Failed: " + response.code());
+                        callback.onFailure("Failed: " + message);
                     }
                 } finally {
                     // Đảm bảo đóng response trong mọi trường hợp

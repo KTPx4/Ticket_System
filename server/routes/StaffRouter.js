@@ -15,7 +15,8 @@ _APP.post('/login', Validator.login, Controller.login)
 
 _APP.get('/verify', StaffAuth.AuthStaff, (req, res)=>{
     return res.status(200).json({
-        message: "Token hợp lệ"
+        message: "Token hợp lệ",
+        data: req.vars.Staff._id ?? ""
     })
 })
 // _APP.post('/ticket', StaffAuth.AuthStaff, Controller.ticket)

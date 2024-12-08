@@ -57,7 +57,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return myTicketList.size();
     }
 
-    public static class EventViewHolder extends RecyclerView.ViewHolder {
+    public static class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tvEventName, tvEventDate;
         RecyclerView listTicket;
         ImageButton btnDrop;
@@ -74,25 +74,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
             btnDrop = itemView.findViewById(R.id.btnDrop);
 
-            btnDrop.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (layoutTickets.getVisibility() == View.GONE) {
-                        expand(layoutTickets);
-                        btnDrop.setImageResource(R.drawable.ic_drop_down);
-                    } else {
-                        collapse(layoutTickets);
-                        btnDrop.setImageResource(R.drawable.ic_drop_up);
-
-                    }
-                }
-            });
-            tvEventName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("CLICK", "onClick: " + tvEventName.getText().toString());
-                }
-            });
+            btnDrop.setOnClickListener(this);
+            tvEventDate.setOnClickListener(this);
+            tvEventName.setOnClickListener(this);
 
         }
 
@@ -155,6 +139,22 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
 
+        @Override
+        public void onClick(View view) {
+            int id = view.getId();
+            if(id == R.id.btnDrop || id == R.id.tvName || id == R.id.tvDate)
+            {
+                if (layoutTickets.getVisibility() == View.GONE) {
+                    expand(layoutTickets);
+                    btnDrop.setImageResource(R.drawable.ic_drop_down);
+                } else {
+                    collapse(layoutTickets);
+                    btnDrop.setImageResource(R.drawable.ic_drop_up);
+
+                }
+            }
+
+        }
     }
 
 }
