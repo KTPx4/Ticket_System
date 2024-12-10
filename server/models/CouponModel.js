@@ -6,20 +6,33 @@ const CouponSchema = new mongoose.Schema({
       type: String,
       unique: true
     },
-    name: String,
-    desc: String,
-    type: String,
+    name: {
+        type:String,
+        default: "Mã giảm giá"
+    },
+    desc: {
+        type: String,
+        default: "Đây là mã giảm giá cho bạn, số lượng có hạn. Hãy nhanh tay!"
+    },
+    type: {
+        type: String,
+        default: "public"
+    },
     maxDiscount: {
         type: Number,
         default: -1
     },
     percentDiscount:{
         type: Number,
-        default: 0
+        default: 5
     },
     count:{
         type: Number,
         default: 10
+    },
+    isValid:{
+        type: Boolean,
+        default: true
     }
 })
 CouponSchema.pre('save', async function (next) {

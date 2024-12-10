@@ -8,6 +8,7 @@ const EventValidator = require('../middlewares/event/EventValidator')
 const AccountAuth = require('../middlewares/account/Account')
 const AccountController = require('../controllers/AccountController')
 const EventController = require('../controllers/EventController')
+const OrderController = require('../controllers/OrderController')
 
 _APP.get('/', EventController.GetAll)
 _APP.post('/', StaffAuth.AuthStaff , EventValidator.Create, EventController.Create)
@@ -44,6 +45,9 @@ _APP.put('/:id/ticket', StaffAuth.AuthStaff, EventValidator.IsExistEvent, EventV
 
 // scan ticket
 _APP.post('/:id/scan',  EventValidator.IsExistEvent, EventValidator.Scan, EventController.ScanTicket )
+
+// get order by (event & user)
+_APP.get('/:id/order' , AccountAuth.AuthAccount, EventValidator.IsExistEvent, OrderController.GetByEvent)
 
 module.exports = (root) =>{
 
