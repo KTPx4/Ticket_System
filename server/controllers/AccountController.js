@@ -460,15 +460,28 @@ module.exports.Update = async(req, res)=>{
         if (Object.keys(updateData).length === 0) {
             return res.status(400).json({ message: 'Không có giá trị để sửa' });
         }
-        const updatedEvent = await AccountModel.findByIdAndUpdate(
+        const updatedAccount = await AccountModel.findByIdAndUpdate(
             id,
             { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
             { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
         );
+        var token = ""
+        if(updateData.email)
+        {
+            var data = {
+                name: updatedAccount.name,
+                email: updatedAccount.email,
+                image: updatedAccount.image,
+                pass: updatedAccount.pass
+            }
+
+            token = await jwt.sign(data, SECRET_LOGIN, {expiresIn: "7d"} )
+        }
 
         res.status(200).json({
-            message: "Chỉnh sửa sự kiện thành công",
-            data: updatedEvent
+            message: "Chỉnh sửa thông tin thành công",
+            token: token,
+            data: updatedAccount
         });
     }
     catch (e) {
