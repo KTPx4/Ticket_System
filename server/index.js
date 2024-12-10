@@ -22,8 +22,11 @@ const ArtistRouter = require('./routes/ArtistRouter')
 const EventRouter = require('./routes/EventRouter')
 const AccountRouter = require('./routes/AccountRouter')
 const OrderRouter = require('./routes/OrderRouter')
+const TicketRouter = require('./routes/TicketRouter')
 const StaffAuth = require("./middlewares/staffs/Staff");
 const NewsRouter = require('./routes/NewsRouter')
+const CouponRouter = require('./routes/CouponRouter')
+
 const fs = require("fs");
 const Generate = require('./modules/Generate')
 // Import cron job
@@ -52,6 +55,8 @@ _APP.use('/api/v1/event', EventRouter(__dirname))
 _APP.use('/api/v1/news', NewsRouter)
 _APP.use('/api/v1/account', AccountRouter(__dirname))
 _APP.use('/api/v1/order', OrderRouter)
+_APP.use('/api/v1/ticket', TicketRouter)
+_APP.use('/api/v1/coupon', CouponRouter)
 _APP.use("/*",(req, res)=>{
     return res.status(404).json({
         status: "notfound",

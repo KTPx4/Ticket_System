@@ -11,8 +11,6 @@ _APP.get('/', AuthAcc.AuthAccount, Controller.GetAll)
 // create order for user
 _APP.post('/', AuthAcc.AuthAccount, Validator.Create, Controller.Create)
 
-// get order by (event & user)
-_APP.get('/:id' , AuthAcc.AuthAccount, EventValidator.IsExistEvent, Controller.GetByEvent)
 
 // change list member / typePayment for order by (event & user)
 _APP.put('/:id' , AuthAcc.AuthAccount, EventValidator.IsExistEvent, Validator.Update, Controller.Update)
@@ -21,7 +19,9 @@ _APP.put('/:id' , AuthAcc.AuthAccount, EventValidator.IsExistEvent, Validator.Up
 // add coupon -> create payment detail with code and wait user pay
 // -> post /valid check code of payment with api
 // -> get money, code from api payment gateway to check with payment detail
-_APP.post('/:id/checkout', AuthAcc.AuthAccount, )
+
+// id of buy ticket model
+_APP.post('/:id/checkout', AuthAcc.AuthAccount,  Validator.GetCheckOut, Controller.GetCheckOut)
 
 _APP.post('/:id/valid', (req, res) =>{
     console.log("id: ", req.params.id)

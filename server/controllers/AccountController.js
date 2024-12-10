@@ -367,7 +367,9 @@ module.exports.GetOrderPending = async (req, res) => {
             $or: [
                 { members: User._id },
                 { accCreate: User._id }
-            ]
+            ],
+            status: "waiting"
+
         })
             .populate({
                 path: 'members', // Liên kết members

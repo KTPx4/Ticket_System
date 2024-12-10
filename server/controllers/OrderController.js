@@ -3,7 +3,8 @@ const TicketModel = require('../models/TicketModel')
 const AccountModel = require('../models/AccountModel')
 const BuyTicketModel = require('../models/BuyTicket')
 const EventModel = require("../models/EventModel");
-
+const jwt = require("jsonwebtoken");
+const SECRET_ORDER = process.env.SECRET_ORDER || "secret-key-order-px4"
 module.exports.GetAll= async(req, res)=>{
     try{
         var {User} = req.vars
@@ -68,6 +69,7 @@ module.exports.GetByEvent = async(req, res)=>{
 
 module.exports.Create = async (req, res) => {
     try {
+
         const { Event, User, ListTicket } = req.vars;
 
         const userId = User._id;
@@ -78,7 +80,7 @@ module.exports.Create = async (req, res) => {
             ListTicket.map(async (ticket) => {
                 let TicketInfo = await TicketInfoModel.findOne({
                     event: eventId,
-                    ticket: ticket,
+                    ticket: ticket
                 });
 
                 if (!TicketInfo) {
@@ -95,17 +97,23 @@ module.exports.Create = async (req, res) => {
         let existBuyTicket = await BuyTicketModel.findOne({
             accCreate: userId,
             event: eventId,
+            status: "waiting"
         });
 
         if (existBuyTicket) {
+            // Lọc những ticketInfo chưa có
+            const newTickets = listInfo.filter((id) => !existBuyTicket.ticketInfo.includes(id));
+
             // Thêm các ticket info mới vào danh sách
-            existBuyTicket.ticketInfo.push(...listInfo);
+            existBuyTicket.ticketInfo.push(...newTickets);
+
             await existBuyTicket.save();
 
             return res.status(200).json({
                 message: "Đã thêm vé",
                 data: existBuyTicket,
             });
+
         } else {
             // Tạo mới BuyTicket
             const BuyTicket = await BuyTicketModel.create({
@@ -135,7 +143,7 @@ module.exports.Update = async(req, res)=> {
         const userId = User._id;
         const eventId = Event._id;
 
-        const updatedEvent = await BuyTicketModel.findByIdAndUpdate(
+        const updatedEvent = await BuyTicketModel.findOneAndUpdate(
             {
                 accCreate: userId,
                 event: eventId
@@ -156,4 +164,87 @@ module.exports.Update = async(req, res)=> {
         });
     }
 
+}
+
+module.exports.GetCheckOut = async(req, res)=>{
+    try{
+        var {User, Coupon, BuyTicket, Infos} = req.vars
+        var {infos} = req.body
+        var CouponDiscount = 0
+        var totalPrice = 0
+        var DiscountMoney = 0
+        var FinalMoney = 0
+
+        if(BuyTicket.typePayment === "all")
+        {
+            // Tính tổng `price` từ `ticket_types`
+            totalPrice = BuyTicket.ticketInfo.reduce((total, ticketInfo) => {
+                const ticketPrice = ticketInfo.ticket?.info?.price || 0; // Lấy giá tiền, nếu không có thì là 0
+                return total + ticketPrice;
+            }, 0);
+            DiscountMoney = BuyTicket.discount?.percentDiscount ? (BuyTicket.discount?.percentDiscount*totalPrice)/100 : 0
+        }
+        else if(BuyTicket.typePayment === "single")
+        {
+             totalPrice = Infos.reduce((acc, info) => {
+                acc += info.ticket.info.price;
+                return acc;
+            }, 0);
+        }
+        else{
+            return res.status(400)
+                .json({
+                    message: "Loại thanh toán không hợp lệ"
+                })
+        }
+
+        if(Coupon)
+        {
+            CouponDiscount = Coupon.maxDiscount < 0
+                ? (Coupon.percentDiscount * totalPrice) / 100
+                : Math.min((Coupon.percentDiscount * totalPrice) / 100, Coupon.maxDiscount);
+        }
+
+        FinalMoney = Math.max(totalPrice - DiscountMoney - CouponDiscount, 100)
+
+        var data = {
+            User: User,
+            Type:  BuyTicket.typePayment.toLowerCase(),
+            BuyTicket: BuyTicket,
+            Coupon: Coupon??"",
+            Price: totalPrice,
+            Discount: DiscountMoney,
+            CouponDiscount: CouponDiscount,
+            FinalPrice: FinalMoney,
+            Infos: Infos
+        }
+        var dataSign ={
+            User: User._id,
+            Type: "all",
+            BuyTicket: BuyTicket._id,
+            Coupon: Coupon?._id??"",
+            Price: totalPrice,
+            Discount: DiscountMoney,
+            CouponDiscount: CouponDiscount,
+            FinalPrice: FinalMoney,
+            Infos: infos
+        }
+
+        await jwt.sign(dataSign, SECRET_ORDER, {expiresIn: "5m"}, (err, tokenLogin)=>{
+            if(err) throw err
+            return res.status(200).json({
+                status: "Lấy thông tin thanh toán thành công",
+                message: "Lấy thông tin thanh toán thành công",
+                data: data,
+                token: tokenLogin
+            })
+        })
+    }
+    catch (error) {
+        console.error("OrderController - GetCheckOut: ", error);
+        return res.status(500).json({
+            message: "Lỗi khi lấy thông tin",
+            error: error.message,
+        });
+    }
 }
