@@ -322,12 +322,12 @@ module.exports.GetMyTicket = async (req, res) => {
                     from: 'ticket_types',  // Tên collection chứa thông tin ticket loại vé
                     localField: 'info',  // Trường info chứa ID của loại vé
                     foreignField: '_id',
-                    as: 'ticketInfo'  // Kết quả sẽ lưu vào trường `ticketInfo`
+                    as: 'info'  // Kết quả sẽ lưu vào trường `ticketInfo`
                 }
             },
             {
                 $unwind: { // Giải nén mảng `ticketInfo` thành object
-                    path: '$ticketInfo',
+                    path: '$info',
                     preserveNullAndEmptyArrays: true // Đảm bảo ticketInfo vẫn là null nếu không có dữ liệu
                 }
             },
@@ -373,11 +373,11 @@ module.exports.GetOrderPending = async (req, res) => {
         })
             .populate({
                 path: 'members', // Liên kết members
-                select: '-password' // Không trả về trường password nếu có
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
             })
             .populate({
                 path: 'accCreate', // Liên kết accCreate
-                select: '-password'
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
             })
             .populate('event') // Liên kết event
             .populate('discount') // Liên kết discount
@@ -401,6 +401,8 @@ module.exports.GetOrderPending = async (req, res) => {
                 }
             })
             .lean(); // Trả về plain object để dễ thao tác hơn
+
+
 
         return res.status(200).json({
             message: "Lấy thành công",
@@ -560,3 +562,4 @@ const createFolder = (root, idUser, nameAvt)=>
     return true;
     // Kiểm tra xem tệp tin nguồn tồn tại hay không
 }
+

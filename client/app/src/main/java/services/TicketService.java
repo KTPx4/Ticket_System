@@ -13,6 +13,8 @@ import modules.LocalStorageManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import services.response.ticket.ResponseMyPending;
+import services.response.ticket.ResponseMyTicket;
 
 public class TicketService {
 
@@ -31,7 +33,7 @@ public class TicketService {
         this.token = localStorageManager.getLoginToken();
     }
 
-    public void GetMyTicket(ResponseCallback callback)
+    public void GetMyTicket(MyTicketCallback callback)
     {
         new Thread(() -> {
             try {
@@ -64,50 +66,49 @@ public class TicketService {
             }
         }).start();
     }
+    public void GetMyPending(MyPendingCallback callback)
+    {
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/account/pending";
 
-    public interface ResponseCallback {
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+
+                    Log.d("GetMyTicket", "Response Body: " + responseBody);
+
+                    Gson gson = new Gson();
+                    ResponseMyPending responseData = gson.fromJson(responseBody, ResponseMyPending.class);
+                    Log.d("ParsedData", gson.toJson(responseData));
+                    callback.onSuccess(responseData.getData());
+                } else {
+                    callback.onFailure("Token is not valid for user.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Tải vé thất bại" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public interface MyTicketCallback {
         void onSuccess(List<MyTicket> events);
         void onFailure(String error);
     }
 
-    public class ResponseMyTicket {
-        private String message;
-        private int length;
-        private List<MyTicket> data;
-
-        public ResponseMyTicket() {
-        }
-
-        public ResponseMyTicket(String message, int length, List<MyTicket> data) {
-            this.message = message;
-            this.length = length;
-            this.data = data;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public int getLength() {
-            return length;
-        }
-
-        public void setLength(int length) {
-            this.length = length;
-        }
-
-        public List<MyTicket> getData() {
-            return data;
-        }
-
-        public void setData(List<MyTicket> data) {
-            this.data = data;
-        }
-        // Getters and Setters
+    public interface MyPendingCallback {
+        void onSuccess(List<MyPending> pendings);
+        void onFailure(String error);
     }
+
 
 }
