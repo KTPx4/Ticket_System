@@ -4,27 +4,33 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.ticketbooking.R;
+import com.google.gson.Gson;
 
 
 import org.json.JSONObject;
 
+import model.account.Account;
 import modules.LocalStorageManager;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import services.response.account.ResponseAccount;
+import services.response.ticket.ResponsePending;
 
 public class AccountService {
     private Context context;
     String SERVER = "";
     private final OkHttpClient client;
     private LocalStorageManager localStorageManager;
+    private String myToken ;
     public AccountService(Context context) {
         client = new OkHttpClient();
         this.context = context;
         this.SERVER = context.getString(R.string.server_url);
         this.localStorageManager = new LocalStorageManager(context);
+        myToken = localStorageManager.getLoginToken();
     }
 
     public void registerAccount(String email, String password, ResponseCallback callback) {
@@ -301,6 +307,48 @@ public class AccountService {
         }).start();
     }
 
+    public void findByEmail(String email,OnFindByEmailCallback callback )
+    {
+        if(email == null || email.isEmpty())
+        {
+            callback.onFailure("Không có email");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/account/find?email=" + email;
+
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + myToken)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                ResponseAccount responseData = gson.fromJson(responseBody, ResponseAccount.class);
+                if (response.isSuccessful()) {
+
+                    Log.d("GetMyTicket", "Response Body: " + responseBody);
+
+
+                    Log.d("ParsedData", gson.toJson(responseData));
+
+                    callback.onSuccess(responseData.getData());
+
+                } else {
+                    callback.onFailure(responseData.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Tải thông tin thất bại" + e.getMessage());
+            }
+        }).start();
+    }
     // Interface callback để xử lý kết quả
     public interface ResponseCallback {
         void onSuccess(String message);
@@ -310,6 +358,11 @@ public class AccountService {
 
     public interface OnVerifyCallback {
         void onSuccess();
+        void onFailure(String error);
+    }
+
+    public interface OnFindByEmailCallback {
+        void onSuccess(Account account);
         void onFailure(String error);
     }
 }

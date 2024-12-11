@@ -67,4 +67,16 @@ public class Account {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "_id='" + _id + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", point=" + point +
+                ", image='" + image + '\'' +
+                ", address='" + address + '\'' +
+                '}';
+    }
 }

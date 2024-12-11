@@ -1,12 +1,17 @@
 package model.ticket;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import model.account.Account;
 import model.event.Event;
 import modules.DateConverter;
 
-public class MyPending {
+public class MyPending{
 
     private String _id;
     private List<Account> members;
@@ -95,6 +100,17 @@ public class MyPending {
         return DateConverter.convertToHCM(date);
     }
 
-
-
+    @Override
+    public String toString() {
+        return "MyPending{" +
+                "_id='" + _id + '\'' +
+                ", members=" + members +
+                ", accCreate=" + accCreate +
+                ", event=" + event +
+                ", ticketInfo=" + ticketInfo +
+                ", date='" + date + '\'' +
+                ", typePayment='" + typePayment + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

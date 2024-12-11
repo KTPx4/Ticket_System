@@ -1,11 +1,10 @@
-package com.example.ticketbooking.ticket.adapter;
+package com.example.ticketbooking.ticket.adapter.event;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.ticket.adapter.TicketItemAdapter;
 
 import java.util.List;
 
