@@ -138,19 +138,43 @@ module.exports.Create = async (req, res) => {
 
 module.exports.Update = async(req, res)=> {
     try {
-        const {Event, User, Update} = req.vars;
+        const {BuyTicket, User, Update} = req.vars;
 
-        const userId = User._id;
-        const eventId = Event._id;
+
 
         const updatedEvent = await BuyTicketModel.findOneAndUpdate(
             {
-                accCreate: userId,
-                event: eventId
+                _id: BuyTicket._id
             },
             {$set: Update}, // Cập nhật chỉ các trường hợp lệ
             {new: true, runValidators: true} // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
-        );
+        )
+            .populate({
+                path: 'members', // Liên kết members
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate('event') // Liên kết event
+            .populate({
+                path: 'accCreate', // Liên kết accCreate
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate({
+                path: 'ticketInfo', // Liên kết ticketInfo
+                match: {
+                    $or: [
+                        { accPay: { $exists: false } }, // ticketInfo không có accPay
+                        { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                    ]
+                },
+                populate: {
+                    path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
+                    populate: {
+                        path: 'info', // Liên kết tiếp tới info trong ticket
+                        model: 'ticket_types'
+                    }
+                }
+            })
+
         return res.status(200).json({
             message: "Chỉnh sửa thành công",
             data: updatedEvent,

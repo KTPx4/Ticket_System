@@ -1,8 +1,6 @@
-package com.example.ticketbooking.ticket.adapter;
+package com.example.ticketbooking.ticket.adapter.pending;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ticketbooking.R;
-import com.example.ticketbooking.ticket.TicketInfoActivity;
 import com.example.ticketbooking.ticket.viewcustom.TicketView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import model.ticket.Ticket;

@@ -13,7 +13,7 @@ _APP.post('/', AuthAcc.AuthAccount, Validator.Create, Controller.Create)
 
 
 // change list member / typePayment for order by (event & user)
-_APP.put('/:id' , AuthAcc.AuthAccount, EventValidator.IsExistEvent, Validator.Update, Controller.Update)
+_APP.put('/:id' , AuthAcc.AuthAccount, Validator.isExistsBuyTicket , Validator.Update, Controller.Update)
 
 //----------- id of buy ticket model
 // add coupon -> create payment detail with code and wait user pay

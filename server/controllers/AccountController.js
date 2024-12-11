@@ -12,6 +12,7 @@ const StaffModel = require("../models/StaffModel");
 const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
 const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret_reset"; // Khóa bí mật cho JWT
 const SERVER = process.env.SERVER
+
 module.exports.GetMyAccount= async (req, res)=>{
     try{
         var {User} = req.vars
@@ -26,6 +27,34 @@ module.exports.GetMyAccount= async (req, res)=>{
             message: "Lấy thông tin thành công",
             data: acc
         })
+    }
+    catch (e)
+    {
+        console.log("Error at AccountController - GetMyAccount: ", e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
+        })
+    }
+
+}
+module.exports.FindByEmail= async (req, res)=>{
+    try{
+        var {email} = req.query || ""
+
+        var acc = await AccountModel.findOne({email: email})
+        if(!acc)
+        {
+            return res.status(400).json({
+                message: "Không tồn tại tài khoản với email này"
+            })
+        }
+        else{
+            return res.status(200).json({
+                message: "Lấy thông tin thành công",
+                data: acc
+            })
+
+        }
     }
     catch (e)
     {
@@ -357,7 +386,55 @@ module.exports.GetMyTicket = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+module.exports.GetPendingById =async (req, res)=>{
+    try {
+        const { id } = req.params;
 
+        // Tìm các BuyTicket phù hợp
+        const buyTickets = await mongoose.model('buy_tickets').findById(id)
+            .populate({
+                path: 'members', // Liên kết members
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate({
+                path: 'accCreate', // Liên kết accCreate
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate('event') // Liên kết event
+            .populate('discount') // Liên kết discount
+            .populate('coupon') // Liên kết coupon
+            .populate('payment') // Liên kết payment
+            .populate('accPay') // Liên kết accPay
+            .populate({
+                path: 'ticketInfo', // Liên kết ticketInfo
+                match: {
+                    $or: [
+                        { accPay: { $exists: false } }, // ticketInfo không có accPay
+                        { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                    ]
+                },
+                populate: {
+                    path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
+                    populate: {
+                        path: 'info', // Liên kết tiếp tới info trong ticket
+                        model: 'ticket_types'
+                    }
+                }
+            })
+            .lean(); // Trả về plain object để dễ thao tác hơn
+
+
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: buyTickets.length,
+            data: buyTickets
+        });
+    } catch (e) {
+        console.error("AccountController - GetOrderPending:", e);
+        return res.status(500).json({ message: "Server error" });
+    }
+}
 module.exports.GetOrderPending = async (req, res) => {
     try {
         const { User } = req.vars;

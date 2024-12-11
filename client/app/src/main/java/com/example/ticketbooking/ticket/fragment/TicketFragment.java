@@ -1,7 +1,11 @@
 package com.example.ticketbooking.ticket.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +21,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.ticketbooking.R;
-import com.example.ticketbooking.ticket.adapter.EventAdapter;
-import com.example.ticketbooking.ticket.adapter.PendingAdapter;
+import com.example.ticketbooking.ticket.EditPendingActivity;
+import com.example.ticketbooking.ticket.adapter.event.EventAdapter;
+import com.example.ticketbooking.ticket.adapter.pending.PendingAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +62,7 @@ public class TicketFragment extends Fragment{
 
     private Handler handler = new Handler();
     private Runnable searchRunnable;
+    private TicketService ticketService;
     private static final int SEARCH_DELAY = 300; // Delay 300ms
 
     public TicketFragment( ) {
@@ -82,6 +89,51 @@ public class TicketFragment extends Fragment{
         }
     }
 
+    private ActivityResultLauncher<Intent> editActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    // Lấy dữ liệu trả về từ Activity
+                    String updatedTicketId = result.getData().getStringExtra("idBuyTicket");
+                    if (updatedTicketId != null) {
+                        // Gọi hàm cập nhật adapter với ID vé đã được thay đổi
+                        updateTicketData(updatedTicketId);
+                    }
+                }
+            }
+    );
+
+    private void updateTicketData(String updatedTicketId) {
+        if(ticketService != null)
+        {
+            ticketService.GetPendingById(updatedTicketId, new TicketService.PendingCallback() {
+                @Override
+                public void onSuccess(MyPending newPendings) {
+                    getActivity().runOnUiThread(()->{
+                        for (int i = 0; i < allPendings.size(); i++) {
+                            MyPending pending = allPendings.get(i);
+                            if (pending.get_id().equals(updatedTicketId)) {
+                                // Fetch updated data for this ticket from server or local cache
+                                allPendings.set(i, newPendings);
+                                filteredPendings.clear();
+                                filteredPendings.addAll(allPendings);
+                                break;
+                            }
+                        }
+                        pendingAdapter.notifyDataSetChanged();
+                    });
+                }
+
+                @Override
+                public void onFailure(String error) {
+
+                }
+            });
+        }
+
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -91,7 +143,7 @@ public class TicketFragment extends Fragment{
         listEvent.setLayoutManager(new LinearLayoutManager(getContext()));
         edSearch = view.findViewById(R.id.edSearch);
         proLoading = view.findViewById(R.id.proLoading);
-
+        ticketService = new TicketService(getContext());
         // init adapter
         ticketAdapter = new EventAdapter(getContext(), new ArrayList<>());
         pendingAdapter = new PendingAdapter(getContext(), new ArrayList<>());
@@ -134,7 +186,14 @@ public class TicketFragment extends Fragment{
                         allPendings.clear();
                         allPendings.addAll(MyPending);
                         filteredPendings.addAll(MyPending);
-                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings); // Không cần final
+
+                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings, buyTicketId -> {
+                            Log.d("IDBUY", "onSuccess: " + buyTicketId);
+                            Intent intent = new Intent(getContext(), EditPendingActivity.class);
+                            intent.putExtra("idBuyTicket", buyTicketId);
+                            editActivityLauncher.launch(intent);
+                        });
+
                         listEvent.setAdapter(pendingAdapter);
 
                         proLoading.setVisibility(View.GONE); // Hide the progress bar when data is loaded

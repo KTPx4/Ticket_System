@@ -2,7 +2,27 @@ const jwt = require('jsonwebtoken')
 const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
 const bcrypt = require('bcrypt')
 const AccountModel = require('../../models/AccountModel')
+const mongoose = require("mongoose");
 
+module.exports.GetPendingById = async (req, res, next)=>{
+    try {
+        var {id} = req.params
+        if (!id || !mongoose.isValidObjectId(id))
+        {
+            return res.status(400).json({
+                message: "Id không đúng"
+            })
+        }
+        return next()
+    }
+    catch (e) {
+        console.log("Error at Account - GetPendingById: ", err);
+        return res.status(500).json({
+            status: "Error Server",
+            message: "Vui lòng thử lại sau"
+        })
+    }
+}
 module.exports.AuthAccount = async (req, res, next) =>{
     try{
         // Get token from header or body

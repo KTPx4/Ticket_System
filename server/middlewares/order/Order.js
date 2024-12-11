@@ -78,14 +78,38 @@ module.exports.Create = async(req, res, next)=>{
     }
 
 }
+module.exports.isExistsBuyTicket = async (req, res, next)=>{
+    var {id} = req.params
+    if(!id)
+    {
+        return res.status(400).json({
+            message: "Thiếu id đơn hàng"
+        })
+    }
+    // Kiểm tra nếu id không phải là ObjectId hợp lệ
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            message: "Id không hợp lệ!"
+        });
+    }
+    var event = await BuyTicketModel.findById(id)
 
+    if(!event)
+    {
+        return res.status(400).json({
+            message: "Đơn không tồn tại"
+        })
+    }
+    req.vars.BuyTicket = event
+    return next()
+}
 module.exports.Update = async(req, res, next)=>{
    try{
        var {members, typePayment} = req.body
-       var {Event, User} = req.vars
+       var {BuyTicket, User} = req.vars
        const updateData = {}; // Dữ liệu đã qua kiểm tra sẽ lưu ở đây
        // members
-       if(Array.isArray(members) && members.length > 0)
+       if(Array.isArray(members) )
        {
            members = [...new Set(members)];
            updateData.members = members
@@ -93,6 +117,11 @@ module.exports.Update = async(req, res, next)=>{
            {
                return res.status(400).json({ message: "Không thể tự thêm mình vào danh sách thành viên"});
            }
+           if(!members.every(member => mongoose.Types.ObjectId.isValid(member)))
+           {
+               return res.status(400).json({ message: "Có chứa Id member không hợp lệ"});
+           }
+
            const existingMembers = await AccountModel.find({
                _id: { $in: updateData.members }, // Lọc theo danh sách `members`
            });
@@ -133,7 +162,7 @@ module.exports.Update = async(req, res, next)=>{
 
        // Tìm discount có memberRange >= memberLength
        const discount = await DiscountModel.findOne({
-           event: Event._id,
+           event: BuyTicket.event,
            memberRange: { $gte: memberLength },
        })
            .sort({ memberRange: 1 }); // Sắp xếp memberRange tăng dần để lấy model nhỏ nhất phù hợp
