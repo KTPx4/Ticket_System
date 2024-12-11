@@ -9,7 +9,7 @@
     android:layout_height="120dp"
     android:background="@color/transparent"
     >
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/layoutTicket"
         android:layout_width="match_parent"
         android:orientation="vertical"
@@ -19,9 +19,6 @@
         android:layout_height="match_parent">
         <TextView
             android:id="@+id/tvId"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:maxLines="1"
             android:ellipsize="end"
             android:layout_width="wrap_content"
@@ -32,9 +29,6 @@
             />
         <TextView
             android:id="@+id/tvType"
-            app:layout_constraintTop_toBottomOf="@+id/tvId"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ex_text_types"
@@ -42,9 +36,6 @@
             />
         <TextView
             android:id="@+id/tvLocation"
-            app:layout_constraintTop_toBottomOf="@+id/tvType"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ex_text_location"
@@ -53,25 +44,10 @@
             />
         <TextView
             android:id="@+id/tvPosition"
-            app:layout_constraintTop_toBottomOf="@+id/tvLocation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ex_text_position"
             android:textSize="16dp"
             />
-
-        <ImageButton
-            android:visibility="gone"
-            android:id="@+id/btnDelTicket"
-            android:backgroundTint="@color/transparent"
-            android:src="@drawable/ic_delete"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.example.ticketbooking.ticket.viewcustom.TicketView>

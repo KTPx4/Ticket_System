@@ -15,6 +15,8 @@ import com.example.ticketbooking.ticket.TicketInfoActivity;
 import com.example.ticketbooking.ticket.viewcustom.TicketView;
 
 import model.ticket.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.TicketViewHolder> {
@@ -24,6 +26,15 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
     public TicketItemAdapter(Context context, List<Ticket> ticketList) {
         this.context = context;
         this.ticketList = ticketList;
+    }
+    public TicketItemAdapter(Context context, List<TicketInfo> ticketInfos, int option) {
+        this.context = context;
+        List<Ticket> tickets = new ArrayList<>();
+        for(TicketInfo ticketInfo : ticketInfos)
+        {
+            tickets.add(ticketInfo.getTicket());
+        }
+        this.ticketList = tickets;
     }
 
     @NonNull
@@ -37,8 +48,8 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
     public void onBindViewHolder(@NonNull TicketViewHolder holder, int position) {
         Ticket ticket = ticketList.get(position);
         holder.tvId.setText(ticket.get_id());
-        holder.tvType.setText("Loại vé: "+ticket.getTicketInfo().getTypeTicket());
-        holder.tvLocation.setText("Vị trí: "+ticket.getTicketInfo().getLocation());
+        holder.tvType.setText("Loại vé: "+ticket.getInfo().getTypeTicket());
+        holder.tvLocation.setText("Vị trí: "+ticket.getInfo().getLocation());
         holder.tvPosition.setText("Số ghế: "+ ticket.getPosition());
         holder.bind(context, ticket);
     }
@@ -65,12 +76,12 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
         public void bind(Context context, Ticket ticket) {
             // Gắn dữ liệu vào View
             tvId.setText(ticket.get_id());
-            tvType.setText("Loại vé: " + ticket.getTicketInfo().getTypeTicket());
-            tvLocation.setText("Vị trí: " + ticket.getTicketInfo().getLocation());
+            tvType.setText("Loại vé: " + ticket.getInfo().getTypeTicket());
+            tvLocation.setText("Vị trí: " + ticket.getInfo().getLocation());
             tvPosition.setText("Số ghế: " + ticket.getPosition());
             if(!ticket.isValid())
             {
-                ticketView.setBackgroundColor(context.getColor(R.color.Dark_Rose));
+                ticketView.setBackgroundColor(context.getColor(R.color.inValid_Ticket));
             }
             // Set sự kiện click
             ticketView.setOnClickListener(new View.OnClickListener() {
@@ -85,8 +96,8 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
 
                     // Truyền dữ liệu qua Intent
                     intent.putExtra("ticketId", ticket.get_id());
-                    intent.putExtra("type", ticket.getTicketInfo().getTypeTicket());
-                    intent.putExtra("location", ticket.getTicketInfo().getLocation());
+                    intent.putExtra("type", ticket.getInfo().getTypeTicket());
+                    intent.putExtra("location", ticket.getInfo().getLocation());
                     intent.putExtra("position", ticket.getPosition() + "");
 
                     // Khởi chạy Activity
