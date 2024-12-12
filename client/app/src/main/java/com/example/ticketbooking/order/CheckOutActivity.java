@@ -252,19 +252,19 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
             tvDiscountCoupon.setText(MoneyFormatter.formatCurrency(data.getCouponDiscount()) + "");
             tvFinalMoney.setText(MoneyFormatter.formatCurrency(data.getFinalPrice()) + "");
 
+
             listTicketData.clear();
             ArrayList<TicketInfo> tickets = myPending.getTicketInfo().stream()
                     .filter(ticketInfo ->
-                            ticketInfo.getTicket() != null && // Kiểm tra null cho Ticket
-                                    (
-                                        ticketInfo.getTicket().getAccBuy() == null || // Kiểm tra null cho AccBuy
-                                        ticketInfo.getTicket().getAccBuy().isEmpty()
-                                    )// Kiểm tra không rỗng
+                            ticketInfo.getTicket() != null && // Ticket không null
+                                    listId.contains(ticketInfo.get_id()) // id của Ticket nằm trong listId
                     )
                     .collect(Collectors.toCollection(ArrayList::new)); // Thu thập kết quả thành ArrayList
 
             listTicketData.addAll(tickets);
             arrayAdapter.notifyDataSetChanged();
+
+
             isLoading = false;
             isWaiting = false;
             setWaiting();
