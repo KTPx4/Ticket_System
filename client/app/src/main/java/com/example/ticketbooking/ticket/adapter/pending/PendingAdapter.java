@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -32,19 +33,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.ticket.MyPending;
+import model.ticket.TicketInfo;
 import modules.LocalStorageManager;
+import modules.MoneyFormatter;
+import services.OrderService;
 
 public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventViewHolder> {
     private final Context context;
     private final List<MyPending> myTicketList;
     private final RecyclerView.RecycledViewPool sharedPool; // Tạo pool dùng chung
-
+    private TicketPendingAdapter ticketItemAdapter;
+    private final  List<TicketInfo> dataSet = new ArrayList<>();
     private  final List<String> listInfo = new ArrayList<>();
     private OnEditTicketListener listener;
     private LocalStorageManager localStorageManager;
+    private OrderService orderService;
 
     public interface OnEditTicketListener {
-        void onEditTicket(String ticketId);
+        void onEditTicket(String buyTicketId);
+        void onCheckOutTicket(String ticketId, List<String> lisInfo);
+        void onDeleteBuyTicket(String buyTicketId);
     }
 
     public PendingAdapter(Context context, List<MyPending> myTicketList,OnEditTicketListener listener) {
@@ -53,12 +61,14 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         this.sharedPool = new RecyclerView.RecycledViewPool(); // Khởi tạo pool
         this.listener = listener;
         localStorageManager = new LocalStorageManager(context);
+        orderService = new OrderService(context);
     }
     public PendingAdapter(Context context, List<MyPending> myTicketList) {
         this.context = context;
         this.myTicketList = myTicketList;
         this.sharedPool = new RecyclerView.RecycledViewPool(); // Khởi tạo pool
         localStorageManager = new LocalStorageManager(context);
+        orderService = new OrderService(context);
 
     }
 
@@ -67,7 +77,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.ticket_item_pending, parent, false);
-        return new EventViewHolder(view);
+        return new EventViewHolder(view, orderService);
     }
 
     @Override
@@ -88,10 +98,12 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.tvEventDate.setText(myPending.getEvent().getDate().getStart());
         holder.tvNameCreate.setText("Người tạo: "+myPending.getAccCreate().getName());
         holder.tvMembers.setText( "Thành viên: "+ myPending.getMembers().stream().count());
-        holder.tvTypePay.setText("Loại mua vé: "+ typePay);
+        holder.tvTypePay.setText("Hình thức mua vé: "+ typePay);
+        dataSet.clear();
+        dataSet.addAll(myPending.getTicketInfo());
 
         // Set the TicketItemAdapter for the nested RecyclerView (listTicket)
-        TicketPendingAdapter ticketItemAdapter = new TicketPendingAdapter(context, myPending.getTicketInfo(), new TicketPendingAdapter.OnTicketClickListener() {
+        ticketItemAdapter = new TicketPendingAdapter(context,dataSet , new TicketPendingAdapter.OnTicketClickListener() {
             @Override
             public void onTicketClick(String infoId) {
                 if(listInfo.contains(infoId))
@@ -115,7 +127,34 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
 
                         .setNegativeButton("Xóa", (dialog2, which) -> {
 
-                            Toast.makeText(context, "Đã xóa vé: " + infoId, Toast.LENGTH_SHORT).show();
+                            for(int i =0 ; i < dataSet.size(); i++)
+                            {
+                                String idInf = dataSet.get(i).get_id();
+                                if(idInf.equals(infoId))
+                                {
+                                    int finalI = i;
+                                    orderService.DeleteInfo(myPending.get_id(), idInf, new OrderService.ValidCallback() {
+                                        @Override
+                                        public void onSuccess(String success) {
+                                            ((Activity)context).runOnUiThread(()->{
+                                                dataSet.remove(finalI);
+                                                ticketItemAdapter.notifyDataSetChanged();
+                                                Toast.makeText(context, "Đã xóa vé: " + infoId, Toast.LENGTH_SHORT).show();
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onFailure(String error) {
+                                            ((Activity)context).runOnUiThread(()->{
+                                                Toast.makeText(context, error , Toast.LENGTH_SHORT).show();
+                                            });
+                                        }
+                                    });
+
+                                    break;
+                                }
+                            }
+
                         }).create();
 
                 dialog.show();
@@ -125,17 +164,18 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
 
             }
         });
+
         holder.btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listInfo.stream().count() < 1)
+                if(listInfo.stream().count() < 1 && myPending.getTypePayment().equals("single"))
                 {
                     Toast.makeText(context, "Vui lòng chọn vé", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                listInfo.forEach(id -> {
-                    Log.d("ID INFO", "id: "+ id);
-                });
+                if (listener != null) {
+                    listener.onCheckOutTicket(myPending.get_id(), listInfo);
+                }
 
             }
         });
@@ -148,6 +188,33 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                 }
             }
         });
+
+        holder.mainLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Tạo AlertDialog
+                AlertDialog dialog =new AlertDialog.Builder(context)
+                        .setTitle("Xác nhận")
+                        .setMessage("Bạn có chắc chắn muốn xóa?")
+                        .setPositiveButton("Hủy", (dialog1, which) -> {
+                            // Xử lý khi người dùng nhấn "Xóa"
+                            dialog1.dismiss();
+                        })
+                        .setNegativeButton("Xóa", (dialog2, which) -> {
+                            // Xử lý khi người dùng nhấn "Hủy"
+                            if (listener != null) {
+                                listener.onDeleteBuyTicket(myPending.get_id());
+                            }
+                        }).create();
+
+                dialog.show();
+                // Tùy chỉnh màu văn bản của các nút
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK); // Màu cho nút "Hủy"
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getColor(R.color.inValid_Ticket));  // Màu cho nút "Xóa"
+                return true; // Trả về true để ngăn chặn các sự kiện khác
+            }
+        });
+
         holder.listTicket.setLayoutManager(new LinearLayoutManager(context));
         holder.listTicket.setAdapter(ticketItemAdapter);
 
@@ -174,13 +241,16 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         ImageButton btnDrop;
         Button btnEdit, btnPay;
         LinearLayout layoutTickets;
-        public EventViewHolder(View itemView) {
+        OrderService orderService;
+        public EventViewHolder(View itemView, OrderService orderSv) {
             super(itemView);
+            this.orderService = orderSv;
             tvEventName = itemView.findViewById(R.id.tvName);
             tvEventDate = itemView.findViewById(R.id.tvDate);
             tvNameCreate = itemView.findViewById(R.id.tvNameCreate);
             tvMembers = itemView.findViewById(R.id.tvMembers);
             tvTypePay = itemView.findViewById(R.id.tvTypePay);
+
             listTicket = itemView.findViewById(R.id.listTicket);
             btnDrop = itemView.findViewById(R.id.btnDrop);
             btnEdit = itemView.findViewById(R.id.btnEdit);
@@ -216,29 +286,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                 }
             });
 
-            mainLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    // Tạo AlertDialog
-                    AlertDialog dialog =new AlertDialog.Builder(itemView.getContext())
-                            .setTitle("Xác nhận")
-                            .setMessage("Bạn có chắc chắn muốn xóa?")
-                            .setPositiveButton("Hủy", (dialog1, which) -> {
-                                // Xử lý khi người dùng nhấn "Xóa"
-                                dialog1.dismiss();
-                            })
-                            .setNegativeButton("Xóa", (dialog2, which) -> {
-                                // Xử lý khi người dùng nhấn "Hủy"
-                                Toast.makeText(itemView.getContext(), "Đã xóa: " + idBuyTicket, Toast.LENGTH_SHORT).show();
-                            }).create();
 
-                    dialog.show();
-                    // Tùy chỉnh màu văn bản của các nút
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK); // Màu cho nút "Hủy"
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(itemView.getContext().getColor(R.color.inValid_Ticket));  // Màu cho nút "Xóa"
-                    return true; // Trả về true để ngăn chặn các sự kiện khác
-                }
-            });
         }
         @Override
         public void onClick(View view) {

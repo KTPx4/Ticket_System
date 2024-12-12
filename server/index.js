@@ -30,7 +30,8 @@ const CouponRouter = require('./routes/CouponRouter')
 const fs = require("fs");
 const Generate = require('./modules/Generate')
 // Import cron job
-const ticketCronJob = require('./modules/CheckingTicket'); // Import cron job
+const ticketCronJob = require('./modules/CheckingTicket');
+const OrderController = require("./controllers/OrderController"); // Import cron job
 
 // variable
 const _APP = express()
@@ -48,6 +49,15 @@ _APP.use((req, res, next)=>{
 
 
 // need account router - login - register
+
+// _APP.post('/stripe-webhook', express.raw({ type: 'application/json' }), OrderController.StripeWebhook);
+_APP.get('/checkout/payment-success', OrderController.StripeSuccess);
+
+_APP.get('/checkout/payment-cancel', (req, res)=>{
+    return res.status(200).json({
+        message: "Thanh toán thất bại"
+    })
+});
 
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))

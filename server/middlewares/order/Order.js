@@ -57,10 +57,15 @@ module.exports.Create = async(req, res, next)=>{
         // }
 
         for (const id of tickets) {
-            const ticket = await TicketModel.findOne({ _id: id, event: event});
+            const ticket = await TicketModel.findOne({
+                _id: id,
+                event: event,
+                accBuy: null,
+                isValid: true
+            });
             if (!ticket) {
                 return res.status(400).json({
-                    message: `Vé có id '${id}' không tồn tại trong sự kiện`,
+                    message: `Vé có id '${id}' không tồn tại hoặc đã được bán`,
                 });
             }
             listTicket.push(ticket);
@@ -158,18 +163,22 @@ module.exports.Update = async(req, res, next)=>{
            return res.status(400).json({ message: "Không có giá trị để sửa : 'members', 'typePayment''" });
        }
 
-       memberLength = members.length ?? 0
-
-       // Tìm discount có memberRange >= memberLength
-       const discount = await DiscountModel.findOne({
-           event: BuyTicket.event,
-           memberRange: { $gte: memberLength },
-       })
-           .sort({ memberRange: 1 }); // Sắp xếp memberRange tăng dần để lấy model nhỏ nhất phù hợp
-
-       if(discount)
+       if(members)
        {
-           updateData.discount = discount._id
+
+            memberLength = members.length ?? 0
+        
+            // Tìm discount có memberRange >= memberLength
+            const discount = await DiscountModel.findOne({
+                event: BuyTicket.event,
+                memberRange: { $gte: memberLength },
+            })
+                .sort({ memberRange: 1 }); // Sắp xếp memberRange tăng dần để lấy model nhỏ nhất phù hợp
+        
+            if(discount)
+            {
+                updateData.discount = discount._id
+            }
        }
 
        req.vars.Update = updateData
@@ -215,28 +224,68 @@ module.exports.GetCheckOut =async (req, res, next)=>{
             });
         }
 
-        var BuyTicket = await BuyTicketModel.findById(id)
-            .populate({
-                path: 'ticketInfo', // Lấy thông tin từ `ticketInfo`
+        //     .populate({
+        //         path: 'ticketInfo', // Lấy thông tin từ `ticketInfo`
+        //         populate: {
+        //             path: 'ticket', // Lấy thông tin từ `tickets`
+        //             populate: {
+        //                 path: 'info', // Lấy thông tin từ `ticket_types`
+        //                 model: 'ticket_types', // Đảm bảo model chính xác
+        //             },
+        //         },
+        //     })
+        //     .populate({
+        //         path: 'event',
+        //         select: 'name'
+        //     })
+        // .populate('discount')
+        var BuyTicket = await BuyTicketModel.findOne({
+            _id: id,
+            status: "waiting"
+        })
+        .populate({
+            path: 'members', // Liên kết members
+            select: 'name email image address point' // Chỉ trả về các trường cần thiết
+        })
+        .populate({
+            path: 'accCreate', // Liên kết accCreate
+            select: 'name email image address point' // Chỉ trả về các trường cần thiết
+        })
+        .populate('event') // Liên kết event
+        .populate('discount') // Liên kết discount
+        .populate('coupon') // Liên kết coupon
+        .populate('payment') // Liên kết payment
+        .populate('accPay') // Liên kết accPay
+        .populate({
+            path: 'ticketInfo', // Liên kết ticketInfo
+            // match: {
+            //     $and: [
+            //         { accPay: { $exists: false } }, // `accPay` không tồn tại
+            //         { 'ticket.accBuy': null }, // `ticket.accBuy` bằng null
+            //         { 'ticket.isValid': true } // `ticket.isValid` là true
+            //     ]
+            // },
+            populate: {
+                path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
                 populate: {
-                    path: 'ticket', // Lấy thông tin từ `tickets`
-                    populate: {
-                        path: 'info', // Lấy thông tin từ `ticket_types`
-                        model: 'ticket_types', // Đảm bảo model chính xác
-                    },
-                },
-            })
-        .populate('discount')
+                    path: 'info', // Liên kết tiếp tới info trong ticket
+                    model: 'ticket_types'
+                }
+            }
+        })
+        .lean(); // Trả về plain object để dễ thao tác hơn
 
         if(!BuyTicket)
         {
             return res.status(400).json({
-                message: "Hóa đơn không tồn tại!"
+                message: "Hóa đơn không tồn tại hoặc đã được thanh toán!"
             });
         }
 
+        var existingInfos = []
+
         // check type pay
-        if(BuyTicket.typePayment !== "all")
+        if(BuyTicket.typePayment === "single")
         {
             console.log(infos)
             if( !infos || !Array.isArray(infos) || infos.length < 1)
@@ -255,7 +304,7 @@ module.exports.GetCheckOut =async (req, res, next)=>{
             }
 
             // Kiểm tra ID tồn tại trong cơ sở dữ liệu và lấy toàn bộ dữ liệu
-            const existingInfos = await TicketInfoModel.find({
+           existingInfos = await TicketInfoModel.find({
                 _id: { $in: infos }, // Lọc theo danh sách infos
                 event: BuyTicket.event,
                 status: "waiting"
@@ -266,7 +315,7 @@ module.exports.GetCheckOut =async (req, res, next)=>{
                         path: 'info', // Lấy thông tin từ `ticket_types`
                         model: 'ticket_types', // Đảm bảo model chính xác
                     },
-                })
+            })
 
             // Danh sách các ID đã tồn tại
             const existingIds = existingInfos.map(info => info._id.toString());
@@ -279,18 +328,43 @@ module.exports.GetCheckOut =async (req, res, next)=>{
                     message: "Một số vé không tồn tại hoặc đã được thanh toán!",
                     missingIds, // Danh sách các ID không tìm thấy
                 });
-            }
-
-
+            }          
+           
             req.vars.Infos = existingInfos
             // check list ticket info
             //..............
         }
-        else if(BuyTicket.typePayment !== "single")
+        else if(BuyTicket.typePayment === "all")
         {
-
+            BuyTicket.ticketInfo = BuyTicket.ticketInfo.filter(ticketInfo => {
+                const ticket = ticketInfo.ticket; // Lấy thông tin ticket từ ticketInfo
+                // Điều kiện: loại bỏ nếu ticket.accBuy !== null hoặc ticket.isValid === false
+                return ticket && ticket.accBuy === null && ticket.isValid === true;
+            });
+            existingInfos = BuyTicket.ticketInfo
         }
 
+         // Giả sử existingInfos đã được lấy từ cơ sở dữ liệu
+         if (existingInfos && existingInfos.length > 0) {
+                
+            for (const info of existingInfos) {
+                const { ticket } = info; // Lấy ticket từ từng info
+                if (ticket) {
+                    // Kiểm tra điều kiện accBuy !== null và isValid === false
+                    if (ticket.accBuy !== null || ticket.isValid === false) {
+                        return res.status(400).json({
+                            message: `Vé có id '${ticket._id}' không hợp lệ hoặc đã được mua`
+                        });
+                    }
+                }
+            }
+        }
+        else{
+            return res.status(400).json({
+                message: `Không có vé để thanh toán`
+            });
+        }
+         
         req.vars.BuyTicket = BuyTicket
 
         return next()
@@ -302,4 +376,36 @@ module.exports.GetCheckOut =async (req, res, next)=>{
         })
     }
 
+}
+
+module.exports.ValidOrder = async(req, res, next)=>{
+    var {token, secret, payment} = req.body   
+    if(!token || !secret || !payment)
+    {
+        return res.status(400).json({
+            message: "Vui lòng cung cấp token, secret, payment"
+        })
+    }
+    return next()
+}
+
+module.exports.Delete = async (req, res, next)=>{
+    var {info} = req.body
+    if( info )
+    {
+        if (!mongoose.Types.ObjectId.isValid(info)) {
+            return res.status(400).json({
+                message: "Id không hợp lệ!"
+            });
+        }
+        var Info = await TicketInfoModel.findById(info)
+        if(!Info)
+        {
+            return res.status(400).json({
+                message: "Vé không tồn tại trong đơn vé của bạn!"
+            });
+        }
+        req.vars.Info = Info
+    }
+    return next()
 }

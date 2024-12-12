@@ -48,7 +48,7 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
     List<Account> listMember = new ArrayList<>();
     private MemberAdapter memberAdapter;
     TextView tvName;
-    ProgressBar loading;
+    ProgressBar loading, waiting;
     Spinner spType;
     RecyclerView recyListMember;
     Button btnSave, btnClose;
@@ -59,6 +59,7 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
     private AccountService accountService;
     private OrderService orderService;
     private LocalStorageManager localStorageManager;
+    private Boolean isWaiting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,10 +121,10 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
         btnSave = findViewById(R.id.btnSave);
         btnClose = findViewById(R.id.btnClose);
         btnAdd = findViewById(R.id.btnAdd);
+        waiting =findViewById(R.id.waiting);
         tvName.setText(myPending.getEvent().getName());
         loading.setVisibility(View.GONE);
         layoutMain.setVisibility(View.VISIBLE);
-
         btnSave.setOnClickListener(this);
         btnClose.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
@@ -238,7 +239,11 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
             });
         });
     }
-
+    void setWaiting()
+    {
+        waiting.setVisibility(isWaiting ? View.VISIBLE : View.GONE);
+        btnSave.setVisibility(!isWaiting ? View.VISIBLE : View.GONE);
+    }
 
     @Override
     public void onClick(View v) {
@@ -249,6 +254,12 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
         }
         else if(id == R.id.btnSave)
         {
+            if(isWaiting)
+            {
+                return;
+            }
+            isWaiting = true;
+            setWaiting();
             listMember = memberAdapter.getListMember();
             List<String> listId = new ArrayList<>();
 
@@ -265,6 +276,8 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
                         resultIntent.putExtra("idBuyTicket", myPending.get_id());
                         setResult(RESULT_OK, resultIntent);
                         finish();
+                        isWaiting = false;
+                        setWaiting();
                     });
                 }
 
@@ -272,7 +285,8 @@ public class EditPendingActivity extends AppCompatActivity implements View.OnCli
                 public void onFailure(String error) {
                     runOnUiThread(()->{
                         Toast.makeText(getApplicationContext(), error , Toast.LENGTH_SHORT).show();
-
+                        isWaiting = false;
+                        setWaiting();
                     });
                 }
             });

@@ -19,8 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.order.CheckOutActivity;
 import com.example.ticketbooking.ticket.EditPendingActivity;
 import com.example.ticketbooking.ticket.adapter.event.EventAdapter;
 import com.example.ticketbooking.ticket.adapter.pending.PendingAdapter;
@@ -30,6 +32,7 @@ import java.util.List;
 
 import model.ticket.MyPending;
 import model.ticket.MyTicket;
+import services.OrderService;
 import services.TicketService;
 
 /**
@@ -65,6 +68,7 @@ public class TicketFragment extends Fragment{
     private TicketService ticketService;
     private static final int SEARCH_DELAY = 300; // Delay 300ms
 
+
     public TicketFragment( ) {
 
     }
@@ -89,19 +93,38 @@ public class TicketFragment extends Fragment{
         }
     }
 
-    private ActivityResultLauncher<Intent> editActivityLauncher = registerForActivityResult(
+    private ActivityResultLauncher<Intent> ActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     // Lấy dữ liệu trả về từ Activity
                     String updatedTicketId = result.getData().getStringExtra("idBuyTicket");
+                    boolean isDelete = result.getData().getBooleanExtra("isDelete", false);
                     if (updatedTicketId != null) {
                         // Gọi hàm cập nhật adapter với ID vé đã được thay đổi
                         updateTicketData(updatedTicketId);
                     }
+//                    if(isDelete == true)
+//                    {
+//                        for (int i = 0; i < allPendings.size(); i++) {
+//                            MyPending pending = allPendings.get(i);
+//                            if (pending.get_id().equals(updatedTicketId)) {
+//                                // Fetch updated data for this ticket from server or local cache
+//                                allPendings.remove(i);
+//                                filteredPendings.clear();
+//                                filteredPendings.addAll(allPendings);
+//                                break;
+//                            }
+//                        }
+//                        pendingAdapter.notifyDataSetChanged();
+//                        return;
+//                    }
+
                 }
             }
     );
+
+
 
     private void updateTicketData(String updatedTicketId) {
         if(ticketService != null)
@@ -187,11 +210,56 @@ public class TicketFragment extends Fragment{
                         allPendings.addAll(MyPending);
                         filteredPendings.addAll(MyPending);
 
-                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings, buyTicketId -> {
-                            Log.d("IDBUY", "onSuccess: " + buyTicketId);
-                            Intent intent = new Intent(getContext(), EditPendingActivity.class);
-                            intent.putExtra("idBuyTicket", buyTicketId);
-                            editActivityLauncher.launch(intent);
+                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings, new PendingAdapter.OnEditTicketListener() {
+                            @Override
+                            public void onEditTicket(String buyTicketId) {
+                                Log.d("IDBUY", "onSuccess: " + buyTicketId);
+                                Intent intent = new Intent(getContext(), EditPendingActivity.class);
+                                intent.putExtra("idBuyTicket", buyTicketId);
+                                ActivityLauncher.launch(intent);
+                            }
+
+                            @Override
+                            public void onCheckOutTicket(String buyTicketId, List<String> lisInfo) {
+                                Intent intent = new Intent(getContext(), CheckOutActivity.class);
+                                intent.putExtra("idBuyTicket", buyTicketId);
+                                intent.putStringArrayListExtra("listInfo", new ArrayList<>(lisInfo));
+                                ActivityLauncher.launch(intent);
+                            }
+
+                            @Override
+                            public void onDeleteBuyTicket(String buyTicketId) {
+                                OrderService orderService = new OrderService(getContext());
+                                orderService.DeleteInfo(buyTicketId, "", new OrderService.ValidCallback() {
+                                    @Override
+                                    public void onSuccess(String success) {
+
+                                        getActivity().runOnUiThread(()->{
+                                            Toast.makeText(getContext(), success, Toast.LENGTH_SHORT).show();
+                                            for (int i = 0; i < allPendings.size(); i++) {
+                                                MyPending pending = allPendings.get(i);
+                                                if (pending.get_id().equals(buyTicketId)) {
+                                                    // Fetch updated data for this ticket from server or local cache
+                                                    allPendings.remove(i);
+                                                    filteredPendings.clear();
+                                                    filteredPendings.addAll(allPendings);
+                                                    break;
+                                                }
+                                            }
+                                            pendingAdapter.notifyDataSetChanged();
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(String error) {
+                                        getActivity().runOnUiThread(()->{
+                                            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+
+                                        });
+                                    }
+                                });
+                            }
+
                         });
 
                         listEvent.setAdapter(pendingAdapter);

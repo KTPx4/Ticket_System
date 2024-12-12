@@ -15,6 +15,7 @@ import com.example.ticketbooking.ticket.TicketInfoActivity;
 import com.example.ticketbooking.ticket.viewcustom.TicketView;
 
 import model.ticket.*;
+import modules.MoneyFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,7 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
             tvType.setText("Loại vé: " + ticket.getInfo().getTypeTicket());
             tvLocation.setText("Vị trí: " + ticket.getInfo().getLocation());
             tvPosition.setText("Số ghế: " + ticket.getPosition());
+
             if(!ticket.isValid())
             {
                 ticketView.setBackgroundColor(context.getColor(R.color.inValid_Ticket));

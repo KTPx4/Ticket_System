@@ -15,7 +15,7 @@
 
 
     <color name="grey">#EEB8B8B8</color>
-    <color name="gray_background">#EBEBEB</color>
+    <color name="gray_background">#eff1f5</color>
 
     <color name="Light_Green">#F4E7FB</color>
     <color name="Peach">#FFBB94</color>
@@ -40,6 +40,7 @@
 
 
     <color name="text_hint">#F6B8B8B8</color>
+    <color name="momo_back">#b0006d </color>
 
 
 </resources>
