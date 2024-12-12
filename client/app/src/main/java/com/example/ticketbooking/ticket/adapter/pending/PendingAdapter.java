@@ -50,9 +50,13 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     private OrderService orderService;
 
     public interface OnEditTicketListener {
-        void onEditTicket(String buyTicketId);
+        void onEditTicket(String buyTicketId, OnUpdateUI callback);
         void onCheckOutTicket(String ticketId, List<String> lisInfo);
         void onDeleteBuyTicket(String buyTicketId);
+    }
+
+    public interface OnUpdateUI{
+        void update(String buyTicketId);
     }
 
     public PendingAdapter(Context context, List<MyPending> myTicketList,OnEditTicketListener listener) {
@@ -133,12 +137,18 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                                 if(idInf.equals(infoId))
                                 {
                                     int finalI = i;
+
                                     orderService.DeleteInfo(myPending.get_id(), idInf, new OrderService.ValidCallback() {
                                         @Override
                                         public void onSuccess(String success) {
                                             ((Activity)context).runOnUiThread(()->{
                                                 dataSet.remove(finalI);
+                                                if(listInfo.contains(infoId))
+                                                {
+                                                    listInfo.remove(infoId);
+                                                }
                                                 ticketItemAdapter.notifyDataSetChanged();
+
                                                 Toast.makeText(context, "Đã xóa vé: " + infoId, Toast.LENGTH_SHORT).show();
                                             });
                                         }
@@ -183,8 +193,14 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (listener != null) {
-                    listener.onEditTicket(myPending.get_id());
+                    listener.onEditTicket(myPending.get_id(), buyTicketId -> {
+                        ((Activity) context).runOnUiThread(()->{
+                            listInfo.clear();
+                            ticketItemAdapter.notifyDataSetChanged();
+                        });
+                    });
                 }
             }
         });
