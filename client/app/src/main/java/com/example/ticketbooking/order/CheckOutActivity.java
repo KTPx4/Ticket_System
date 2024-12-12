@@ -254,14 +254,21 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
 
 
             listTicketData.clear();
-            ArrayList<TicketInfo> tickets = myPending.getTicketInfo().stream()
-                    .filter(ticketInfo ->
-                            ticketInfo.getTicket() != null && // Ticket không null
-                                    listId.contains(ticketInfo.get_id()) // id của Ticket nằm trong listId
-                    )
-                    .collect(Collectors.toCollection(ArrayList::new)); // Thu thập kết quả thành ArrayList
+            if(myPending.getTypePayment().toLowerCase().equals("all"))
+            {
+                listTicketData.addAll(myPending.getTicketInfo());
+            }
+            else{
+                ArrayList<TicketInfo> tickets = myPending.getTicketInfo().stream()
+                        .filter(ticketInfo ->
+                                ticketInfo.getTicket() != null && // Ticket không null
+                                        listId.contains(ticketInfo.get_id()) // id của Ticket nằm trong listId
+                        )
+                        .collect(Collectors.toCollection(ArrayList::new)); // Thu thập kết quả thành ArrayList
 
-            listTicketData.addAll(tickets);
+                listTicketData.addAll(tickets);
+            }
+
             arrayAdapter.notifyDataSetChanged();
 
 

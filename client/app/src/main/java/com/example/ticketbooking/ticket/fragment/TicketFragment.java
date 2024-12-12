@@ -67,7 +67,7 @@ public class TicketFragment extends Fragment{
     private Runnable searchRunnable;
     private TicketService ticketService;
     private static final int SEARCH_DELAY = 300; // Delay 300ms
-
+    private PendingAdapter.OnUpdateUI mainCallBack;
 
     public TicketFragment( ) {
 
@@ -99,6 +99,7 @@ public class TicketFragment extends Fragment{
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     // Lấy dữ liệu trả về từ Activity
                     String updatedTicketId = result.getData().getStringExtra("idBuyTicket");
+                    mainCallBack.update(updatedTicketId);
                     boolean isDelete = result.getData().getBooleanExtra("isDelete", false);
                     if (updatedTicketId != null) {
                         // Gọi hàm cập nhật adapter với ID vé đã được thay đổi
@@ -212,7 +213,8 @@ public class TicketFragment extends Fragment{
 
                         pendingAdapter = new PendingAdapter(getContext(), filteredPendings, new PendingAdapter.OnEditTicketListener() {
                             @Override
-                            public void onEditTicket(String buyTicketId) {
+                            public void onEditTicket(String buyTicketId, PendingAdapter.OnUpdateUI callback) {
+                                mainCallBack = callback;
                                 Log.d("IDBUY", "onSuccess: " + buyTicketId);
                                 Intent intent = new Intent(getContext(), EditPendingActivity.class);
                                 intent.putExtra("idBuyTicket", buyTicketId);
