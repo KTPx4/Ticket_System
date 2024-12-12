@@ -1,5 +1,7 @@
 package com.example.ticketbooking;
 
+import java.util.List;
+
 public class Event {
     private String id;
     private String name;
@@ -10,10 +12,12 @@ public class Event {
     private String image;
     private int minPrice;
     private int maxPrice;
+    private List<String> artists;
 
     // Constructor
     public Event(String id, String name, String description, String location,
-                 String startDate, String endDate, String image, int minPrice, int maxPrice) {
+                 String startDate, String endDate, String image, int minPrice,
+                 int maxPrice, List<String> artists) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -23,14 +27,22 @@ public class Event {
         this.image = image;
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
+        this.artists = artists;
     }
 
-    // Getter for id
+    public List<String> getArtists() {
+        return artists;
+    }
+
+    public void setArtists(List<String> artists) {
+        this.artists = artists;
+    }
+
+    // Các getter khác...
     public String getId() {
         return id;
     }
 
-    // Other getters and setters if necessary
     public String getName() {
         return name;
     }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Màu nền của hình tròn -->
+    <solid android:color="@color/Blush_Pink" />
+
+    <!-- Đường viền của hình tròn (nếu cần) -->
+    <!--
+    <stroke
+        android:width="2dp"
+        android:color="#FFFFFF" />
+    -->
+</shape>

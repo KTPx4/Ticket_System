@@ -42,18 +42,30 @@
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/edtSearch"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:hint="Nhập từ khoá"
-            android:textColorHint="@color/gray"
-            android:textColor="@color/gray"
-            android:drawableLeft="@drawable/ic_search"
-            android:drawablePadding="8dp"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp" />
+            android:paddingRight="8dp">
+
+            <EditText
+                android:id="@+id/edtSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Nhập từ khoá"
+                android:textColorHint="@color/gray"
+                android:textColor="@color/gray" />
+
+            <ImageView
+                android:id="@+id/img_search"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                app:srcCompat="@drawable/ic_search" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llFilters"
@@ -84,11 +96,6 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_search_history"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_search_results"

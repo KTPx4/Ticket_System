@@ -70,4 +70,10 @@ public class LocalStorageManager {
         clearIdUser();
     }
 
+    public static void clearAllData(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear(); // Clears all data
+        editor.apply();
+    }
 }
