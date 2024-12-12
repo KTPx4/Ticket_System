@@ -158,18 +158,22 @@ module.exports.Update = async(req, res, next)=>{
            return res.status(400).json({ message: "Không có giá trị để sửa : 'members', 'typePayment''" });
        }
 
-       memberLength = members.length ?? 0
-
-       // Tìm discount có memberRange >= memberLength
-       const discount = await DiscountModel.findOne({
-           event: BuyTicket.event,
-           memberRange: { $gte: memberLength },
-       })
-           .sort({ memberRange: 1 }); // Sắp xếp memberRange tăng dần để lấy model nhỏ nhất phù hợp
-
-       if(discount)
+       if(members)
        {
-           updateData.discount = discount._id
+
+            memberLength = members.length ?? 0
+        
+            // Tìm discount có memberRange >= memberLength
+            const discount = await DiscountModel.findOne({
+                event: BuyTicket.event,
+                memberRange: { $gte: memberLength },
+            })
+                .sort({ memberRange: 1 }); // Sắp xếp memberRange tăng dần để lấy model nhỏ nhất phù hợp
+        
+            if(discount)
+            {
+                updateData.discount = discount._id
+            }
        }
 
        req.vars.Update = updateData
@@ -216,17 +220,51 @@ module.exports.GetCheckOut =async (req, res, next)=>{
         }
 
         var BuyTicket = await BuyTicketModel.findById(id)
-            .populate({
-                path: 'ticketInfo', // Lấy thông tin từ `ticketInfo`
+        //     .populate({
+        //         path: 'ticketInfo', // Lấy thông tin từ `ticketInfo`
+        //         populate: {
+        //             path: 'ticket', // Lấy thông tin từ `tickets`
+        //             populate: {
+        //                 path: 'info', // Lấy thông tin từ `ticket_types`
+        //                 model: 'ticket_types', // Đảm bảo model chính xác
+        //             },
+        //         },
+        //     })
+        //     .populate({
+        //         path: 'event',
+        //         select: 'name'
+        //     })
+        // .populate('discount')
+        .populate({
+            path: 'members', // Liên kết members
+            select: 'name email image address point' // Chỉ trả về các trường cần thiết
+        })
+        .populate({
+            path: 'accCreate', // Liên kết accCreate
+            select: 'name email image address point' // Chỉ trả về các trường cần thiết
+        })
+        .populate('event') // Liên kết event
+        .populate('discount') // Liên kết discount
+        .populate('coupon') // Liên kết coupon
+        .populate('payment') // Liên kết payment
+        .populate('accPay') // Liên kết accPay
+        .populate({
+            path: 'ticketInfo', // Liên kết ticketInfo
+            match: {
+                $or: [
+                    { accPay: { $exists: false } }, // ticketInfo không có accPay
+                    { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                ]
+            },
+            populate: {
+                path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
                 populate: {
-                    path: 'ticket', // Lấy thông tin từ `tickets`
-                    populate: {
-                        path: 'info', // Lấy thông tin từ `ticket_types`
-                        model: 'ticket_types', // Đảm bảo model chính xác
-                    },
-                },
-            })
-        .populate('discount')
+                    path: 'info', // Liên kết tiếp tới info trong ticket
+                    model: 'ticket_types'
+                }
+            }
+        })
+        .lean(); // Trả về plain object để dễ thao tác hơn
 
         if(!BuyTicket)
         {

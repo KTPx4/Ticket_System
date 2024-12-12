@@ -18,6 +18,7 @@ import java.util.List;
 
 import model.ticket.Ticket;
 import model.ticket.TicketInfo;
+import modules.MoneyFormatter;
 
 public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdapter.TicketViewHolder> {
     public interface OnTicketClickListener {
@@ -56,7 +57,7 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
     }
 
     public static class TicketViewHolder extends RecyclerView.ViewHolder {
-        TextView tvId, tvType, tvLocation, tvPosition;
+        TextView tvId, tvType, tvLocation, tvPosition, tvPrice;
         TicketView ticketView;
         ImageButton btnDel;
         boolean isChecked = false;
@@ -70,6 +71,8 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
             ticketView = itemView.findViewById(R.id.item_ticket);
             btnDel = itemView.findViewById(R.id.btnDelTicket);
             btnDel.setVisibility(View.VISIBLE);
+            tvPrice = itemView.findViewById(R.id.tvPrice);
+            tvPrice.setVisibility(View.VISIBLE);
         }
         void setColorText(int color)
         {
@@ -88,6 +91,7 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
             tvType.setText("Loại vé: " + ticket.getInfo().getTypeTicket());
             tvLocation.setText("Vị trí: " + ticket.getInfo().getLocation());
             tvPosition.setText("Số ghế: " + ticket.getPosition());
+            tvPrice.setText("Giá vé: " + MoneyFormatter.formatCurrency(ticket.getInfo().getPrice()));
 
             if(ticket.getAccBuy() != null && !ticket.getAccBuy().isEmpty())
             {

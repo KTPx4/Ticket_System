@@ -1,40 +1,69 @@
 package com.example.ticketbooking.order;
-import android.os.Build;
-import android.util.Log;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
-import vn.momo.momo_partner.AppMoMoLib;
-import vn.momo.momo_partner.MoMoParameterNameMap;
 import com.example.ticketbooking.R;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Base64;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+import model.ticket.MyPending;
+import model.ticket.Ticket;
+import model.ticket.TicketInfo;
+import modules.MoneyFormatter;
+import services.OrderService;
+import services.response.order.DataGetCheckOut;
+import vn.momo.momo_partner.AppMoMoLib;
 
-public class CheckOutActivity extends AppCompatActivity {
+public class CheckOutActivity extends AppCompatActivity implements  View.OnClickListener{
+    private String idBuyTicket;
+    private String typePayment;
+    private String tokenCheckout = "";
 
-    private String amount = "10000000";
+    private List<String> listId;
+    private List<TicketInfo> listTicketData = new ArrayList<>();
+
+    private OrderService orderService;
+    private String couponCode = "";
+
+    boolean isWaiting = false, isLoading = true;
+    ArrayAdapter arrayAdapter ;
+
+    ConstraintLayout layoutMain;
+    TextView tvName, tvType, tvTotal, tvDiscount, tvDiscountCoupon, tvFinalMoney;
+    EditText edCoupon;
+    ListView lvListTicket;
+    ProgressBar prWaiting, prLoading;
+
+    ImageButton btnAddCoupon, btnClose;
+    Button btnVisa, btnMomo;
+
+    // MOMO
+    private String amount = "-1";
     private String fee = "0";
     int environment = 0;//developer default
     private String merchantName = "Ticket Booking";
@@ -42,33 +71,205 @@ public class CheckOutActivity extends AppCompatActivity {
     private String merchantNameLabel = "Nhà cung cấp";
     private String description = "Thanh toán đặt vé";
 
-    Button btnMomo;
-    TextView tvMessage;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_check_out);
+        setContentView(R.layout.ticket_activity_check_out);
         AppMoMoLib.getInstance().setEnvironment(AppMoMoLib.ENVIRONMENT.DEVELOPMENT); // AppMoMoLib.ENVIRONMENT.PRODUCTION
+        orderService = new OrderService(this);
+        initView();
+        getFromIntent();
+        getCheckOut();
 
-        btnMomo = findViewById(R.id.btn_momo);
-        tvMessage = findViewById(R.id.tvMessage);
-        btnMomo.setOnClickListener(new View.OnClickListener() {
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if(id == R.id.btnClose)
+        {
+            this.finish();
+        }
+
+        if(isWaiting || isLoading)
+        {
+            Toast.makeText(this, "Vui lòng đợi", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(id == R.id.btnAdd)
+        {
+            couponCode = edCoupon.getText().toString();
+            if(couponCode == null || couponCode.isEmpty())
+            {
+                Toast.makeText(this, "Vui lòng nhập code", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            isWaiting = true;
+            setWaiting();
+            getCheckOut();
+            return;
+        }
+
+        if(tokenCheckout == null || tokenCheckout.isEmpty())
+        {
+            AlertDialog dig =  new AlertDialog.Builder(this)
+                    .setTitle("Thiếu thông tin")
+                    .setMessage("Không có thôn tin token thanh toán. Vui lòng tải lại thanh toán")
+                    .setPositiveButton("Ok", (dialog, which) -> {
+                        dialog.dismiss();
+                        this.finish();
+                    }).create();
+            dig.show();
+            return;
+        }
+
+        isWaiting = true;
+        setWaiting();
+
+        if(id == R.id.btnVisa)
+        {
+
+        }
+        else if(id == R.id.btnMomo)
+        {
+
+            JSONObject objExtraData = new JSONObject();
+            try {
+                objExtraData.put("ticket_code", "");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            requestPayment(idBuyTicket , objExtraData);
+        }
+    }
+    private void setWaiting()
+    {
+
+        int statusView = isWaiting  ?  View.INVISIBLE : View.VISIBLE;
+        int statusProcessBar = isWaiting  ? View.VISIBLE : View.INVISIBLE;
+        btnAddCoupon.setVisibility(statusView);
+        btnVisa.setVisibility(statusView);
+        btnMomo.setVisibility(statusView);
+
+        prWaiting.setVisibility(statusProcessBar);
+
+    }
+    private void initView()
+    {
+        tvName = findViewById(R.id.tvName);
+        tvType = findViewById(R.id.tvType);
+        tvTotal = findViewById(R.id.tvTotal);
+        tvDiscount = findViewById(R.id.tvDiscount);
+        tvDiscountCoupon = findViewById(R.id.tvDiscountCoupon);
+        tvFinalMoney = findViewById(R.id.tvFinalMoney);
+        edCoupon = findViewById(R.id.edCoupon);
+        lvListTicket = findViewById(R.id.listTicket);
+        btnAddCoupon = findViewById(R.id.btnAdd);
+        btnClose = findViewById(R.id.btnClose);
+        btnVisa = findViewById(R.id.btnVisa);
+        btnMomo = findViewById(R.id.btnMomo);
+        prWaiting = findViewById(R.id.waiting);
+        prLoading = findViewById(R.id.loading);
+        layoutMain = findViewById(R.id.layoutMain);
+
+        btnAddCoupon.setOnClickListener(this);
+        btnClose.setOnClickListener(this);
+        btnVisa.setOnClickListener(this);
+        btnMomo.setOnClickListener(this);
+
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_2, android.R.id.text1, listTicketData){
             @Override
-            public void onClick(View view) {
-                String orderID = "123";
-                JSONObject objExtraData = new JSONObject();
-                try {
-                    objExtraData.put("ticket_code", "");
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+                TicketInfo ticketIf = listTicketData.get(position);
+                Ticket ticket = ticketIf.getTicket();
+                String name = ticket.getInfo().getTypeTicket() +" - " + ticket.getInfo().getLocation() +" - " + ticket.getPosition();
+                String price = MoneyFormatter.formatCurrency(ticket.getInfo().getPrice()) + "";
+                text1.setText(name);
+                text2.setText(price);
+                return view;
+            }
+        };
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                requestPayment(orderID , objExtraData);
+        lvListTicket.setAdapter(arrayAdapter);
+
+    }
+
+    private void getFromIntent()
+    {
+        Intent intent = getIntent();
+        idBuyTicket = intent.getStringExtra("idBuyTicket");
+        listId = intent.getStringArrayListExtra("listInfo");
+
+        if(idBuyTicket == null || idBuyTicket.isEmpty())
+        {
+            Toast.makeText(this, "Thiếu id hóa đơn, không thể thanh toán", Toast.LENGTH_SHORT).show();
+            this.finish();
+            return;
+        }
+        if(listId == null)
+        {
+            listId = new ArrayList<>();
+        }
+
+
+    }
+    private void updateView(DataGetCheckOut data)
+    {
+
+        try{
+            MyPending myPending = data.getBuyTicket();
+
+            String typePay = myPending.getEvent().getName().toLowerCase().equals("all")? "Tất cả": "Từng thành viên";
+            layoutMain.setVisibility(View.VISIBLE);
+            tvName.setText(myPending.getEvent().getName());
+            tvType.setText(typePay);
+            tvTotal.setText(MoneyFormatter.formatCurrency(data.getPrice()) + "");
+            tvDiscount.setText(MoneyFormatter.formatCurrency(data.getDiscount()) + "");
+            tvDiscountCoupon.setText(MoneyFormatter.formatCurrency(data.getCouponDiscount()) + "");
+            tvFinalMoney.setText(MoneyFormatter.formatCurrency(data.getFinalPrice()) + "");
+
+            listTicketData.clear();
+
+            listTicketData.addAll(myPending.getTicketInfo());
+            arrayAdapter.notifyDataSetChanged();
+            isLoading = false;
+            isWaiting = false;
+            setWaiting();
+            amount = data.getFinalPrice() + "";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void getCheckOut()
+    {
+        orderService.GetCheckOut(idBuyTicket, couponCode, listId, new OrderService.GetCheckOutCallback() {
+            @Override
+            public void onSuccess(DataGetCheckOut data, String token) {
+                runOnUiThread(()->{
+                    Toast.makeText(CheckOutActivity.this, "Tải thông tin thành công", Toast.LENGTH_SHORT).show();
+                    tokenCheckout = token;
+                    updateView(data);
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(()->{
+                    Toast.makeText(CheckOutActivity.this, error, Toast.LENGTH_SHORT).show();
+                    isLoading = false;
+                    isWaiting = false;
+                    setWaiting();
+                });
             }
         });
     }
+
 
     //Get token through MoMo app
     private void requestPayment(String orderId, JSONObject objExtraData) {
@@ -109,6 +310,9 @@ public class CheckOutActivity extends AppCompatActivity {
     //Get token callback from MoMo app an submit to server side
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        isWaiting = false;
+        setWaiting();
+
         if (requestCode == AppMoMoLib.getInstance().REQUEST_CODE_MOMO && resultCode == -1) {
             if (data != null) {
 
@@ -122,7 +326,9 @@ public class CheckOutActivity extends AppCompatActivity {
                             Gson gson = new Gson();
                             String jsonValue = gson.toJson(value);
                             Log.d("MOMO_RESPONSE", "Key: " + key + " | Value: " + jsonValue);
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             // Nếu không thể serialize, in kiểu dữ liệu và giá trị thô
                             Log.d("MOMO_RESPONSE", "Key: " + key + " | Value (raw): " + value + " | Type: " + value.getClass().getName());
                         }
@@ -133,45 +339,45 @@ public class CheckOutActivity extends AppCompatActivity {
 
                 if (data.getIntExtra("status", -1) == 0) {
                     //TOKEN IS AVAILABLE
-                    String message = data.getStringExtra("message");
-                    tvMessage.setText("message: " + "Get token " + message);
+                    /*
+                        String message = data.getStringExtra("message");
+                        tvMessage.setText("message: " + "Get token " + message);
+                        String phoneNumber = data.getStringExtra("phonenumber");
+                        String env = data.getStringExtra("env");
+                        if (env == null) {
+                            env = "app";
+                        }
+                    */
+
                     String token = data.getStringExtra("data"); //Token response
-                    String phoneNumber = data.getStringExtra("phonenumber");
-                    String env = data.getStringExtra("env");
-                    if (env == null) {
-                        env = "app";
-                    }
 
                     if (token != null && !token.equals("")) {
-                        // TODO: send phoneNumber & token to your server side to process payment with MoMo server
-                        // IF Momo topup success, continue to process your order
+                        // Call order service to valid transaction
+
                     } else {
-                        tvMessage.setText("message: " + "no info");
+//                        tvMessage.setText("message: " + "no info");
                     }
                 }
                 else if (data.getIntExtra("status", -1) == 1) {
                     //TOKEN FAIL
                     String message = data.getStringExtra("message") != null ? data.getStringExtra("message") : "Thất bại";
-                    tvMessage.setText("message: " + message);
+//                    tvMessage.setText("message: " + message);
                 }
                 else if (data.getIntExtra("status", -1) == 2) {
                     //TOKEN FAIL
-                    tvMessage.setText("message: " + "no info");
+//                    tvMessage.setText("message: " + "no info");
                 }
                 else {
                     //TOKEN FAIL
-                    tvMessage.setText("message: " + "no info");
+//                    tvMessage.setText("message: " + "no info");
                 }
             }
             else {
-                tvMessage.setText("message: " + "no info");
+//                tvMessage.setText("message: " + "no info");
             }
         }
         else {
-            tvMessage.setText("message: " + "no info err");
+//            tvMessage.setText("message: " + "no info err");
         }
     }
-
-
-
 }

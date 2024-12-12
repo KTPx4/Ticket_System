@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.order.CheckOutActivity;
 import com.example.ticketbooking.ticket.EditPendingActivity;
 import com.example.ticketbooking.ticket.adapter.event.EventAdapter;
 import com.example.ticketbooking.ticket.adapter.pending.PendingAdapter;
@@ -89,7 +90,7 @@ public class TicketFragment extends Fragment{
         }
     }
 
-    private ActivityResultLauncher<Intent> editActivityLauncher = registerForActivityResult(
+    private ActivityResultLauncher<Intent> ActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -102,6 +103,8 @@ public class TicketFragment extends Fragment{
                 }
             }
     );
+
+
 
     private void updateTicketData(String updatedTicketId) {
         if(ticketService != null)
@@ -187,11 +190,23 @@ public class TicketFragment extends Fragment{
                         allPendings.addAll(MyPending);
                         filteredPendings.addAll(MyPending);
 
-                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings, buyTicketId -> {
-                            Log.d("IDBUY", "onSuccess: " + buyTicketId);
-                            Intent intent = new Intent(getContext(), EditPendingActivity.class);
-                            intent.putExtra("idBuyTicket", buyTicketId);
-                            editActivityLauncher.launch(intent);
+                        pendingAdapter = new PendingAdapter(getContext(), filteredPendings, new PendingAdapter.OnEditTicketListener() {
+                            @Override
+                            public void onEditTicket(String buyTicketId) {
+                                Log.d("IDBUY", "onSuccess: " + buyTicketId);
+                                Intent intent = new Intent(getContext(), EditPendingActivity.class);
+                                intent.putExtra("idBuyTicket", buyTicketId);
+                                ActivityLauncher.launch(intent);
+                            }
+
+                            @Override
+                            public void onCheckOutTicket(String buyTicketId, List<String> lisInfo) {
+                                Intent intent = new Intent(getContext(), CheckOutActivity.class);
+                                intent.putExtra("idBuyTicket", buyTicketId);
+                                intent.putStringArrayListExtra("listInfo", new ArrayList<>(lisInfo));
+                                ActivityLauncher.launch(intent);
+                            }
+
                         });
 
                         listEvent.setAdapter(pendingAdapter);

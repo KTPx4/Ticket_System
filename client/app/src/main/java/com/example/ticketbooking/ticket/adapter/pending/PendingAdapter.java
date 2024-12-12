@@ -33,6 +33,7 @@ import java.util.List;
 
 import model.ticket.MyPending;
 import modules.LocalStorageManager;
+import modules.MoneyFormatter;
 
 public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventViewHolder> {
     private final Context context;
@@ -44,7 +45,8 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     private LocalStorageManager localStorageManager;
 
     public interface OnEditTicketListener {
-        void onEditTicket(String ticketId);
+        void onEditTicket(String buyTicketId);
+        void onCheckOutTicket(String ticketId, List<String> lisInfo);
     }
 
     public PendingAdapter(Context context, List<MyPending> myTicketList,OnEditTicketListener listener) {
@@ -88,7 +90,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.tvEventDate.setText(myPending.getEvent().getDate().getStart());
         holder.tvNameCreate.setText("Người tạo: "+myPending.getAccCreate().getName());
         holder.tvMembers.setText( "Thành viên: "+ myPending.getMembers().stream().count());
-        holder.tvTypePay.setText("Loại mua vé: "+ typePay);
+        holder.tvTypePay.setText("Hình thức mua vé: "+ typePay);
 
         // Set the TicketItemAdapter for the nested RecyclerView (listTicket)
         TicketPendingAdapter ticketItemAdapter = new TicketPendingAdapter(context, myPending.getTicketInfo(), new TicketPendingAdapter.OnTicketClickListener() {
@@ -128,14 +130,14 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listInfo.stream().count() < 1)
+                if(listInfo.stream().count() < 1 && myPending.getTypePayment().equals("single"))
                 {
                     Toast.makeText(context, "Vui lòng chọn vé", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                listInfo.forEach(id -> {
-                    Log.d("ID INFO", "id: "+ id);
-                });
+                if (listener != null) {
+                    listener.onCheckOutTicket(myPending.get_id(), listInfo);
+                }
 
             }
         });
@@ -181,6 +183,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
             tvNameCreate = itemView.findViewById(R.id.tvNameCreate);
             tvMembers = itemView.findViewById(R.id.tvMembers);
             tvTypePay = itemView.findViewById(R.id.tvTypePay);
+
             listTicket = itemView.findViewById(R.id.listTicket);
             btnDrop = itemView.findViewById(R.id.btnDrop);
             btnEdit = itemView.findViewById(R.id.btnEdit);

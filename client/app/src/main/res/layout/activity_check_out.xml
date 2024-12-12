@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".order.CheckOutActivity">
+    tools:context=".order.CheckOutActivity_TEST">
     <Button
         android:id="@+id/btn_momo"
         app:layout_constraintTop_toTopOf="parent"

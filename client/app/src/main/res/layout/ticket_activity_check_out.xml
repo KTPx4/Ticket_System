@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="15dp"
+    android:paddingVertical="50dp"
+    android:background="@color/gray_background"
+    tools:context=".order.CheckOutActivity">
+    <ImageButton
+        android:id="@+id/btnClose"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/backbutton"
+        android:src="@drawable/ic_back_2"
+        android:layout_width="35dp"
+        android:layout_height="35dp" />
+    <TextView
+        android:id="@+id/tvCheckout"
+        android:textSize="22dp"
+        android:fontFamily="sans-serif-black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="CHECKOUT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvCheckout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:indeterminateTint="@color/Dark_Rose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMain"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/tvCheckout"
+        app:layout_constraintBottom_toTopOf="@+id/btnVisa"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/card_boder"
+        android:padding="10dp"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:padding="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/payment"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Thông tin"
+                android:textSize="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/ly1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp"
+
+                app:layout_constraintTop_toBottomOf="@+id/tv1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="Tên sự kiện"
+                    android:textColor="@color/text_hint"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="end"
+                    android:maxLines="3"
+                    android:paddingHorizontal="10dp"
+                    android:text="Buổi hòa nhạc của mây"
+                    android:textSize="14dp" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginVertical="5dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintTop_toBottomOf="@+id/ly1" />
+
+            <LinearLayout
+                android:id="@+id/ly2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp"
+
+                app:layout_constraintTop_toBottomOf="@+id/divider">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="Hình thức mua vé"
+                    android:textColor="@color/text_hint"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/tvType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="end"
+                    android:maxLines="3"
+                    android:paddingHorizontal="10dp"
+                    android:text="Tất cả"
+                    android:textSize="14dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Vé"
+                android:textSize="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ly2" />
+
+
+            <ListView
+                android:id="@+id/listTicket"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:paddingHorizontal="5dp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv2" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+          android:id="@+id/payment"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginHorizontal="5dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:text="Mã giảm giá"
+                android:fontFamily="sans-serif-medium"
+                android:layout_width="wrap_content"
+                android:textSize="16dp"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/edCoupon"
+                    android:background="@drawable/edittext_bottom_border"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:paddingHorizontal="10dp"
+                    android:layout_height="40dp" />
+                <ImageButton
+                    android:id="@+id/btnAdd"
+                    android:background="@color/white"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_add"
+                    />
+            </LinearLayout>
+
+
+
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="0dp">
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="5dp"
+                    android:layout_marginHorizontal="5dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:text="Thanh toán"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_width="wrap_content"
+                    android:textSize="16dp"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:paddingHorizontal="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Tổng tiền"
+                        android:textColor="@color/text_hint"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="wrap_content"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvTotal"
+                        android:text="100.000"
+                        android:maxLines="3"
+                        android:gravity="end"
+                        android:paddingHorizontal="10dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:paddingHorizontal="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Giảm giá sự kiện"
+                        android:textColor="@color/text_hint"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="wrap_content"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvDiscount"
+                        android:text="0"
+                        android:maxLines="3"
+                        android:gravity="end"
+                        android:paddingHorizontal="10dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:paddingHorizontal="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Mã giảm giá"
+                        android:textColor="@color/text_hint"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="wrap_content"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvDiscountCoupon"
+                        android:text="0"
+                        android:maxLines="3"
+                        android:gravity="end"
+                        android:paddingHorizontal="10dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:paddingHorizontal="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Thanh toaán"
+                        android:textColor="@color/text_hint"
+                        android:fontFamily="sans-serif"
+                        android:layout_width="wrap_content"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvFinalMoney"
+                        android:text="100.000"
+                        android:maxLines="3"
+                        android:gravity="end"
+                        android:paddingHorizontal="10dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/waiting"
+        android:visibility="invisible"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnMomo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:indeterminateTint="@color/Dark_Rose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:visibility="visible"
+        android:id="@+id/btnVisa"
+        app:layout_constraintBottom_toTopOf="@+id/btnMomo"
+        android:text="Visa / Mastercard"
+        android:backgroundTint="@color/blue"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+    <Button
+        android:visibility="visible"
+        android:id="@+id/btnMomo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Momo"
+        android:backgroundTint="@color/momo_back"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

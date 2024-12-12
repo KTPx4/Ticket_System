@@ -5,6 +5,9 @@ const BuyTicketModel = require('../models/BuyTicket')
 const EventModel = require("../models/EventModel");
 const jwt = require("jsonwebtoken");
 const SECRET_ORDER = process.env.SECRET_ORDER || "secret-key-order-px4"
+const SECRET_ORDER_START = process.env.SECRET_ORDER_START || "secret-key-"
+const SECRET_ORDER_END = process.env.SECRET_ORDER_END || "order-px4"
+
 module.exports.GetAll= async(req, res)=>{
     try{
         var {User} = req.vars

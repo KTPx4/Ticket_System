@@ -15,7 +15,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import services.response.ticket.ResponseMyPending;
+import services.response.order.DataGetCheckOut;
+import services.response.order.ResponeGetCheckOut;
 import services.response.ticket.ResponsePending;
 
 public class OrderService {
@@ -46,7 +47,7 @@ public class OrderService {
 
                 // Chuyển thông tin Java List sang JSON Payload
                 Gson gson = new Gson();
-                String jsonPayload = gson.toJson(new RequestPayload(listId, typePayment));
+                String jsonPayload = gson.toJson(new UpdatePayload(listId, typePayment));
 
                 // Tạo RequestBody
                 RequestBody body = RequestBody.create(
@@ -83,16 +84,80 @@ public class OrderService {
         }).start();
     }
 
+    public void GetCheckOut(String id, String couponCode, List<String> listId , GetCheckOutCallback callback )
+    {
+        if(id == null || id.isEmpty())
+        {
+            callback.onFailure("Không có id");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/order/" + id +"/checkout";
+
+                // Chuyển thông tin Java List sang JSON Payload
+                Gson gson = new Gson();
+                String jsonPayload = gson.toJson(new GetCheckOutPayload(listId, couponCode));
+
+                // Tạo RequestBody
+                RequestBody body = RequestBody.create(
+                        jsonPayload,
+                        MediaType.parse("application/json")
+                );
+
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .post(body)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                ResponeGetCheckOut responseData = gson.fromJson(responseBody, ResponeGetCheckOut.class);
+
+                if (response.isSuccessful())
+                {
+
+                    Log.d("ORDER-CHECKOUT", "Response Body: " + responseBody);
+                    Log.d("ORDER-CHECKOUT ParsedData", gson.toJson(responseData));
+                    callback.onSuccess(responseData.getData(), responseData.getToken());
+                }
+                else
+                {
+                    callback.onFailure(responseData.getMessage());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Tải thông tin thất bại" + e.getMessage());
+            }
+        }).start();
+    }
+
+
+
+
+
     public interface UpdateCallback {
         void onSuccess(MyPending myPending);
         void onFailure(String error);
     }
 
-    class RequestPayload {
+    public interface GetCheckOutCallback {
+        void onSuccess(DataGetCheckOut myPending, String token);
+        void onFailure(String error);
+    }
+
+
+    class UpdatePayload {
         private List<String> members;
         private String typePayment;
 
-        public RequestPayload(List<String> members, String typePayment) {
+        public UpdatePayload(List<String> members, String typePayment) {
             this.members = members;
             this.typePayment = typePayment;
         }
@@ -103,6 +168,34 @@ public class OrderService {
 
         public String getTypePayment() {
             return typePayment;
+        }
+    }
+    class GetCheckOutPayload {
+        private List<String> infos;
+        private String coupon;
+
+        public GetCheckOutPayload() {
+        }
+
+        public GetCheckOutPayload(List<String> infos, String coupon) {
+            this.infos = infos;
+            this.coupon = coupon;
+        }
+
+        public List<String> getInfos() {
+            return infos;
+        }
+
+        public void setInfos(List<String> infos) {
+            this.infos = infos;
+        }
+
+        public String getCoupon() {
+            return coupon;
+        }
+
+        public void setCoupon(String coupon) {
+            this.coupon = coupon;
         }
     }
 }
