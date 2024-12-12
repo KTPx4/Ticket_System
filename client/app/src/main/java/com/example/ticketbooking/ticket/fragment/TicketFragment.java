@@ -223,6 +223,8 @@ public class TicketFragment extends Fragment{
                             public void onCheckOutTicket(String buyTicketId, List<String> lisInfo) {
                                 Intent intent = new Intent(getContext(), CheckOutActivity.class);
                                 intent.putExtra("idBuyTicket", buyTicketId);
+                                Log.d("onCheckOutTicket", "count: " + lisInfo.stream().count());
+
                                 intent.putStringArrayListExtra("listInfo", new ArrayList<>(lisInfo));
                                 ActivityLauncher.launch(intent);
                             }
