@@ -1,6 +1,8 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
 const TicketModel = require('../models/TicketModel')
+const BuyTicketModel = require('../models/BuyTicket')
+
 const mongoose = require('mongoose')
 
 const sendEmail = require('../modules/Mailer')
@@ -376,11 +378,79 @@ module.exports.GetMyTicket = async (req, res) => {
             }
         ]);
 
+        const boughtTickets = await BuyTicketModel.aggregate([
+            { $match: { status: 'done', typePayment: 'all' } },
+            { $lookup: { from: 'ticket_infos', localField: 'ticketInfo', foreignField: '_id', as: 'ticketInfos' } },
+            { $unwind: '$ticketInfos' },
+            { $lookup: { from: 'tickets', localField: 'ticketInfos.ticket', foreignField: '_id', as: 'ticketDetails' } },
+            { $unwind: '$ticketDetails' },
+            { $lookup: { from: 'events', localField: 'ticketDetails.event', foreignField: '_id', as: 'eventDetails' } },
+            { $unwind: '$eventDetails' },
+            { $lookup: { from: 'ticket_types', localField: 'ticketDetails.info', foreignField: '_id', as: 'ticketTypeDetails' } },
+            { $unwind: { path: '$ticketTypeDetails', preserveNullAndEmptyArrays: true } }, // Đảm bảo info không bị bỏ qua
+            {
+                $group: {
+                    _id: '$ticketDetails.event',
+                    eventDetails: { $first: '$eventDetails' },
+                    tickets: {
+                        $push: {
+                            _id: '$ticketDetails._id',
+                            event: '$ticketDetails.event',
+                            position: '$ticketDetails.position',
+                            desc: '$ticketDetails.desc',
+                            isAvailable: '$ticketDetails.isAvailable',
+                            accBuy: '$ticketDetails.accBuy',
+                            expiresAt: '$ticketDetails.expiresAt',
+                            isValid: '$ticketDetails.isValid',
+                            info: '$ticketTypeDetails' // Gắn trực tiếp dữ liệu từ ticket_types
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    event: '$eventDetails',
+                    tickets: 1
+                }
+            }
+        ]);
+        
+        // Hợp nhất hai danh sách và loại bỏ trùng lặp dựa trên `ticket._id`
+        const allTicketsMap = new Map();
+
+        // Đưa tất cả tickets từ `tickets` vào map
+        tickets.forEach(group => {
+            group.tickets.forEach(ticket => {
+                allTicketsMap.set(ticket._id.toString(), { event: group.event, ticket });
+            });
+        });
+
+        // Đưa tất cả tickets từ `boughtTickets` vào map (loại trùng lặp tự động do `Map` chỉ lưu unique key)
+        boughtTickets.forEach(group => {
+            group.tickets.forEach(ticket => {
+                allTicketsMap.set(ticket._id.toString(), { event: group.event, ticket });
+            });
+        });
+
+        // Chuyển từ map thành mảng group theo sự kiện
+        const combinedTickets = Array.from(allTicketsMap.values()).reduce((acc, { event, ticket }) => {
+            let group = acc.find(g => g.event._id.toString() === event._id.toString());
+            if (!group) {
+                group = { event, tickets: [] };
+                acc.push(group);
+            }
+            group.tickets.push(ticket);
+            return acc;
+        }, []);
+       
+
         return res.status(200).json({
             message: "Lấy thành công",
-            length: tickets.length ?? 0,
-            data: tickets
+            length: combinedTickets.length ?? 0,
+            data: combinedTickets
         });
+
     } catch (e) {
         console.log("AccountController - GetMyTicket:", e);
         res.status(500).json({ message: "Server error" });
@@ -407,12 +477,13 @@ module.exports.GetPendingById =async (req, res)=>{
             .populate('accPay') // Liên kết accPay
             .populate({
                 path: 'ticketInfo', // Liên kết ticketInfo
-                match: {
-                    $or: [
-                        { accPay: { $exists: false } }, // ticketInfo không có accPay
-                        { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
-                    ]
-                },
+                // match: {
+                //     $and: [
+                //         { accPay: { $exists: false } }, // `accPay` không tồn tại
+                //         { 'ticket.accBuy': { $exists: false }  }, // `ticket.accBuy` bằng null
+                //         { 'ticket.isValid': true } // `ticket.isValid` là true
+                //     ]
+                // },
                 populate: {
                     path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
                     populate: {
@@ -445,8 +516,8 @@ module.exports.GetOrderPending = async (req, res) => {
                 { members: User._id },
                 { accCreate: User._id }
             ],
-            status: "waiting"
-
+            status: "waiting",
+            isDeleted: false
         })
             .populate({
                 path: 'members', // Liên kết members
@@ -463,12 +534,12 @@ module.exports.GetOrderPending = async (req, res) => {
             .populate('accPay') // Liên kết accPay
             .populate({
                 path: 'ticketInfo', // Liên kết ticketInfo
-                match: {
-                    $or: [
-                        { accPay: { $exists: false } }, // ticketInfo không có accPay
-                        { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
-                    ]
-                },
+                // match: {
+                //     $or: [
+                //         { accPay: { $exists: false } }, // ticketInfo không có accPay
+                //         { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                //     ]
+                // },
                 populate: {
                     path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
                     populate: {

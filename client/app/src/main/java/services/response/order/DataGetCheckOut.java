@@ -11,9 +11,11 @@ public class DataGetCheckOut {
     private long Discount;
     private long CouponDiscount;
     private long FinalPrice;
+    private String Order;
 
     public DataGetCheckOut() {
     }
+
 
     public DataGetCheckOut(String type, Account user, MyPending buyTicket) {
         Type = type;
@@ -29,6 +31,25 @@ public class DataGetCheckOut {
         Discount = discount;
         CouponDiscount = couponDiscount;
         FinalPrice = finalPrice;
+    }
+
+    public DataGetCheckOut(String type, Account user, MyPending buyTicket, long price, long discount, long couponDiscount, long finalPrice, String order) {
+        Type = type;
+        User = user;
+        BuyTicket = buyTicket;
+        Price = price;
+        Discount = discount;
+        CouponDiscount = couponDiscount;
+        FinalPrice = finalPrice;
+        Order = order;
+    }
+
+    public String getOrder() {
+        return Order;
+    }
+
+    public void setOrder(String order) {
+        Order = order;
     }
 
     public long getPrice() {

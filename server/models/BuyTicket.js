@@ -40,7 +40,7 @@ const BuyTicketSchema = new mongoose.Schema({
     },
     typePayment:{
         type: String,
-        default: "single" // single or all
+        default: "all" // single or all
     },
     payment:{
       type: Schema.Types.ObjectId,
@@ -69,6 +69,10 @@ const BuyTicketSchema = new mongoose.Schema({
     status:{
         type:String,
         default: "waiting"
+    },
+    isDeleted:{
+        type: Boolean,
+        default: false
     }
 
 }, {

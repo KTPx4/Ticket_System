@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import model.ticket.MyPending;
 import model.ticket.Ticket;
@@ -43,6 +44,7 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
     private String idBuyTicket;
     private String typePayment;
     private String tokenCheckout = "";
+    private String OrderId = "";
 
     private List<String> listId;
     private List<TicketInfo> listTicketData = new ArrayList<>();
@@ -70,6 +72,9 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
     private String merchantCode = "MOMONPMB20210629";
     private String merchantNameLabel = "Nhà cung cấp";
     private String description = "Thanh toán đặt vé";
+
+    // visa master card
+    private static final int REQUEST_CODE_STRIPE = 28903;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +117,7 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
             return;
         }
 
-        if(tokenCheckout == null || tokenCheckout.isEmpty())
+        if(tokenCheckout == null || tokenCheckout.isEmpty() || OrderId == null || OrderId.isEmpty())
         {
             AlertDialog dig =  new AlertDialog.Builder(this)
                     .setTitle("Thiếu thông tin")
@@ -130,7 +135,21 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
 
         if(id == R.id.btnVisa)
         {
+            orderService.GetCheckOutStripe(idBuyTicket, couponCode, listId, new OrderService.GetCheckOutStripeCallback() {
+                @Override
+                public void onSuccess(String url) {
+                    runOnUiThread(()->{
+                        Intent intent = new Intent(getApplicationContext(), CheckOutCard.class);
+                        intent.putExtra("PAYMENT_URL", url); // Gửi URL thanh toán
+                        startActivityForResult(intent, REQUEST_CODE_STRIPE);
+                    });
+                }
 
+                @Override
+                public void onFailure(String error) {
+
+                }
+            });
         }
         else if(id == R.id.btnMomo)
         {
@@ -138,11 +157,10 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
             JSONObject objExtraData = new JSONObject();
             try {
                 objExtraData.put("ticket_code", "");
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            requestPayment(idBuyTicket , objExtraData);
+            requestPayment(OrderId , objExtraData);
         }
     }
     private void setWaiting()
@@ -224,8 +242,8 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
 
         try{
             MyPending myPending = data.getBuyTicket();
-
-            String typePay = myPending.getEvent().getName().toLowerCase().equals("all")? "Tất cả": "Từng thành viên";
+            Log.d("PPPPPPP"," updateView: " + myPending.getEvent().getName().toLowerCase());
+            String typePay = myPending.getTypePayment().toLowerCase().equals("all") ? "Tất cả": "Từng thành viên";
             layoutMain.setVisibility(View.VISIBLE);
             tvName.setText(myPending.getEvent().getName());
             tvType.setText(typePay);
@@ -235,17 +253,30 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
             tvFinalMoney.setText(MoneyFormatter.formatCurrency(data.getFinalPrice()) + "");
 
             listTicketData.clear();
+            ArrayList<TicketInfo> tickets = myPending.getTicketInfo().stream()
+                    .filter(ticketInfo ->
+                            ticketInfo.getTicket() != null && // Kiểm tra null cho Ticket
+                                    (
+                                        ticketInfo.getTicket().getAccBuy() == null || // Kiểm tra null cho AccBuy
+                                        ticketInfo.getTicket().getAccBuy().isEmpty()
+                                    )// Kiểm tra không rỗng
+                    )
+                    .collect(Collectors.toCollection(ArrayList::new)); // Thu thập kết quả thành ArrayList
 
-            listTicketData.addAll(myPending.getTicketInfo());
+            listTicketData.addAll(tickets);
             arrayAdapter.notifyDataSetChanged();
             isLoading = false;
             isWaiting = false;
             setWaiting();
+
             amount = data.getFinalPrice() + "";
+            OrderId = data.getOrder();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     private void getCheckOut()
     {
         orderService.GetCheckOut(idBuyTicket, couponCode, listId, new OrderService.GetCheckOutCallback() {
@@ -349,6 +380,37 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
                         }
                     */
 
+                    orderService.PostValid(idBuyTicket, tokenCheckout, "momo", new OrderService.ValidCallback() {
+                        @Override
+                        public void onSuccess(String success) {
+                            runOnUiThread(()->{
+
+                                Toast.makeText(getApplicationContext(), success, Toast.LENGTH_SHORT).show();
+
+                                AlertDialog dig =  new AlertDialog.Builder(getApplicationContext())
+                                        .setTitle("Thành Công")
+                                        .setMessage("Thanh toán thành công rồi bạn ơi. Mừng quá")
+                                        .setPositiveButton("Ok luôn", (dialog, which) -> {
+                                            Intent resultIntent = new Intent();
+                                            resultIntent.putExtra("idBuyTicket", idBuyTicket);
+                                            resultIntent.putExtra("isDelete", true);
+                                            setResult(RESULT_OK, resultIntent);
+                                            finish();
+                                        }).create();
+                                dig.show();
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(String error) {
+                            runOnUiThread(()->{
+                                Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                                CheckOutActivity.this.finish();
+
+                            });
+                        }
+                    });
+
                     String token = data.getStringExtra("data"); //Token response
 
                     if (token != null && !token.equals("")) {
@@ -357,6 +419,7 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
                     } else {
 //                        tvMessage.setText("message: " + "no info");
                     }
+                    return;
                 }
                 else if (data.getIntExtra("status", -1) == 1) {
                     //TOKEN FAIL
@@ -371,13 +434,32 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
                     //TOKEN FAIL
 //                    tvMessage.setText("message: " + "no info");
                 }
+                Toast.makeText(getApplicationContext(), "Thanh toán thất bại", Toast.LENGTH_SHORT).show();
+
             }
             else {
 //                tvMessage.setText("message: " + "no info");
+
+                Toast.makeText(getApplicationContext(), "Thanh toán thất bại", Toast.LENGTH_SHORT).show();
+
             }
         }
-        else {
-//            tvMessage.setText("message: " + "no info err");
+        else if (requestCode == REQUEST_CODE_STRIPE && resultCode == -1)
+        {
+            Toast.makeText(getApplicationContext(), "Thanh toán thành công", Toast.LENGTH_SHORT).show();
+
+            AlertDialog dig =  new AlertDialog.Builder(this)
+                    .setTitle("Thành Công")
+                    .setMessage("Thanh toán thành công rồi bạn ơi. Mừng quá")
+                    .setPositiveButton("Ok luôn", (dialog, which) -> {
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("idBuyTicket", idBuyTicket);
+                        resultIntent.putExtra("isDelete", true);
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
+                    }).create();
+            dig.show();
+            return;
         }
     }
 }

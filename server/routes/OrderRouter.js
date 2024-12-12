@@ -15,6 +15,9 @@ _APP.post('/', AuthAcc.AuthAccount, Validator.Create, Controller.Create)
 // change list member / typePayment for order by (event & user)
 _APP.put('/:id' , AuthAcc.AuthAccount, Validator.isExistsBuyTicket , Validator.Update, Controller.Update)
 
+//delete ticket
+_APP.delete('/:id' , AuthAcc.AuthAccount, Validator.isExistsBuyTicket , Validator.Delete, Controller.Delete)
+
 //----------- id of buy ticket model
 // add coupon -> create payment detail with code and wait user pay
 // -> post /valid check code of payment with api
@@ -23,13 +26,8 @@ _APP.put('/:id' , AuthAcc.AuthAccount, Validator.isExistsBuyTicket , Validator.U
 // id of buy ticket model
 _APP.post('/:id/checkout', AuthAcc.AuthAccount,  Validator.GetCheckOut, Controller.GetCheckOut)
 
-_APP.post('/:id/valid', (req, res) =>{
-    console.log("id: ", req.params.id)
-    console.log("Respone from momo: \n", req.body)
-    return res.status(200).json({
-        message:"ok"
-    })
-} )
+_APP.post('/:id/valid', AuthAcc.AuthAccount,  Validator.ValidOrder, Controller.ValidOrder)
+_APP.post('/:id/stripe-checkout', AuthAcc.AuthAccount, Validator.GetCheckOut, Controller.StripeCheckout);
 
 
 module.exports = _APP
