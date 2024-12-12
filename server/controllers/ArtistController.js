@@ -13,6 +13,21 @@ module.exports.GetAll = async(req, res)=>{
     })
 }
 
+module.exports.GetByID = async(req, res)=>{
+    var {id} = req.params
+    if (!mongoose.Types.ObjectId.isValid(id))
+    {
+        return res.status(400).json({
+            message: "Id không hợp lệ"
+        })
+    }
+    var data = await ArtistModel.findById(id)
+    return res.status(200).json({
+        message: "Lấy thành công nghệ sĩ",
+        data: data
+    })
+}
+
 module.exports.Create = async(req, res)=>{
     try{
         let {name, desc} = req.body

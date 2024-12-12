@@ -9,6 +9,7 @@ const ArtisController = require('../controllers/ArtistController')
 const ImageValidator = require('../middlewares/ImageValidator')
 
 _APP.get('/', ArtisController.GetAll)
+_APP.get('/:id', ArtisController.GetByID)
 
 _APP.post('/', StaffAuth.AuthRole(['admin', 'manager']), ArtistValidator.create, ArtisController.Create)
 

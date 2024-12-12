@@ -5,6 +5,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -14,6 +15,7 @@
 
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -26,17 +28,28 @@
         tools:replace="android:theme"
         tools:targetApi="31">
         <activity
+            android:name=".order.CheckOutCard"
+            android:exported="false" />
+        <activity
+            android:name=".order.CheckOutActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".ticket.EditPendingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NoInternetActivity"
+            android:exported="false" />
+        <activity
             android:name="staffactivity.ScanTicketActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".ticket.TicketInfoActivity"
-            android:exported="false" /> <!-- <activity -->
+            android:exported="false" />
+        <!-- <activity -->
         <!-- android:name=".ticket.TicketActivity" -->
-        <!-- android:exported="true"></activity> -->
+        <!-- android:exported="true">
+        </activity> -->
         <activity
-
             android:name=".IntroActivity"
             android:exported="true">
             <intent-filter>
@@ -55,9 +68,8 @@
             android:name=".RegisterActivity"
             android:exported="true" />
         <activity
-            android:name=".order.CheckOutActivity"
-                   android:exported="true" />
-
+            android:name=".order.CheckOutActivity_TEST"
+            android:exported="true" />
         <activity
             android:name=".SearchUserActivity"
             android:exported="true">
@@ -69,6 +81,10 @@
         <activity android:name=".ChangeInfoUserActivity"
             android:exported="true">
         </activity>
+     
+            <!-- Service -->
+        <service android:name="services.InternetCheckService" />
+
     </application>
 
 </manifest>

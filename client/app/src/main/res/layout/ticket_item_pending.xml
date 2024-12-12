@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.cardview.widget.CardView
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_height="wrap_content" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="match_parent"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="8dp"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/layoutName"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvName"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/ex_text_name"
+                    android:textSize="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content" />
+
+                <ImageButton
+                    android:id="@+id/btnDrop"
+                    android:background="@color/transparent"
+                    android:src="@drawable/ic_drop_up"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <TextView
+                android:visibility="gone"
+                android:layout_marginTop="5dp"
+                android:textStyle="italic"
+                android:textColor="@color/text_hint"
+                android:id="@+id/tvDate"
+                android:text="@string/ex_text_date"
+                app:layout_constraintTop_toBottomOf="@+id/layoutName"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvNameCreate"
+                android:layout_marginTop="5dp"
+                android:textStyle="italic"
+                android:textColor="@color/text_hint"
+                android:text="Người tạo: Kiều Thành Phát"
+                app:layout_constraintTop_toBottomOf="@+id/layoutName"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvMembers"
+                android:layout_marginTop="5dp"
+                android:textStyle="italic"
+                android:textColor="@color/text_hint"
+                android:text="Thành viên: 5"
+                app:layout_constraintTop_toBottomOf="@+id/tvNameCreate"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvTypePay"
+                android:layout_marginTop="5dp"
+                android:textStyle="italic"
+                android:textColor="@color/text_hint"
+                android:text="Loại thanh toán: tất cả"
+                app:layout_constraintTop_toBottomOf="@+id/tvMembers"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/layoutButton"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/tvTypePay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:text="Sửa"
+                    android:layout_marginRight="20dp"
+                    android:backgroundTint="@color/Dark_Rose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp" />
+                <Button
+                    android:id="@+id/btnPay"
+                    android:text="Thanh toán"
+                    android:backgroundTint="@color/Dark_Rose_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/layoutTicket"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@+id/layoutButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <view class="androidx.recyclerview.widget.RecyclerView"
+                    android:id="@+id/listTicket"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </view>
+            </LinearLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

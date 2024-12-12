@@ -47,6 +47,7 @@
                     android:textStyle="bold"/>
             </LinearLayout>
             <EditText
+                android:inputType="textEmailAddress"
                 android:id="@+id/login_email"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -57,6 +58,7 @@
                 android:drawablePadding="8dp"
                 android:hint="Email/User"/>
             <EditText
+                android:inputType="textPassword"
                 android:id="@+id/login_password"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

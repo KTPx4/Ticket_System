@@ -2,6 +2,7 @@ package com.example.ticketbooking.ticket.viewcustom;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -26,7 +27,8 @@ public class TicketView extends FrameLayout {
 
         // Thiết lập Paint
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(0xFFF4F4F4); // Màu nền
+        paint.setColor(context.getColor(R.color.back_Ticket)); // Màu nền
+//        paint.setColor(Color.BLUE); // Màu nền
         paint.setStyle(Paint.Style.FILL);
 
         // Khởi tạo Path
@@ -35,7 +37,10 @@ public class TicketView extends FrameLayout {
         // Đảm bảo con sẽ được vẽ
         setWillNotDraw(false);
     }
-
+    public void setFullBackgroundColor(int color) {
+        paint.setColor(color); // Cập nhật màu nền
+        invalidate(); // Yêu cầu vẽ lại view
+    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         runOnUiThread(() -> {
                             Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
                         });
-                        localStorageManager.clearLoginToken();
+//                        localStorageManager.clearLoginToken();
                     }
                 });
             }
@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         runOnUiThread(() -> {
                             Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
                         });
-                        localStorageManager.clearLoginToken();
+//                        localStorageManager.clearLoginToken();
                     }
                 });
             }

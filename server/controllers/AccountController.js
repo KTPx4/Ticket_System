@@ -1,6 +1,9 @@
 const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
 const TicketModel = require('../models/TicketModel')
+const BuyTicketModel = require('../models/BuyTicket')
+
+const mongoose = require('mongoose')
 
 const sendEmail = require('../modules/Mailer')
 const jwt = require("jsonwebtoken");
@@ -11,6 +14,7 @@ const StaffModel = require("../models/StaffModel");
 const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
 const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret_reset"; // Khóa bí mật cho JWT
 const SERVER = process.env.SERVER
+
 module.exports.GetMyAccount= async (req, res)=>{
     try{
         var {User} = req.vars
@@ -25,6 +29,34 @@ module.exports.GetMyAccount= async (req, res)=>{
             message: "Lấy thông tin thành công",
             data: acc
         })
+    }
+    catch (e)
+    {
+        console.log("Error at AccountController - GetMyAccount: ", e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
+        })
+    }
+
+}
+module.exports.FindByEmail= async (req, res)=>{
+    try{
+        var {email} = req.query || ""
+
+        var acc = await AccountModel.findOne({email: email})
+        if(!acc)
+        {
+            return res.status(400).json({
+                message: "Không tồn tại tài khoản với email này"
+            })
+        }
+        else{
+            return res.status(200).json({
+                message: "Lấy thông tin thành công",
+                data: acc
+            })
+
+        }
     }
     catch (e)
     {
@@ -321,12 +353,12 @@ module.exports.GetMyTicket = async (req, res) => {
                     from: 'ticket_types',  // Tên collection chứa thông tin ticket loại vé
                     localField: 'info',  // Trường info chứa ID của loại vé
                     foreignField: '_id',
-                    as: 'ticketInfo'  // Kết quả sẽ lưu vào trường `ticketInfo`
+                    as: 'info'  // Kết quả sẽ lưu vào trường `ticketInfo`
                 }
             },
             {
                 $unwind: { // Giải nén mảng `ticketInfo` thành object
-                    path: '$ticketInfo',
+                    path: '$info',
                     preserveNullAndEmptyArrays: true // Đảm bảo ticketInfo vẫn là null nếu không có dữ liệu
                 }
             },
@@ -346,16 +378,191 @@ module.exports.GetMyTicket = async (req, res) => {
             }
         ]);
 
+        const boughtTickets = await BuyTicketModel.aggregate([
+            { $match: { status: 'done', typePayment: 'all' } },
+            { $lookup: { from: 'ticket_infos', localField: 'ticketInfo', foreignField: '_id', as: 'ticketInfos' } },
+            { $unwind: '$ticketInfos' },
+            { $lookup: { from: 'tickets', localField: 'ticketInfos.ticket', foreignField: '_id', as: 'ticketDetails' } },
+            { $unwind: '$ticketDetails' },
+            { $lookup: { from: 'events', localField: 'ticketDetails.event', foreignField: '_id', as: 'eventDetails' } },
+            { $unwind: '$eventDetails' },
+            { $lookup: { from: 'ticket_types', localField: 'ticketDetails.info', foreignField: '_id', as: 'ticketTypeDetails' } },
+            { $unwind: { path: '$ticketTypeDetails', preserveNullAndEmptyArrays: true } }, // Đảm bảo info không bị bỏ qua
+            {
+                $group: {
+                    _id: '$ticketDetails.event',
+                    eventDetails: { $first: '$eventDetails' },
+                    tickets: {
+                        $push: {
+                            _id: '$ticketDetails._id',
+                            event: '$ticketDetails.event',
+                            position: '$ticketDetails.position',
+                            desc: '$ticketDetails.desc',
+                            isAvailable: '$ticketDetails.isAvailable',
+                            accBuy: '$ticketDetails.accBuy',
+                            expiresAt: '$ticketDetails.expiresAt',
+                            isValid: '$ticketDetails.isValid',
+                            info: '$ticketTypeDetails' // Gắn trực tiếp dữ liệu từ ticket_types
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    event: '$eventDetails',
+                    tickets: 1
+                }
+            }
+        ]);
+        
+        // Hợp nhất hai danh sách và loại bỏ trùng lặp dựa trên `ticket._id`
+        const allTicketsMap = new Map();
+
+        // Đưa tất cả tickets từ `tickets` vào map
+        tickets.forEach(group => {
+            group.tickets.forEach(ticket => {
+                allTicketsMap.set(ticket._id.toString(), { event: group.event, ticket });
+            });
+        });
+
+        // Đưa tất cả tickets từ `boughtTickets` vào map (loại trùng lặp tự động do `Map` chỉ lưu unique key)
+        boughtTickets.forEach(group => {
+            group.tickets.forEach(ticket => {
+                allTicketsMap.set(ticket._id.toString(), { event: group.event, ticket });
+            });
+        });
+
+        // Chuyển từ map thành mảng group theo sự kiện
+        const combinedTickets = Array.from(allTicketsMap.values()).reduce((acc, { event, ticket }) => {
+            let group = acc.find(g => g.event._id.toString() === event._id.toString());
+            if (!group) {
+                group = { event, tickets: [] };
+                acc.push(group);
+            }
+            group.tickets.push(ticket);
+            return acc;
+        }, []);
+       
+
         return res.status(200).json({
             message: "Lấy thành công",
-            length: tickets.length ?? 0,
-            data: tickets
+            length: combinedTickets.length ?? 0,
+            data: combinedTickets
         });
+
     } catch (e) {
         console.log("AccountController - GetMyTicket:", e);
         res.status(500).json({ message: "Server error" });
     }
 };
+module.exports.GetPendingById =async (req, res)=>{
+    try {
+        const { id } = req.params;
+
+        // Tìm các BuyTicket phù hợp
+        const buyTickets = await mongoose.model('buy_tickets').findById(id)
+            .populate({
+                path: 'members', // Liên kết members
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate({
+                path: 'accCreate', // Liên kết accCreate
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate('event') // Liên kết event
+            .populate('discount') // Liên kết discount
+            .populate('coupon') // Liên kết coupon
+            .populate('payment') // Liên kết payment
+            .populate('accPay') // Liên kết accPay
+            .populate({
+                path: 'ticketInfo', // Liên kết ticketInfo
+                // match: {
+                //     $and: [
+                //         { accPay: { $exists: false } }, // `accPay` không tồn tại
+                //         { 'ticket.accBuy': { $exists: false }  }, // `ticket.accBuy` bằng null
+                //         { 'ticket.isValid': true } // `ticket.isValid` là true
+                //     ]
+                // },
+                populate: {
+                    path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
+                    populate: {
+                        path: 'info', // Liên kết tiếp tới info trong ticket
+                        model: 'ticket_types'
+                    }
+                }
+            })
+            .lean(); // Trả về plain object để dễ thao tác hơn
+
+
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: buyTickets.length,
+            data: buyTickets
+        });
+    } catch (e) {
+        console.error("AccountController - GetOrderPending:", e);
+        return res.status(500).json({ message: "Server error" });
+    }
+}
+module.exports.GetOrderPending = async (req, res) => {
+    try {
+        const { User } = req.vars;
+
+        // Tìm các BuyTicket phù hợp
+        const buyTickets = await mongoose.model('buy_tickets').find({
+            $or: [
+                { members: User._id },
+                { accCreate: User._id }
+            ],
+            status: "waiting",
+            isDeleted: false
+        })
+            .populate({
+                path: 'members', // Liên kết members
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate({
+                path: 'accCreate', // Liên kết accCreate
+                select: 'name email image address point' // Chỉ trả về các trường cần thiết
+            })
+            .populate('event') // Liên kết event
+            .populate('discount') // Liên kết discount
+            .populate('coupon') // Liên kết coupon
+            .populate('payment') // Liên kết payment
+            .populate('accPay') // Liên kết accPay
+            .populate({
+                path: 'ticketInfo', // Liên kết ticketInfo
+                // match: {
+                //     $or: [
+                //         { accPay: { $exists: false } }, // ticketInfo không có accPay
+                //         { 'ticket.accBuy': { $exists: false } } // ticket trong ticketInfo không có accBuy
+                //     ]
+                // },
+                populate: {
+                    path: 'ticket', // Liên kết sâu tới ticket trong ticketInfo
+                    populate: {
+                        path: 'info', // Liên kết tiếp tới info trong ticket
+                        model: 'ticket_types'
+                    }
+                }
+            })
+            .lean(); // Trả về plain object để dễ thao tác hơn
+
+
+
+        return res.status(200).json({
+            message: "Lấy thành công",
+            length: buyTickets.length,
+            data: buyTickets
+        });
+    } catch (e) {
+        console.error("AccountController - GetOrderPending:", e);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 
 module.exports.UnFollowEvent = async(req, res)=>{
@@ -403,15 +610,28 @@ module.exports.Update = async(req, res)=>{
         if (Object.keys(updateData).length === 0) {
             return res.status(400).json({ message: 'Không có giá trị để sửa' });
         }
-        const updatedEvent = await AccountModel.findByIdAndUpdate(
+        const updatedAccount = await AccountModel.findByIdAndUpdate(
             id,
             { $set: updateData }, // Cập nhật chỉ các trường hợp lệ
             { new: true, runValidators: true } // Trả về dữ liệu sau khi cập nhật và kiểm tra tính hợp lệ
         );
+        var token = ""
+        if(updateData.email)
+        {
+            var data = {
+                name: updatedAccount.name,
+                email: updatedAccount.email,
+                image: updatedAccount.image,
+                pass: updatedAccount.pass
+            }
+
+            token = await jwt.sign(data, SECRET_LOGIN, {expiresIn: "7d"} )
+        }
 
         res.status(200).json({
-            message: "Chỉnh sửa sự kiện thành công",
-            data: updatedEvent
+            message: "Chỉnh sửa thông tin thành công",
+            token: token,
+            data: updatedAccount
         });
     }
     catch (e) {
@@ -490,3 +710,4 @@ const createFolder = (root, idUser, nameAvt)=>
     return true;
     // Kiểm tra xem tệp tin nguồn tồn tại hay không
 }
+
