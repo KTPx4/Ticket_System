@@ -1,85 +1,93 @@
-<androidx.core.widget.NestedScrollView android:layout_width="match_parent"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fillViewport="true"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/gray_background">
+    android:orientation="vertical"
+    tools:context=".HomeUserFragment">
 
-    <LinearLayout
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:context=".HomeUserFragment">
+        android:background="@color/Berry_Crush"
+        app:title="Ticket Booking"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp"/>
 
-        <!-- Toolbar -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+    <!-- ScrollView for the content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/Berry_Crush"
-            app:title="Ticket Booking"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:elevation="4dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/text_special_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sự kiện đặc biệt"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:padding="16dp"/>
+            <TextView
+                android:id="@+id/text_special_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sự kiện đặc biệt"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="16dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_special_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_special_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/text_music_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Âm nhạc"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:padding="16dp"/>
+            <TextView
+                android:id="@+id/text_music_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Âm nhạc"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:padding="16dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_music_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_music_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/text_art_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nghệ thuật"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:padding="16dp"/>
+            <TextView
+                android:id="@+id/text_art_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nghệ thuật"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:padding="16dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_art_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_art_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/text_comedy_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hài kịch"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:padding="16dp"/>
+            <TextView
+                android:id="@+id/text_comedy_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hài kịch"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="16dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_comedy_events"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_comedy_events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
