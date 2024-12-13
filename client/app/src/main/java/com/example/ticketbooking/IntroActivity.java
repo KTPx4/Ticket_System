@@ -12,6 +12,7 @@ import modules.InternetConnection;
 import modules.LocalStorageManager;
 import services.AccountService;
 import services.InternetCheckService;
+import staffactivity.StaffMainActivity;
 
 public class IntroActivity extends AppCompatActivity implements View.OnClickListener{
     Button btnUser, btnStaff;
@@ -73,10 +74,12 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onSuccess() {
                         // Token hợp lệ cho người dùng, chuyển sang màn hình chính
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("login-token", loginToken);
-                        startActivity(intent);
-                        finish();
+                      runOnUiThread(()->{
+                          Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                          intent.putExtra("login-token", loginToken);
+                          startActivity(intent);
+                          finish();
+                      });
                     }
 
                     @Override
@@ -96,7 +99,11 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onSuccess(String message) {
                         // Chuyển sang screen cho staff
-
+                        runOnUiThread(()->{
+                            Intent intent = new Intent(getApplicationContext(), StaffMainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        });
                     }
 
                     @Override
