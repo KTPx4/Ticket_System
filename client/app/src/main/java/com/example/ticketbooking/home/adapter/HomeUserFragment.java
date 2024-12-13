@@ -1,4 +1,4 @@
-package com.example.ticketbooking;
+package com.example.ticketbooking.home.adapter;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -15,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.ticketbooking.home.adapter.EventAdapter;
+import com.example.ticketbooking.R;
 import com.example.ticketbooking.Event;
 import services.HomeService;
 

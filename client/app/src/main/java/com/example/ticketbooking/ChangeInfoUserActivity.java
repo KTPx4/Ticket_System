@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -22,9 +23,10 @@ import org.json.JSONObject;
 import services.AccountHomeService;
 
 public class ChangeInfoUserActivity extends Activity {
-    private EditText edt_Name, edt_Address,edt_FileChangeImage;
+    private EditText edt_Name, edt_Address,edt_FileChangeImage,edt_Email;
     private ImageButton btn_back;
     private Button button_edit;
+    private TextView tv_Email;
     private ImageView img_User,img_Chosseimage;
     private AccountHomeService accountHomeService;
     private static final int PICK_IMGAE_REQUEST = 1;
@@ -36,11 +38,10 @@ public class ChangeInfoUserActivity extends Activity {
         setContentView(R.layout.change_info_user_activity);
 
         edt_Name = findViewById(R.id.edt_Name);
+        tv_Email = findViewById(R.id.tv_Email);
         edt_Address = findViewById(R.id.edt_Address);
         img_User = findViewById(R.id.img_User);
-        img_Chosseimage = findViewById(R.id.img_Chosseimage);
         btn_back = findViewById(R.id.btn_back);
-        edt_FileChangeImage = findViewById(R.id.edt_filechangeimage);
         button_edit = findViewById(R.id.button_edit);
 
         if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -50,14 +51,6 @@ public class ChangeInfoUserActivity extends Activity {
         accountHomeService = new AccountHomeService(this);
 
         btn_back.setOnClickListener(v -> onBackPressed());
-
-        img_Chosseimage.setOnClickListener(v -> {
-            // Mở trình chọn ảnh
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(intent, PICK_IMGAE_REQUEST);
-        });
-
-
 
         // Lấy thông tin tài khoản hiện tại
         fetchAccountInfo();
@@ -81,6 +74,7 @@ public class ChangeInfoUserActivity extends Activity {
                     JSONObject data = jsonResponse.optJSONObject("data");
                     if (data != null) {
                         String name = data.optString("name", "");
+                        String email = data.optString("email", "");
                         String address = data.optString("address", "");
                         String image = "https://ticket-system-l5j0.onrender.com/public/account/" + data.optString("_id") + "/" + data.optString("image");
 
@@ -88,6 +82,7 @@ public class ChangeInfoUserActivity extends Activity {
                         runOnUiThread(() -> {
                             edt_Name.setText(name);
                             edt_Address.setText(address);
+                            tv_Email.setText(email);
 
                             // Load the profile image
                             if (!image.isEmpty()) {

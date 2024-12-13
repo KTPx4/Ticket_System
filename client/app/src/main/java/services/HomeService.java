@@ -100,6 +100,7 @@ public class HomeService {
         Volley.newRequestQueue(context).add(request);
     }
 
+
     public void searchEvents(String query, final EventCallback callback) {
         String url = SERVER + "/api/v1/event?name=" + query;
 

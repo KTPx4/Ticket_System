@@ -34,11 +34,6 @@ public class Event {
         return artists;
     }
 
-    public void setArtists(List<String> artists) {
-        this.artists = artists;
-    }
-
-    // Các getter khác...
     public String getId() {
         return id;
     }

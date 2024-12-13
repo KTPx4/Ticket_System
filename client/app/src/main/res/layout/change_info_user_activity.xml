@@ -56,17 +56,17 @@
                 tools:srcCompat="@tools:sample/avatars"
                 android:contentDescription="User Image"/>
 
-            <ImageView
-                android:id="@+id/img_Chosseimage"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/camera"
-                android:background="@drawable/circle_black"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="8dp"
-                android:scaleType="centerInside"
-                android:padding="6dp"
-                android:contentDescription="Choose Image"/>
+<!--            <ImageView-->
+<!--                android:id="@+id/img_Chosseimage"-->
+<!--                android:layout_width="36dp"-->
+<!--                android:layout_height="36dp"-->
+<!--                android:src="@drawable/camera"-->
+<!--                android:background="@drawable/circle_black"-->
+<!--                android:layout_gravity="bottom|end"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:scaleType="centerInside"-->
+<!--                android:padding="6dp"-->
+<!--                android:contentDescription="Choose Image"/>-->
         </FrameLayout>
 
         <TextView
@@ -117,15 +117,36 @@
                 android:paddingTop="8dp"
                 android:textSize="16dp"/>
 
-            <EditText
-                android:id="@+id/edt_Email"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ABC@gmail.com"
-                android:inputType="textPersonName"
-                android:textSize="14dp"
-                android:padding="8dp"
-                android:background="@drawable/edit_text_background" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/edit_text_background"
+                android:clickable="false"
+                android:focusable="false">
+
+                <TextView
+                    android:id="@+id/tv_Email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="ABC@gmail.com"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/icon_email"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/verified"
+                    android:layout_gravity="center_vertical" />
+            </LinearLayout>
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -151,14 +172,6 @@
                 android:padding="8dp"
                 android:background="@drawable/edit_text_background" />
         </LinearLayout>
-        <EditText
-            android:id="@+id/edt_filechangeimage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:textSize="14dp"
-            android:padding="8dp"
-            android:background="@drawable/edit_text_background" />
     </LinearLayout>
 
     <Button
