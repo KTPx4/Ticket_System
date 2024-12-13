@@ -1,6 +1,7 @@
 package com.example.ticketbooking.home.adapter;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.ticketbooking.DetailsEventActivity;
 import com.example.ticketbooking.Event;
 import com.example.ticketbooking.R;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import services.AccountHomeService;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private List<Event> eventList;
     private int nameTextColor = Color.BLACK;
+    private AccountHomeService accountHomeService;
 
     public EventAdapter(List<Event> eventList) {
         this.eventList = eventList;
@@ -53,19 +55,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         Glide.with(holder.eventImage.getContext())
                 .load(imageUrl)
                 .into(holder.eventImage);
-
         holder.itemView.setOnClickListener(v -> {
-            // Pass event details to the DetailsEventActivity
-            Intent intent = new Intent(holder.itemView.getContext(), DetailsEventActivity.class);
-            intent.putExtra("event_id", event.getId());
-            intent.putExtra("event_name", event.getName());
-            intent.putExtra("event_location", event.getLocation());
-            intent.putExtra("event_desc", event.getDescription());
-            intent.putExtra("event_start_time", event.getStartDate());
-            intent.putExtra("event_image", imageUrl);
-            intent.putExtra("event_price", event.getMinPrice());
-
-            holder.itemView.getContext().startActivity(intent);
+            Log.d("EventAdapter", "Event ID: " + event.getId());
+            Intent intent = new Intent(v.getContext(), DetailsEventActivity.class);
+            intent.putExtra("eventId", event.getId());  // Truyền eventId qua Intent
+            v.getContext().startActivity(intent);
         });
     }
 

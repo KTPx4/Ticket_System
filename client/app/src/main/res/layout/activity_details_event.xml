@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/gray_background"
-    tools:context=".DetailsEventActivity">
+    tools:context=".home.adapter.DetailsEventActivity">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -40,8 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-
-        <!-- The content inside ScrollView -->
+]
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,7 +52,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/mau"
                 android:contentDescription="Event Banner" />
 
             <LinearLayout
@@ -68,7 +66,6 @@
                     android:id="@+id/tv_event_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WINTERJOY 2024"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:paddingBottom="8dp" />
@@ -80,7 +77,6 @@
                     android:drawableStart="@drawable/calendar"
                     android:drawableTint="@color/black"
                     android:drawablePadding="8dp"
-                    android:text="15:00 - 22:00, 21 Tháng 12, 2024"
                     android:textColor="#388E3C"
                     android:paddingBottom="8dp" />
 
@@ -91,7 +87,6 @@
                     android:drawableStart="@drawable/location"
                     android:drawableTint="@color/black"
                     android:drawablePadding="8dp"
-                    android:text="Hồ Chí Minh"
                     android:paddingBottom="8dp" />
             </LinearLayout>
 
@@ -116,8 +111,7 @@
                     android:id="@+id/tv_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:lineSpacingExtra="4dp"
-                    android:text="WinterJoy – Lễ hội Âm nhạc x Thời trang lớn nhất mùa đông 2024 tại trung tâm Tp.HCM..." />
+                    android:lineSpacingExtra="4dp"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"

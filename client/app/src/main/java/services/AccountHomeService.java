@@ -77,6 +77,83 @@ public class AccountHomeService {
         }).start();
     }
 
+    public void getEventById(String eventId, final ResponseCallback callback) {
+        String url = SERVER + "/api/v1/event/" + eventId;
+
+        // Create a request with Authorization header (if needed)
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + token) // Add Bearer token
+                .build();
+
+        // Make the request in a background thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        JSONObject jsonResponse = new JSONObject(responseBody);
+
+                        String message = jsonResponse.optString("message");
+                        if (message != null && message.equals("Lấy dữ liệu sự kiện thành công")) {
+                            // Handle the successful response
+                            callback.onSuccess(responseBody);
+                        } else {
+                            // If message is not successful
+                            callback.onFailure("Failed to retrieve event data");
+                        }
+                    } else {
+                        callback.onFailure("Request failed: " + response.message());
+                    }
+                } catch (Exception e) {
+                    Log.e("AccountHomeService", "Error retrieving event data", e);
+                    callback.onFailure("Error: " + e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+
+    public void getArtistById(String artistId, final ResponseCallback callback) {
+        String url = SERVER + "/api/v1/artist/" + artistId; // API endpoint for artist info
+
+        // Create a request without an Authorization header
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        // Make the request in a background thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        JSONObject jsonResponse = new JSONObject(responseBody);
+
+                        String message = jsonResponse.optString("message");
+                        if (message != null && message.equals("Lấy thành công nghệ sĩ")) {
+                            // Handle the successful response
+                            callback.onSuccess(responseBody);
+                        } else {
+                            // If message is not successful
+                            callback.onFailure("Failed to retrieve artist data");
+                        }
+                    } else {
+                        callback.onFailure("Request failed: " + response.message());
+                    }
+                } catch (Exception e) {
+                    Log.e("AccountHomeService", "Error retrieving artist data", e);
+                    callback.onFailure("Error: " + e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+
     public void deleteAllHistory(final ResponseCallback callback) {
         String url = SERVER + "/api/v1/account/history"; // API endpoint for deleting all history
 
@@ -214,8 +291,6 @@ public class AccountHomeService {
             }
         }).start();
     }
-
-
 
     public interface ResponseCallback {
         void onSuccess(String success);
