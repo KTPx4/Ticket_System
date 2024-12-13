@@ -1,6 +1,8 @@
 const cron = require('node-cron');
 const Ticket = require('../models/TicketModel')
 const Order = require('../models/OrderModel')
+const EventModel = require('../models/EventModel')
+const EventController = require('../controllers/EventController')
 
 // Định nghĩa cron job
 const ticketCronJob = () => {
@@ -47,4 +49,23 @@ const ticketCronJob = () => {
     });
 };
 
-module.exports = ticketCronJob;
+const checkCreteTicket = async()=>{
+
+    var listEvent = await EventModel.find()
+
+    for(const event of listEvent)
+    {
+        // console.log("Event: ",event)
+        var listTicket = await Ticket.find({
+            event: event._id
+        })
+        if(!listTicket || listTicket.length < 1)
+        {
+            await EventController.createTicket(event)
+        }
+    }
+
+}
+
+module.exports.ticketCronJob = ticketCronJob;
+module.exports.CreateTicket = checkCreteTicket;

@@ -88,7 +88,7 @@ module.exports.isExistsBuyTicket = async (req, res, next)=>{
     if(!id)
     {
         return res.status(400).json({
-            message: "Thiếu id đơn hàng"
+            message: "Thiếu id đơn mua vé"
         })
     }
     // Kiểm tra nếu id không phải là ObjectId hợp lệ

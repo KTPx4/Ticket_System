@@ -41,9 +41,8 @@ import services.OrderService;
 public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventViewHolder> {
     private final Context context;
     private final List<MyPending> myTicketList;
-    private final RecyclerView.RecycledViewPool sharedPool; // Tạo pool dùng chung
+
     private TicketPendingAdapter ticketItemAdapter;
-    private final  List<TicketInfo> dataSet = new ArrayList<>();
     private  final List<String> listInfo = new ArrayList<>();
     private OnEditTicketListener listener;
     private LocalStorageManager localStorageManager;
@@ -56,13 +55,13 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     }
 
     public interface OnUpdateUI{
-        void update(String buyTicketId);
+        void update();
     }
 
     public PendingAdapter(Context context, List<MyPending> myTicketList,OnEditTicketListener listener) {
         this.context = context;
         this.myTicketList = myTicketList;
-        this.sharedPool = new RecyclerView.RecycledViewPool(); // Khởi tạo pool
+
         this.listener = listener;
         localStorageManager = new LocalStorageManager(context);
         orderService = new OrderService(context);
@@ -70,7 +69,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     public PendingAdapter(Context context, List<MyPending> myTicketList) {
         this.context = context;
         this.myTicketList = myTicketList;
-        this.sharedPool = new RecyclerView.RecycledViewPool(); // Khởi tạo pool
+
         localStorageManager = new LocalStorageManager(context);
         orderService = new OrderService(context);
 
@@ -87,7 +86,9 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         MyPending myPending = myTicketList.get(position);
+
         String typePay = myPending.getTypePayment().toLowerCase().equals("all") ? "Tất cả" : "Từng thành viên";
+
         String myId= localStorageManager.getIdUser();
         if(!myId.equals(myPending.getAccCreate().get_id()))
         {
@@ -103,11 +104,13 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.tvNameCreate.setText("Người tạo: "+myPending.getAccCreate().getName());
         holder.tvMembers.setText( "Thành viên: "+ myPending.getMembers().stream().count());
         holder.tvTypePay.setText("Hình thức mua vé: "+ typePay);
-        dataSet.clear();
-        dataSet.addAll(myPending.getTicketInfo());
+
+        List<TicketInfo> arrMyListIfo = myPending.getTicketInfo();
+
+
 
         // Set the TicketItemAdapter for the nested RecyclerView (listTicket)
-        ticketItemAdapter = new TicketPendingAdapter(context,dataSet , new TicketPendingAdapter.OnTicketClickListener() {
+        ticketItemAdapter = new TicketPendingAdapter(context, arrMyListIfo , new TicketPendingAdapter.OnTicketClickListener() {
             @Override
             public void onTicketClick(String infoId) {
                 if(listInfo.contains(infoId))
@@ -131,9 +134,9 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
 
                         .setNegativeButton("Xóa", (dialog2, which) -> {
 
-                            for(int i =0 ; i < dataSet.size(); i++)
+                            for(int i =0 ; i < arrMyListIfo.size(); i++)
                             {
-                                String idInf = dataSet.get(i).get_id();
+                                String idInf = arrMyListIfo.get(i).get_id();
                                 if(idInf.equals(infoId))
                                 {
                                     int finalI = i;
@@ -142,12 +145,16 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                                         @Override
                                         public void onSuccess(String success) {
                                             ((Activity)context).runOnUiThread(()->{
-                                                dataSet.remove(finalI);
+
+                                                arrMyListIfo.remove(finalI);
+
                                                 if(listInfo.contains(infoId))
                                                 {
                                                     listInfo.remove(infoId);
                                                 }
+
                                                 ticketItemAdapter.notifyDataSetChanged();
+
 
                                                 Toast.makeText(context, "Đã xóa vé: " + infoId, Toast.LENGTH_SHORT).show();
                                             });
@@ -173,18 +180,35 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getColor(R.color.inValid_Ticket));  // Màu cho nút "Xóa"
 
             }
+
+
+
+
         });
 
         holder.btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listInfo.stream().count() < 1 && myPending.getTypePayment().equals("single"))
+//                if(listInfo.stream().count() < 1 && myPending.getTypePayment().equals("single"))
+//                {
+//                    Toast.makeText(context, "Vui lòng chọn vé", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+                List<String> listCheckoutInfo = new ArrayList<>();
+                for(TicketInfo ifo : arrMyListIfo)
+                {
+                    if(listInfo.contains(ifo.get_id()))
+                    {
+                        listCheckoutInfo.add(ifo.get_id());
+                    }
+                }
+                if(listCheckoutInfo.stream().count() < 1 && myPending.getTypePayment().equals("single"))
                 {
                     Toast.makeText(context, "Vui lòng chọn vé", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (listener != null) {
-                    listener.onCheckOutTicket(myPending.get_id(), listInfo);
+                    listener.onCheckOutTicket(myPending.get_id(), listCheckoutInfo);
                 }
 
             }
@@ -195,11 +219,16 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
             public void onClick(View v) {
 
                 if (listener != null) {
-                    listener.onEditTicket(myPending.get_id(), buyTicketId -> {
-                        ((Activity) context).runOnUiThread(()->{
-                            listInfo.clear();
-                            ticketItemAdapter.notifyDataSetChanged();
-                        });
+                    listener.onEditTicket(myPending.get_id(), () -> {
+                        listInfo.clear();
+//                        callbackUpdateTicket.onUpdateUI();
+//                        ((Activity) context).runOnUiThread(()->{
+//                            List<TicketInfo> dataSet_Temp  = new ArrayList<>();
+//                            dataSet_Temp.addAll(dataSet);
+//                            dataSet.clear();
+//                            dataSet.addAll(dataSet_Temp);
+//                            ticketItemAdapter.notifyDataSetChanged();
+//                        });
                     });
                 }
             }
@@ -234,8 +263,6 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         holder.listTicket.setLayoutManager(new LinearLayoutManager(context));
         holder.listTicket.setAdapter(ticketItemAdapter);
 
-        // Set shared RecycledViewPool
-        holder.listTicket.setRecycledViewPool(sharedPool);
 
         ticketItemAdapter.notifyDataSetChanged();
         holder.idBuyTicket = myPending.get_id();

@@ -1,4 +1,4 @@
-package com.example.ticketbooking.ticket.adapter;
+package com.example.ticketbooking.ticket.adapter.myticket;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,9 +15,7 @@ import com.example.ticketbooking.ticket.TicketInfoActivity;
 import com.example.ticketbooking.ticket.viewcustom.TicketView;
 
 import model.ticket.*;
-import modules.MoneyFormatter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.TicketViewHolder> {
@@ -28,15 +26,15 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
         this.context = context;
         this.ticketList = ticketList;
     }
-    public TicketItemAdapter(Context context, List<TicketInfo> ticketInfos, int option) {
-        this.context = context;
-        List<Ticket> tickets = new ArrayList<>();
-        for(TicketInfo ticketInfo : ticketInfos)
-        {
-            tickets.add(ticketInfo.getTicket());
-        }
-        this.ticketList = tickets;
-    }
+//    public TicketItemAdapter(Context context, List<TicketInfo> ticketInfos, int option) {
+//        this.context = context;
+//        List<Ticket> tickets = new ArrayList<>();
+//        for(TicketInfo ticketInfo : ticketInfos)
+//        {
+//            tickets.add(ticketInfo.getTicket());
+//        }
+//        this.ticketList = tickets;
+//    }
 
     @NonNull
     @Override
@@ -48,10 +46,10 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
     @Override
     public void onBindViewHolder(@NonNull TicketViewHolder holder, int position) {
         Ticket ticket = ticketList.get(position);
-        holder.tvId.setText(ticket.get_id());
-        holder.tvType.setText("Loại vé: "+ticket.getInfo().getTypeTicket());
-        holder.tvLocation.setText("Vị trí: "+ticket.getInfo().getLocation());
-        holder.tvPosition.setText("Số ghế: "+ ticket.getPosition());
+//        holder.tvId.setText(ticket.get_id());
+//        holder.tvType.setText("Loại vé: "+ticket.getInfo().getTypeTicket());
+//        holder.tvLocation.setText("Vị trí: "+ticket.getInfo().getLocation());
+//        holder.tvPosition.setText("Số ghế: "+ ticket.getPosition());
         holder.bind(context, ticket);
     }
 
@@ -78,8 +76,8 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
             // Gắn dữ liệu vào View
             tvId.setText(ticket.get_id());
             tvType.setText("Loại vé: " + ticket.getInfo().getTypeTicket());
-            tvLocation.setText("Vị trí: " + ticket.getInfo().getLocation());
-            tvPosition.setText("Số ghế: " + ticket.getPosition());
+            tvLocation.setText("Khu vực: " + ticket.getInfo().getLocation());
+            tvPosition.setText("Ghế: " + ticket.getPosition());
 
             if(!ticket.isValid())
             {
@@ -101,6 +99,8 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
                     intent.putExtra("type", ticket.getInfo().getTypeTicket());
                     intent.putExtra("location", ticket.getInfo().getLocation());
                     intent.putExtra("position", ticket.getPosition() + "");
+                    intent.putExtra("desc", ticket.getDesc());
+                    intent.putExtra("name", ticket.getEventDetails().getName());
 
                     // Khởi chạy Activity
                     context.startActivity(intent);

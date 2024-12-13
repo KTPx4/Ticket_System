@@ -37,6 +37,62 @@ public class OrderService {
         this.token = localStorageManager.getLoginToken();
     }
 
+    public void BuyTicket(String id, List<String> listId, ValidCallback callback )
+    {
+        if(id == null || id.isEmpty())
+        {
+            callback.onFailure("Không có id sự kiện");
+            return;
+        }
+        if(token == null || token.isEmpty())
+        {
+            callback.onFailure("Không có id người dùng");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/order" ;
+
+                // Chuyển thông tin Java List sang JSON Payload
+                Gson gson = new Gson();
+                String jsonPayload = gson.toJson(new BuyTicketPayload(id, listId));
+
+                // Tạo RequestBody
+                RequestBody body = RequestBody.create(
+                        jsonPayload,
+                        MediaType.parse("application/json")
+                );
+
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .post(body)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                ResponseValid responseData = gson.fromJson(responseBody, ResponseValid.class);
+
+                if (response.isSuccessful()) {
+
+                    Log.d("ORDER", "Response Body: " + responseBody);
+                    Log.d("ORDER ParsedData", gson.toJson(responseData));
+                    callback.onSuccess(responseData.getMessage());
+
+                } else {
+                    callback.onFailure(responseData.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Tải thông tin thất bại" + e.getMessage());
+            }
+        }).start();
+    }
+
     public void UpdateOrder(String id, String typePayment, List<String> listId , UpdateCallback callback )
     {
         if(id == null || id.isEmpty())
@@ -329,7 +385,34 @@ public class OrderService {
         void onFailure(String error);
     }
 
+    class BuyTicketPayload{
+        private String event;
+        private List<String> tickets;
 
+        public BuyTicketPayload() {
+        }
+
+        public BuyTicketPayload(String event, List<String> tickets) {
+            this.event = event;
+            this.tickets = tickets;
+        }
+
+        public String getEvent() {
+            return event;
+        }
+
+        public void setEvent(String event) {
+            this.event = event;
+        }
+
+        public List<String> getTickets() {
+            return tickets;
+        }
+
+        public void setTickets(List<String> tickets) {
+            this.tickets = tickets;
+        }
+    }
     class ValidPayload{
         private String token;
         private String payment;
