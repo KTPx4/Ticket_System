@@ -1,15 +1,20 @@
 package com.example.ticketbooking.home.adapter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.ticket.ticket_activity_booking_ticket;
 
 import org.json.JSONObject;
 
@@ -25,7 +30,8 @@ public class DetailsEventActivity extends AppCompatActivity {
     private RecyclerView recycler_artist;
     private ArtistAdapter artistAdapter;
     private AccountHomeService accountHomeService;
-
+    private Button btnBookingTicket;
+    private String EventID = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +46,7 @@ public class DetailsEventActivity extends AppCompatActivity {
         img_banner = findViewById(R.id.img_banner);
         tv_price = findViewById(R.id.tv_price);
         recycler_artist = findViewById(R.id.recycler_artist);
-
+        btnBookingTicket = findViewById(R.id.btn_select_schedule);
         // Handle back button click
         imgBack.setOnClickListener(v -> onBackPressed());
         String eventId = getIntent().getStringExtra("eventId");
@@ -50,10 +56,23 @@ public class DetailsEventActivity extends AppCompatActivity {
         accountHomeService = new AccountHomeService(this);
 
         fetchEvenByID();
+
+        btnBookingTicket.setOnClickListener((v)->{
+            if(EventID == null || EventID.isEmpty())
+            {
+                Toast.makeText(this, "Sự kiện chưa được tải thành công", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, ticket_activity_booking_ticket.class);
+            intent.putExtra("idEvent", EventID);
+            startActivity(intent);
+        });
+
     }
 
     private void fetchEvenByID(){
         String eventId = getIntent().getStringExtra("eventId");
+        EventID= eventId;
         accountHomeService.getEventById(eventId, new AccountHomeService.ResponseCallback() {
             @Override
             public void onSuccess(String response) {
