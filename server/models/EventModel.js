@@ -73,6 +73,7 @@ const EventSchema = new mongoose.Schema({
     toJSON: { getters: true }, // Bật chế độ dùng getter khi convert sang JSON
     toObject: { getters: true } // Bật chế độ dùng getter khi convert sang Object
 })
+
 EventSchema.pre('save', function (next) {
     // Nếu giá trị của 'NameAvt' là null hoặc không được xác định, đặt giá trị mặc định là '_id.png'
     if (!this.image || this.image === null) {

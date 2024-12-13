@@ -8,6 +8,6 @@ const TicketType = new mongoose.Schema({
     },
     typeTicket:{type: String, default:"Vip 1"}, // Vip 1, Vip 2, Normal
     location: {type: String, default: "A"}, // A, B, C
-    price: {type: Number, default: 0},
+    price: {type: Number, default: 50000},
 })
 module.exports = mongoose.model('ticket_types', TicketType)

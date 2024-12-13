@@ -14,8 +14,8 @@ public class ZoomableView extends ViewGroup {
     private ScaleGestureDetector scaleDetector;
     private float lastTouchX, lastTouchY;
     private float focusX = 0, focusY = 0; // Tọa độ kéo (pan)
-    private float minScale = 0.6f, maxScale = 2.5f; // Giới hạn zoom, nới rộng maxScale
-    private float maxPanX = 1300f, maxPanY = 900f; // Nới rộng phạm vi kéo
+    private float minScale = 0.6f, maxScale = 2.5f; // Giới hạn zoom
+    private float maxPanX = 1200f, maxPanY = 900f; // Phạm vi kéo tối đa
 
     public ZoomableView(Context context) {
         super(context);
@@ -29,6 +29,12 @@ public class ZoomableView extends ViewGroup {
 
     private void init(Context context) {
         scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        // Chặn các sự kiện touch cho các View con khi zoom hoặc pan
+        return scaleDetector.isInProgress() || super.onInterceptTouchEvent(ev);
     }
 
     @Override
@@ -49,7 +55,7 @@ public class ZoomableView extends ViewGroup {
                 focusX += dx;
                 focusY += dy;
 
-                // Điều chỉnh phạm vi kéo với giá trị zoom, cho phép kéo rộng hơn
+                // Điều chỉnh phạm vi kéo
                 focusX = Math.max(Math.min(focusX, getWidth() - getWidth() * scale + maxPanX), -maxPanX);
                 focusY = Math.max(Math.min(focusY, getHeight() - getHeight() * scale + maxPanY), -maxPanY);
 
@@ -62,11 +68,7 @@ public class ZoomableView extends ViewGroup {
         return true;
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        // Không cần vẽ nội dung ở đây vì ViewGroup sẽ vẽ các view con
-    }
+
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
@@ -74,13 +76,23 @@ public class ZoomableView extends ViewGroup {
 
         // Áp dụng zoom và kéo
         canvas.scale(scale, scale);
-
-        // Điều chỉnh vị trí kéo (pan) sao cho không lệch quá nhiều
         canvas.translate(focusX / scale, focusY / scale);
 
         super.dispatchDraw(canvas);
 
         canvas.restore();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Điều chỉnh tọa độ touch theo zoom và pan
+        float adjustedX = (ev.getX() - focusX) / scale;
+        float adjustedY = (ev.getY() - focusY) / scale;
+
+        // Thay đổi tọa độ của sự kiện trước khi chuyển đến View con
+        ev.setLocation(adjustedX, adjustedY);
+
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override

@@ -120,7 +120,7 @@ module.exports.Create = async(req, res)=>{
         return res.status(500).json({ message: "Có lỗi xảy ra khi tạo sự kiện", error: error.message });
     }
 }
-const createTicket = async(newEvent)=>{
+module.exports.createTicket = async (newEvent) => {
     try {
         const locations = ["A", "B", "C"]; // Danh sách các khu vực
         const types = ["Vip 1", "Vip 2", "Normal"]; // Danh sách các loại vé
@@ -136,31 +136,41 @@ const createTicket = async(newEvent)=>{
 
         // Thêm toàn bộ ticket types vào database một lần
         const insertedTicketTypes = await TicketTypeModel.insertMany(ticketTypes);
-        // console.log("Đã tạo các loại vé thành công:", insertedTicketTypes);
 
-        // Tạo 20 ticket cho mỗi ticket type
-        for (const ticketType of insertedTicketTypes) {
-            const tickets = [];
+        // Tạo vé với số thứ tự tiếp nối
+        for (const location of locations) {
+            let position = 1; // Khởi tạo số thứ tự từ 1 cho mỗi khu vực
 
-            for (let i = 1; i <= 20; i++) {
-                tickets.push({
-                    event: newEvent._id,
-                    position: i,
-                    desc: `Vé vị trí ${i} cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`,
-                    info: ticketType._id,
-                    isAvailable: true,
-                });
+            for (const type of types) {
+                const ticketType = insertedTicketTypes.find(
+                    tt => tt.location === location && tt.typeTicket === type
+                );
+
+                if (!ticketType) continue;
+
+                const tickets = [];
+
+                for (let i = 0; i < 20; i++) {
+                    tickets.push({
+                        event: newEvent._id,
+                        position: position++, // Số thứ tự tự động tăng
+                        desc: `Vé vị trí ${position - 1} cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`,
+                        info: ticketType._id,
+                        isAvailable: true,
+                    });
+                }
+
+                // Thêm tất cả ticket cho ticket type hiện tại
+                await TicketModel.insertMany(tickets);
+                // console.log(`Đã tạo vé cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`);
             }
-            // Thêm tất cả ticket cho ticket type hiện tại
-            await TicketModel.insertMany(tickets);
-         //   console.log(`Đã tạo 20 vé cho loại ${ticketType.typeTicket} tại khu vực ${ticketType.location}`);
         }
-    //    console.log("Đã tạo các loại vé thành công:", result);
 
+        console.log("Đã tạo các loại vé thành công!");
     } catch (error) {
         console.error("Lỗi khi tạo loại vé:", error);
     }
-}
+};
 
 module.exports.getTicket = async(req, res)=>{
     try {

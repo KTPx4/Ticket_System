@@ -109,7 +109,7 @@ const StartProgram = async()=>{
             })
 
             // Khởi chạy cron job
-            // ticketCronJob();
+            ticketCronJob.CreateTicket()
 
             // tạo folder, copy ảnh default cho event
             await Generate.AddImageEvent(__dirname)

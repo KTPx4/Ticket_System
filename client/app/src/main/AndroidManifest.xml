@@ -30,11 +30,7 @@
         <activity
             android:name=".ticket.ticket_activity_booking_ticket"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".order.CheckOutCard"
