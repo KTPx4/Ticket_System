@@ -162,7 +162,7 @@
             android:id="@+id/btn_select_schedule"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chọn lịch diễn"
+            android:text="Đặt vé"
             android:backgroundTint="@color/Berry_Crush"
             android:textColor="@color/white" />
     </LinearLayout>

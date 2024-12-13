@@ -64,7 +64,7 @@ public class ticket_activity_booking_ticket extends AppCompatActivity {
          grLocationC = findViewById(R.id.grLocationC);
 
          // get intent
-        // getFromIntent();
+         getFromIntent();
 
         // Get Data
         getData();
@@ -157,10 +157,16 @@ public class ticket_activity_booking_ticket extends AppCompatActivity {
 
             @Override
             public void onFailure(String error) {
+
                 runOnUiThread(()->{
-                    isLoading = false;
-                    updateView();
-                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                    AlertDialog dig =  new AlertDialog.Builder(ticket_activity_booking_ticket.this)
+                            .setTitle("Tải thông tin thất bại")
+                            .setMessage(error)
+                            .setPositiveButton("Thoát", (dialog, which) -> {
+                                ticket_activity_booking_ticket.this.finish();
+                                return;
+                            }).create();
+                    dig.show();
                 });
             }
         });
