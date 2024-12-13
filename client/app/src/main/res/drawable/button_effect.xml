@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/custom_button.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <!-- Ripple Effect when pressed -->
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="8dp" />
+            <stroke android:color="#FF6200EE" android:width="2dp"/>
+            <ripple android:color="@android:color/darker_gray" />
+        </shape>
+    </item>
+    <item>
+        <!-- Normal state -->
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="8dp" />
+            <stroke android:color="#FF6200EE" android:width="2dp"/>
+        </shape>
+    </item>
+</selector>

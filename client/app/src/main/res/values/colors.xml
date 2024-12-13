@@ -42,5 +42,13 @@
     <color name="text_hint">#F6B8B8B8</color>
     <color name="momo_back">#b0006d </color>
 
+    <color name="main_hall">#EDDE6478</color>
+
+    <color name="back_booking_ticket">#F5EBEB</color>
+
+    <color name="ticket_selected">#009688</color>
+    <color name="ticket_sold">#FFC107</color>
+    <color name="ticket_valid">#A9A6A6</color>
+
 
 </resources>

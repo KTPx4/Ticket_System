@@ -109,4 +109,20 @@ public class TicketInfo {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "TicketInfo{" +
+                "_id='" + _id + '\'' +
+                ", ticket=" + ticket +
+                ", event='" + event + '\'' +
+                ", coupon=" + coupon +
+                ", price=" + price +
+                ", priceFinal=" + priceFinal +
+                ", moneyGive=" + moneyGive +
+                ", moneyChange=" + moneyChange +
+                ", date='" + date + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

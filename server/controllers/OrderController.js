@@ -132,7 +132,7 @@ module.exports.Create = async (req, res) => {
             });
 
             return res.status(201).json({
-                message: "Đã tạo đơn hàng thành công",
+                message: "Đã tạo đơn mua vé thành công",
                 data: BuyTicket,
             });
         }
