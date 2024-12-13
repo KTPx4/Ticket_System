@@ -386,44 +386,43 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
                             env = "app";
                         }
                     */
-
-                    orderService.PostValid(idBuyTicket, tokenCheckout, "momo", new OrderService.ValidCallback() {
-                        @Override
-                        public void onSuccess(String success) {
-                            runOnUiThread(()->{
-
-                                Toast.makeText(getApplicationContext(), success, Toast.LENGTH_SHORT).show();
-
-                                AlertDialog dig =  new AlertDialog.Builder(getApplicationContext())
-                                        .setTitle("Thành Công")
-                                        .setMessage("Thanh toán thành công rồi bạn ơi. Mừng quá")
-                                        .setPositiveButton("Ok luôn", (dialog, which) -> {
-                                            Intent resultIntent = new Intent();
-                                            resultIntent.putExtra("idBuyTicket", idBuyTicket);
-                                            resultIntent.putExtra("isDelete", true);
-                                            setResult(RESULT_OK, resultIntent);
-                                            finish();
-                                        }).create();
-                                dig.show();
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(String error) {
-                            runOnUiThread(()->{
-                                Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-                                CheckOutActivity.this.finish();
-
-                            });
-                        }
-                    });
-
                     String token = data.getStringExtra("data"); //Token response
 
                     if (token != null && !token.equals("")) {
                         // Call order service to valid transaction
+                        orderService.PostValid(idBuyTicket, tokenCheckout, "momo", new OrderService.ValidCallback() {
+                            @Override
+                            public void onSuccess(String success) {
+                                runOnUiThread(()->{
 
+                                    Toast.makeText(CheckOutActivity.this, success, Toast.LENGTH_SHORT).show();
+
+                                    AlertDialog dig =  new AlertDialog.Builder(CheckOutActivity.this)
+                                            .setTitle("Thành Công")
+                                            .setMessage("Thanh toán thành công rồi bạn ơi. Mừng quá")
+                                            .setPositiveButton("Ok luôn", (dialog, which) -> {
+                                                Intent resultIntent = new Intent();
+                                                resultIntent.putExtra("idBuyTicket", idBuyTicket);
+                                                resultIntent.putExtra("isDelete", true);
+                                                setResult(RESULT_OK, resultIntent);
+                                                CheckOutActivity.this.finish();
+                                            }).create();
+                                    dig.show();
+                                    return;
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(String error) {
+                                runOnUiThread(()->{
+                                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                                    CheckOutActivity.this.finish();
+                                });
+                            }
+                        });
                     } else {
+                        Toast.makeText(getApplicationContext(), "Lỗi thanh toán. Vui lòng liên hệ admin để lấy lại tiền", Toast.LENGTH_LONG).show();
+
 //                        tvMessage.setText("message: " + "no info");
                     }
                     return;
@@ -441,7 +440,6 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
                     //TOKEN FAIL
 //                    tvMessage.setText("message: " + "no info");
                 }
-                Toast.makeText(getApplicationContext(), "Thanh toán thất bại", Toast.LENGTH_SHORT).show();
 
             }
             else {
@@ -453,7 +451,7 @@ public class CheckOutActivity extends AppCompatActivity implements  View.OnClick
         }
         else if (requestCode == REQUEST_CODE_STRIPE && resultCode == -1)
         {
-            Toast.makeText(getApplicationContext(), "Thanh toán thành công", Toast.LENGTH_SHORT).show();
+            Toast.makeText( CheckOutActivity.this, "Thanh toán thành công", Toast.LENGTH_SHORT).show();
 
             AlertDialog dig =  new AlertDialog.Builder(this)
                     .setTitle("Thành Công")

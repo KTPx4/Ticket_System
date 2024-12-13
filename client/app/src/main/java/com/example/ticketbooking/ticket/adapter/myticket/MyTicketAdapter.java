@@ -1,4 +1,4 @@
-package com.example.ticketbooking.ticket.adapter.event;
+package com.example.ticketbooking.ticket.adapter.myticket;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,17 +17,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ticketbooking.R;
-import com.example.ticketbooking.ticket.adapter.TicketItemAdapter;
 
 import java.util.List;
 
 import model.ticket.MyTicket;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.EventViewHolder> {
     private final Context context;
     private final List<MyTicket> myTicketList;
 
-    public EventAdapter(Context context, List<MyTicket> myTicketList) {
+    public MyTicketAdapter(Context context, List<MyTicket> myTicketList) {
         this.context = context;
         this.myTicketList = myTicketList;
     }

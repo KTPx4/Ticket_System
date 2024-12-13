@@ -34,7 +34,7 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
     private CountDownTimer countDownTimer;
 
     private Button btnGenerate, btnClose;
-    private TextView txtType, txtPosition, txtLocation,txtId, txtTime;
+    private TextView txtType, txtPosition, txtLocation,txtId, txtTime, ticket_tvName, ticket_tvDesc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,9 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
         btnClose = findViewById(R.id.ticket_btnClose);
         btnGenerate.setOnClickListener(this);
         btnClose.setOnClickListener(this);
+        ticket_tvName = findViewById(R.id.ticket_tvName);
+        ticket_tvDesc = findViewById(R.id.ticket_tvDesc);
+
     }
     void getFromIntent()
     {
@@ -67,6 +70,8 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
         typeTicket = intent.getStringExtra("type");
         locaTicket = intent.getStringExtra("location");
         posTicket = intent.getStringExtra("position");
+        String nameEvent = intent.getStringExtra("name");
+        String desc = intent.getStringExtra("desc");
 
         idUser = localStorageManager.getIdUser();
         if(idTicket.isEmpty() || idUser.isEmpty())
@@ -76,9 +81,11 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
         }
 
         txtId.setText(idTicket);
-        txtType.setText("Loại vé: "+ typeTicket);
-        txtLocation.setText("Khu vực: "+ locaTicket);
-        txtPosition.setText("Vị trí: " + posTicket);
+        txtType.setText(""+ typeTicket);
+        txtLocation.setText(""+ locaTicket);
+        txtPosition.setText("" + posTicket);
+        ticket_tvName.setText(nameEvent);
+        ticket_tvDesc.setText(desc);
     }
 
 

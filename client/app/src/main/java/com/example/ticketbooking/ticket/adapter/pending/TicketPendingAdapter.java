@@ -1,6 +1,7 @@
 package com.example.ticketbooking.ticket.adapter.pending;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ticketbooking.R;
 import com.example.ticketbooking.ticket.viewcustom.TicketView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import model.ticket.MyPending;
 import model.ticket.Ticket;
 import model.ticket.TicketInfo;
 import modules.MoneyFormatter;
@@ -24,17 +27,19 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
     public interface OnTicketClickListener {
         void onTicketClick(String ticketId);
         void onDelTicket(String infoId);
-
     }
 
+
     private final Context context;
-    private final List<TicketInfo> ticketList;
+    private final List<TicketInfo> listInfo;
+
     private final OnTicketClickListener listener; // Tham chiếu interface
 
     public TicketPendingAdapter(Context context, List<TicketInfo> ticketInfos, OnTicketClickListener listener) {
         this.context = context;
-        this.ticketList = ticketInfos;
+        this.listInfo = ticketInfos;
         this.listener = listener; // Gán giá trị
+
     }
     @NonNull
     @Override
@@ -45,7 +50,9 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
 
     @Override
     public void onBindViewHolder(@NonNull TicketPendingAdapter.TicketViewHolder holder, int position) {
-        TicketInfo info = ticketList.get(position);
+
+        TicketInfo info = listInfo.get(position);
+        Log.d("onBindViewHolder", "Position: "+ position + " \nInfo: "+ info.toString());
 
         holder.bind(context, info, listener);
 
@@ -53,7 +60,7 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
 
     @Override
     public int getItemCount() {
-        return ticketList.size();
+        return listInfo.size();
     }
 
     public static class TicketViewHolder extends RecyclerView.ViewHolder {
@@ -89,14 +96,15 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
             // Gắn dữ liệu vào View
             tvId.setText(ticket.get_id());
             tvType.setText("Loại vé: " + ticket.getInfo().getTypeTicket());
-            tvLocation.setText("Vị trí: " + ticket.getInfo().getLocation());
-            tvPosition.setText("Số ghế: " + ticket.getPosition());
+            tvLocation.setText("Khu vực: " + ticket.getInfo().getLocation());
+            tvPosition.setText("Ghế: " + ticket.getPosition());
             tvPrice.setText("Giá vé: " + MoneyFormatter.formatCurrency(ticket.getInfo().getPrice()));
 
             if(ticket.getAccBuy() != null && !ticket.getAccBuy().isEmpty())
             {
                 ticketView.setBackgroundColor(context.getColor(R.color.inValid_Ticket));
             }
+
 
             // Set sự kiện click ticket
             ticketView.setOnClickListener(new View.OnClickListener() {

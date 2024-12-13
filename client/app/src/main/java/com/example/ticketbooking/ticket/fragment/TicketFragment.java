@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.example.ticketbooking.R;
 import com.example.ticketbooking.order.CheckOutActivity;
 import com.example.ticketbooking.ticket.EditPendingActivity;
-import com.example.ticketbooking.ticket.adapter.event.EventAdapter;
+import com.example.ticketbooking.ticket.adapter.myticket.MyTicketAdapter;
 import com.example.ticketbooking.ticket.adapter.pending.PendingAdapter;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class TicketFragment extends Fragment{
     private RecyclerView listEvent;
     private EditText edSearch;
     private ProgressBar proLoading;
-    private EventAdapter ticketAdapter;  // Biến này sẽ không cần phải là final
+    private MyTicketAdapter ticketAdapter;  // Biến này sẽ không cần phải là final
     private PendingAdapter pendingAdapter;  // Biến này sẽ không cần phải là final
 
     private List<MyTicket> allTickets = new ArrayList<>();
@@ -99,8 +99,8 @@ public class TicketFragment extends Fragment{
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     // Lấy dữ liệu trả về từ Activity
                     String updatedTicketId = result.getData().getStringExtra("idBuyTicket");
-                    mainCallBack.update(updatedTicketId);
                     boolean isDelete = result.getData().getBooleanExtra("isDelete", false);
+
                     if (updatedTicketId != null) {
                         // Gọi hàm cập nhật adapter với ID vé đã được thay đổi
                         updateTicketData(updatedTicketId);
@@ -145,6 +145,10 @@ public class TicketFragment extends Fragment{
                             }
                         }
                         pendingAdapter.notifyDataSetChanged();
+                        if(mainCallBack != null)
+                        {
+                            mainCallBack.update();
+                        }
                     });
                 }
 
@@ -169,7 +173,7 @@ public class TicketFragment extends Fragment{
         proLoading = view.findViewById(R.id.proLoading);
         ticketService = new TicketService(getContext());
         // init adapter
-        ticketAdapter = new EventAdapter(getContext(), new ArrayList<>());
+        ticketAdapter = new MyTicketAdapter(getContext(), new ArrayList<>());
         pendingAdapter = new PendingAdapter(getContext(), new ArrayList<>());
 
 
@@ -185,7 +189,7 @@ public class TicketFragment extends Fragment{
                         allTickets.clear();
                         allTickets.addAll(MyTicket);
                         filteredTickets.addAll(MyTicket);
-                        ticketAdapter = new EventAdapter(getContext(), filteredTickets); // Không cần final
+                        ticketAdapter = new MyTicketAdapter(getContext(), filteredTickets); // Không cần final
                         listEvent.setAdapter(ticketAdapter);
                         proLoading.setVisibility(View.GONE); // Hide the progress bar when data is loaded
                         ticketAdapter.notifyDataSetChanged();
