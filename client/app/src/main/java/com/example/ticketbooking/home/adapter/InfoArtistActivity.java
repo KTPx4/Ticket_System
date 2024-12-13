@@ -21,7 +21,7 @@ import services.AccountHomeService;
 public class InfoArtistActivity extends Activity {
     private ImageView img_artist;
     private ImageButton btn_back;
-    private TextView tv_originName, tv_birthDay, tv_duration, tv_more;
+    private TextView tv_originName, tv_birthDay, tv_duration, tv_more,tv_artistName;
     private Button btn_follow;
     private AccountHomeService accountHomeService;
 
@@ -30,6 +30,7 @@ public class InfoArtistActivity extends Activity {
         setContentView(R.layout.activity_info_artist);
 
         img_artist = findViewById(R.id.img_artist);
+        tv_artistName = findViewById(R.id.tv_artistName);
         tv_originName = findViewById(R.id.tv_originName);
         tv_birthDay = findViewById(R.id.tv_birthDay);
         tv_duration = findViewById(R.id.tv_duration);
@@ -74,6 +75,7 @@ public class InfoArtistActivity extends Activity {
                         if (desc != null) {
                             // Lấy thông tin nghệ sĩ
                             String originName = desc.optString("originName");
+                            String artistName = desc.optString("artistName");
                             String birthDay = desc.optString("birthDay");
                             String duration = desc.optString("duration");
                             String more = desc.optString("more");
@@ -81,6 +83,7 @@ public class InfoArtistActivity extends Activity {
                             // Sử dụng runOnUiThread để đảm bảo cập nhật UI trên luồng chính
                             runOnUiThread(() -> {
                                 // Cập nhật dữ liệu lên các thành phần UI
+                                tv_artistName.setText(artistName);
                                 tv_originName.setText(originName);
                                 tv_birthDay.setText(birthDay);
                                 tv_duration.setText(duration);
