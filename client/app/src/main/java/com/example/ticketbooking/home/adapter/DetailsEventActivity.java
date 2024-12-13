@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,12 +28,13 @@ import services.AccountHomeService;
 public class DetailsEventActivity extends AppCompatActivity {
 
     private ImageView imgBack, img_banner;
-    private TextView tv_event_name, tv_event_time, tv_event_location, tv_description, tv_price;
+    private TextView tv_event_name, tv_event_time, tv_event_location, tv_description, tv_price,tv_trailer;
     private RecyclerView recycler_artist;
     private ArtistAdapter artistAdapter;
     private AccountHomeService accountHomeService;
     private Button btnBookingTicket;
     private String EventID = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +47,7 @@ public class DetailsEventActivity extends AppCompatActivity {
         tv_event_location = findViewById(R.id.tv_event_location);
         tv_event_time = findViewById(R.id.tv_event_time);
         img_banner = findViewById(R.id.img_banner);
+        tv_trailer = findViewById(R.id.tv_trailer);
         tv_price = findViewById(R.id.tv_price);
         recycler_artist = findViewById(R.id.recycler_artist);
         btnBookingTicket = findViewById(R.id.btn_select_schedule);
@@ -56,6 +60,17 @@ public class DetailsEventActivity extends AppCompatActivity {
         accountHomeService = new AccountHomeService(this);
 
         fetchEvenByID();
+
+        tv_trailer.setOnClickListener((v)->{
+            if(EventID == null || EventID.isEmpty())
+            {
+                Toast.makeText(this, "Video chưa được tải thành công", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, TrailerEventActivity.class);
+            intent.putExtra("idEvent", EventID);
+            startActivity(intent);
+        });
 
         btnBookingTicket.setOnClickListener((v)->{
             if(EventID == null || EventID.isEmpty())
@@ -105,6 +120,7 @@ public class DetailsEventActivity extends AppCompatActivity {
                             tv_event_time.setText(formattedTime);
                             tv_price.setText(formattedPrice);
                             String imageUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/" + data.optString("image");
+                            String trailerUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/trailer" + "/" + data.optString("trailer");
                             Glide.with(DetailsEventActivity.this)
                                     .load(imageUrl)
                                     .into(img_banner);
@@ -123,6 +139,8 @@ public class DetailsEventActivity extends AppCompatActivity {
             }
         });
     }
+
+
     private void fetchArtists(List<String> artistIds) {
         List<Artist> artistList = new ArrayList<>(); // List to hold artist data
 
