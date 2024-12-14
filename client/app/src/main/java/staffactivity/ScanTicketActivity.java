@@ -1,5 +1,6 @@
 package staffactivity;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -9,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.ticketbooking.R;
 
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,13 +29,13 @@ import staffactivity.adapter.TicketAdapter;
 
 public class ScanTicketActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-
+    private TextView staff_scan_tvName, staff_scan_tvLocation;
     private DecoratedBarcodeView barcodeView;
     private RecyclerView recyclerView;
     private TicketAdapter adapter;
     private List<String> scannedTickets;
     private EventService eventService;
-    private static String idEvent= "6753135fbb66303563157426" ;
+    private static String idEvent= "" ;
 
     private String lastScannedCode = "";
     private long lastScanTime = 0;
@@ -61,12 +63,29 @@ public class ScanTicketActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_ticket);
+
         // Kiểm tra quyền camera
         if (!hasCameraPermission()) {
             requestCameraPermission();
         } else {
             initializeScanner(); // Chỉ khởi tạo nếu quyền đã được cấp
         }
+
+    }
+    private void getFromIntent()
+    {
+        Intent intent = getIntent();
+        idEvent = intent.getStringExtra("idEvent");
+        String name = intent.getStringExtra("name");
+        String location = intent.getStringExtra("location");
+
+        if(idEvent == null || idEvent.isEmpty())
+        {
+            Toast.makeText(this, "Không có id sự kiện", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        staff_scan_tvName.setText("Sự kiện: " + name);
+        staff_scan_tvLocation.setText("" + location);
 
     }
     private void initializeScanner() {
@@ -81,6 +100,10 @@ public class ScanTicketActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new TicketAdapter(scannedTickets);
         recyclerView.setAdapter(adapter);
+        staff_scan_tvName = findViewById(R.id.staff_scan_tvName);
+        staff_scan_tvLocation = findViewById(R.id.staff_scan_tvLocation);
+
+        getFromIntent();
 
         // Khởi tạo BarcodeView
         barcodeView = findViewById(R.id.staff_scan_camera_view);

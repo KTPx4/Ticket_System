@@ -44,6 +44,14 @@ public class Event {
         this.image = image;
     }
 
+    public List<String> getAccJoins() {
+        return accJoins;
+    }
+
+    public void setAccJoins(List<String> accJoins) {
+        this.accJoins = accJoins;
+    }
+
     public String get_id() {
         return _id;
     }
@@ -148,13 +156,6 @@ public class Event {
         this.news = news;
     }
 
-    public List<String> getAccJoins() {
-        return accJoins;
-    }
-
-    public void setAccJoins(List<String> accJoins) {
-        this.accJoins = accJoins;
-    }
 
     public List<String> getFile() {
         return file;

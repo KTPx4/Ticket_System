@@ -15,7 +15,7 @@ public class DateRange {
     }
 
     public String getStart() {
-        return DateConverter.convertToHCM(start);
+        return start;
     }
 
     public void setStart(String start) {
