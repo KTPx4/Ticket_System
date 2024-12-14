@@ -2,8 +2,8 @@
     <string name="app_name">Ticket Booking</string>
     <string name="JWT_SECRET_KEY">jwtToken-valid-ticket-user</string>
     <string name="ORDER_SECRET_START">secret-key-</string>
-    <!--    <string name="server_url">http://localhost:3001</string>-->
-    <string name="server_url">https://ticket-system-l5j0.onrender.com</string>
+        <string name="server_url">http://localhost:3001</string>
+<!--    <string name="server_url">https://ticket-system-l5j0.onrender.com</string>-->
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
