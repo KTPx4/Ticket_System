@@ -2,20 +2,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@color/gray_background"
-    tools:context=".TicketsUserFragment">
+    tools:context=".coupon.CouponActivity">
+
     <Toolbar
         android:id="@+id/toolbar"
+        android:title="Mã giảm giá"
+        android:background="@color/tabBack"
+        android:textAlignment="center"
+        android:titleTextColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
-        android:title="Vé sự kiện"
-        android:background="@color/Dark_Raspberry"
-        android:titleTextColor="@color/white"
-        android:layout_height="?attr/actionBarSize" />
-
+        android:layout_height="wrap_content" />
     <com.google.android.material.tabs.TabLayout
 
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -37,4 +39,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

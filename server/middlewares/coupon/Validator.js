@@ -28,3 +28,29 @@ module.exports.Create = async(req, res, next)=>{
     return next();
 
 }
+
+module.exports.ChangeCoupon = async (req, res, next)=>{
+    try{
+        var {type} = req.query
+        if(!type)
+        {
+            return res.status(400).json({
+                message: "Vui lòng chọn loại vé muốn đổi"
+            })
+        }
+        if(!(typeof type !== "number"))
+        {
+            return res.status(400).json({
+                message: "Loại vé hiện tại là kiểu số nguyên"
+            })
+        }
+        return next()
+
+    }
+    catch (e) {
+        console.log("Coupon Validator - ChangeCoupon", e)
+        return res.status(500).json({
+            message: "Vui lòng thử lại sau!"
+        })
+    }
+}
