@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_background"
+    tools:context=".coupon.fragment.ExchangeFragment">
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tvMyPoint"
+            android:layout_marginStart="10dp"
+            android:text="Điểm của bạn: 1.600 pts"
+            android:textSize="17dp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_marginVertical="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginStart="10dp"
+            android:text="Đổi mã"
+            android:textSize="17dp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <HorizontalScrollView
+            android:padding="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:paddingHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:paddingVertical="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+                <LinearLayout
+                    android:background="@drawable/card_gift"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="13dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="2.000 pts"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn2"
+                        android:layout_marginTop="10dp"
+                        android:text="Đổi"
+                        android:layout_width="80dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:background="@drawable/card_gift"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="13dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="3.000 pts"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn3"
+                        android:layout_marginTop="10dp"
+                        android:text="Đổi"
+                        android:layout_width="80dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:background="@drawable/card_gift"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="13dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="4.000 pts"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn4"
+                        android:layout_marginTop="10dp"
+                        android:text="Đổi"
+                        android:layout_width="80dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:background="@drawable/card_gift"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="13dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="5.000 pts"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn5"
+                        android:layout_marginTop="10dp"
+                        android:text="Đổi"
+                        android:layout_width="80dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:background="@drawable/card_gift"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="13dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="10.000 pts"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn10"
+                        android:layout_marginTop="10dp"
+                        android:text="Đổi"
+                        android:layout_width="80dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
+
+
+
+
+
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_marginVertical="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginStart="10dp"
+            android:text="Mã miễn phí"
+            android:textSize="17dp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_marginTop="20dp"
+            android:indeterminateTint="@color/Dark_Rose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
+            android:id="@+id/listPublicCoupon"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

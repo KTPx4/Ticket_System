@@ -33,8 +33,13 @@ const CouponSchema = new mongoose.Schema({
     isValid:{
         type: Boolean,
         default: true
+    },
+    acc:{
+        type: Schema.Types.ObjectId,
+        ref: 'accounts'
     }
 })
+
 CouponSchema.pre('save', async function (next) {
     if (!this.code) {
         let isUnique = false;
@@ -42,7 +47,7 @@ CouponSchema.pre('save', async function (next) {
 
         // Lặp để tạo mã không trùng
         while (!isUnique) {
-            newCode = Generate.RandomChar();
+            newCode = Generate.RandomChar(5);
             const existingDoc = await mongoose.model('coupons').findOne({ code: newCode });
             if (!existingDoc) {
                 isUnique = true;

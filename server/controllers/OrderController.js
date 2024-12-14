@@ -610,7 +610,7 @@ module.exports.StripeSuccess = async (req, res)=>{
         console.log("Session id: ", sessionId)
         // Truy vấn chi tiết session từ Stripe
         const session = await stripe.checkout.sessions.retrieve(sessionId);
-
+        var BuyTicket = null;
         // Truy cập metadata
         const metadata = session.metadata;
         var {orderId, userId, typePayment, couponId, FinalPrice} = metadata
