@@ -82,13 +82,23 @@
             android:exported="true" />
         <activity
             android:name=".home.adapter.SearchUserActivity"
-            android:exported="true" />
-        <activity
-            android:name=".home.adapter.DetailsEventActivity"
-            android:exported="true" />
-        <activity
-            android:name=".home.adapter.InfoArtistActivity"
-            android:exported="true" />
+
+            android:exported="true">
+
+        </activity>
+        <activity android:name=".home.adapter.DetailsEventActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".home.adapter.TrailerEventActivity"
+            android:exported="true">
+        </activity>
+
+        <activity android:name=".home.adapter.InfoArtistActivity"
+            android:exported="true">
+
+        </activity>
+     
+
         <activity
             android:name=".ChangeInfoUserActivity"
             android:exported="true" /> <!-- Service -->
