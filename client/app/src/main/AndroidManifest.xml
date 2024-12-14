@@ -97,6 +97,12 @@
             android:name=".home.adapter.InfoArtistActivity"
             android:exported="true"></activity>
         <activity
+            android:name=".ForgotPasswordActivity"
+
+            android:exported="true">
+
+        </activity>
+        <activity
             android:name=".ChangeInfoUserActivity"
             android:exported="true" /> <!-- Service -->
         <service android:name="services.InternetCheckService" />
