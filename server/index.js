@@ -59,6 +59,7 @@ _APP.get('/checkout/payment-cancel', (req, res)=>{
     })
 });
 
+
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
 _APP.use('/api/v1/event', EventRouter(__dirname))
@@ -73,6 +74,7 @@ _APP.use("/*",(req, res)=>{
         message: "Endpoint không hợp lệ"
     })
 })
+
 
 const createFolder = async()=>{
     var root = path.join(__dirname, "public")

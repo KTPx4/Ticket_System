@@ -21,6 +21,7 @@ import com.example.ticketbooking.R;
 import java.util.List;
 
 import model.ticket.MyTicket;
+import modules.DateConverter;
 
 public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.EventViewHolder> {
     private final Context context;
@@ -42,7 +43,8 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.EventV
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         MyTicket myTicket = myTicketList.get(position);
         holder.tvEventName.setText(myTicket.getEvent().getName());
-        holder.tvEventDate.setText(myTicket.getEvent().getDate().getStart());
+        String date = DateConverter.convertToHCM(myTicket.getEvent().getDate().getStart());
+        holder.tvEventDate.setText(date);
 
         // Set the TicketItemAdapter for the nested RecyclerView (listTicket)
         TicketItemAdapter ticketItemAdapter = new TicketItemAdapter(context, myTicket.getTickets());

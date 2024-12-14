@@ -1,3 +1,4 @@
+const CouponModel = require('../models/CouponModel')
 const TicketInfoModel = require('../models/TicketInfoModel')
 const TicketModel = require('../models/TicketModel')
 const AccountModel = require('../models/AccountModel')
@@ -321,7 +322,7 @@ module.exports.ValidOrder = async(req, res)=>{
             }
 
             console.log(data);
-            var {User, Type, BuyTicket, Price, Discount, CouponDiscount, FinalPrice, Order, Infos} = data
+            var {User, Type, BuyTicket, Price, Discount, CouponDiscount, FinalPrice, Order, Infos, Coupon} = data
             
             var OrderRow = await OrderModel.findByIdAndUpdate(Order, {
                 payment: payment,
@@ -425,6 +426,29 @@ module.exports.ValidOrder = async(req, res)=>{
                     }
                 )
             }
+
+            var point = FinalPrice / 100
+            var {User} = req.vars
+            User.point = (User.point ?? 0) + point
+
+            await User.save()
+
+            if(Coupon)
+            {
+                var cp = await  CouponModel.findById(Coupon)
+                if(cp)
+                {
+                    if(cp.type === "public")
+                    {
+                        cp.count -= 1
+                    }
+                    else{
+                        cp.isValid = false;
+                    }
+                    await cp.save()
+                }
+            }
+
             return res.status(200).json({
                 message: "Thanh toán thành công"
             })
@@ -521,6 +545,8 @@ module.exports.StripeCheckout = async (req, res) => {
                 orderId: order._id.toString(),
                 userId: User._id.toString(),
                 typePayment: BuyTicket.typePayment,
+                couponId: Coupon?._id??"",
+                FinalPrice: FinalMoney
             },
         });
 
@@ -587,7 +613,7 @@ module.exports.StripeSuccess = async (req, res)=>{
 
         // Truy cập metadata
         const metadata = session.metadata;
-        var {orderId, userId, typePayment} = metadata
+        var {orderId, userId, typePayment, couponId, FinalPrice} = metadata
 
         var OrderM = await OrderModel.findByIdAndUpdate(orderId,
             {
@@ -692,6 +718,27 @@ module.exports.StripeSuccess = async (req, res)=>{
             }
         }
 
+        var point = FinalPrice / 100
+        var User = await AccountModel.findById(userId)
+        if(User)
+        {
+            User.point = (User.point ?? 0) + point
+            await User.save()
+        }
+        
+        var Coupon = await CouponModel.findById(couponId)
+
+        if(Coupon)
+        {
+            if(Coupon.type === "public")
+            {
+                Coupon.count -= 1
+            }
+            else{
+                Coupon.isValid = false;
+            }
+            await Coupon.save()
+        }
 
         res.status(200).send(`
         <!DOCTYPE html>
