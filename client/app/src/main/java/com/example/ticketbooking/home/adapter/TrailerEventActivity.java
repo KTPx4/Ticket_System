@@ -1,5 +1,6 @@
 package com.example.ticketbooking.home.adapter;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.MediaController;
@@ -51,12 +52,16 @@ public class TrailerEventActivity extends AppCompatActivity {
                     JSONObject data = jsonResponse.optJSONObject("data");
                     if(data != null){
                         runOnUiThread(() -> {
-                            String trailerUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/trailer" + "/" + data.optString("trailer");
-                            videoView.setVideoPath(trailerUrl);
+                            String trailerUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/trailer/" + data.optString("trailer");
+                            Log.d("TrailerEventActivity", "Trailer URL: " + trailerUrl);
+
+                            Uri videoUri = Uri.parse(trailerUrl);
+                            videoView.setVideoURI(videoUri);
                             mediaController.setAnchorView(videoView);
                             videoView.setMediaController(mediaController);
                             videoView.start();
                         });
+
 
                     }
                 } catch (Exception e) {

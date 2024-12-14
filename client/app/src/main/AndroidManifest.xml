@@ -30,11 +30,6 @@
         <activity
             android:name=".coupon.CouponActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="staffactivity.SelectEventActivity"
@@ -101,6 +96,12 @@
         <activity
             android:name=".home.adapter.InfoArtistActivity"
             android:exported="true"></activity>
+        <activity
+            android:name=".ForgotPasswordActivity"
+
+            android:exported="true">
+
+        </activity>
         <activity
             android:name=".ChangeInfoUserActivity"
             android:exported="true" /> <!-- Service -->

@@ -77,6 +77,58 @@ public class AccountHomeService {
         }).start();
     }
 
+    public void resetAccount(String email, final ResponseCallback callback) {
+        String url = SERVER + "/api/v1/account/reset"; // API endpoint for resetting the account
+
+        // Create the request body with email
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("email", email); // Add email to the request body
+        } catch (JSONException e) {
+            Log.e("AccountHomeService", "Error creating JSON body for reset", e);
+            callback.onFailure("Error: " + e.getMessage());
+            return;
+        }
+
+        // Create request body for the POST request
+        RequestBody body = RequestBody.create(jsonObject.toString(), MediaType.parse("application/json"));
+
+        // Create the request with the Authorization header (optional, depending on your API requirements)
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body) // Use POST method for sending the data
+                .build();
+
+        // Execute the request in a background thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
+                        JSONObject jsonResponse = new JSONObject(responseBody);
+
+                        // Check if response message indicates success
+                        String message = jsonResponse.optString("message");
+                        if (message != null && message.equals("Reset successful")) {
+                            // Handle the successful response
+                            callback.onSuccess(responseBody);
+                        } else {
+                            // If message is not successful
+                            callback.onFailure("Failed to reset account");
+                        }
+                    } else {
+                        callback.onFailure("Request failed: " + response.message());
+                    }
+                } catch (Exception e) {
+                    Log.e("AccountHomeService", "Error resetting account", e);
+                    callback.onFailure("Error: " + e.getMessage());
+                }
+            }
+        }).start();
+    }
+
     public void getEventById(String eventId, final ResponseCallback callback) {
         String url = SERVER + "/api/v1/event/" + eventId;
 
