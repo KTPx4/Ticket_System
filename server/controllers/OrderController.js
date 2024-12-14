@@ -6,6 +6,7 @@ const BuyTicketModel = require('../models/BuyTicket')
 const OrderModel = require('../models/OrderModel')
 const EventModel = require("../models/EventModel");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const SECRET_ORDER = process.env.SECRET_ORDER || "secret-key-order-px4"
 const SECRET_ORDER_START = process.env.SECRET_ORDER_START || "secret-key-"
 const SECRET_ORDER_END = process.env.SECRET_ORDER_END || "order-px4"
@@ -626,7 +627,8 @@ module.exports.StripeSuccess = async (req, res)=>{
 
         if(typePayment === "all")
         {
-            BuyTicket = await BuyTicketModel.findByIdAndUpdate(BuyTicket,
+
+            BuyTicket = await BuyTicketModel.findByIdAndUpdate(OrderM.buyTicket.toString(),
                 {
                     status: "done",
                     accPay: userId
@@ -725,19 +727,22 @@ module.exports.StripeSuccess = async (req, res)=>{
             User.point = (User.point ?? 0) + point
             await User.save()
         }
-
-        var Coupon = await CouponModel.findById(couponId)
-
-        if(Coupon)
+        if(couponId && mongoose.isValidObjectId(couponId))
         {
-            if(Coupon.type === "public")
+            var Coupon = await CouponModel.findById(couponId)
+
+            if(Coupon)
             {
-                Coupon.count -= 1
+                if(Coupon.type === "public")
+                {
+                    Coupon.count -= 1
+                }
+                else{
+                    Coupon.isValid = false;
+                }
+                await Coupon.save()
             }
-            else{
-                Coupon.isValid = false;
-            }
-            await Coupon.save()
+
         }
 
         res.status(200).send(`
