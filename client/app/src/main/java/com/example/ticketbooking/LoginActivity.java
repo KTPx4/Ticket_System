@@ -3,6 +3,7 @@ package com.example.ticketbooking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -22,6 +23,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private String loginToken;
     private ImageButton btnBack;
     private LinearLayout layoutRegister;
+    private Button forgot_password_button;
 
     AccountService accountService ;
     // lưu token vào SharedPreferences thông qua LocalStorageManager
@@ -34,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         accountService = new AccountService(this);
         localStorageManager = new LocalStorageManager(this);
         loginEmail = findViewById(R.id.login_email);
+        forgot_password_button = findViewById(R.id.forgot_password_button);
         loginPassword = findViewById(R.id.login_password);
         layoutRegister = findViewById(R.id.login_layout_resigter);
         txtLogin = findViewById(R.id.txtLogin);
@@ -42,6 +45,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.login_btn_register).setOnClickListener(this);
         getFromIntent();
         checkIsLogin();
+
+        forgot_password_button.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
     }
 
     void getFromIntent()
