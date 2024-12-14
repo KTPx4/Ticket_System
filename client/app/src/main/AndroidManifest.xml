@@ -28,10 +28,14 @@
         tools:replace="android:theme"
         tools:targetApi="31">
         <activity
+            android:name="staffactivity.SelectEventActivity"
+            android:exported="false" />
+        <activity
+            android:name="staffactivity.StaffMainActivity"
+            android:exported="false" />
+        <activity
             android:name=".ticket.ticket_activity_booking_ticket"
-            android:exported="true">
-
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".order.CheckOutCard"
             android:exported="false" />
@@ -78,6 +82,7 @@
             android:exported="true" />
         <activity
             android:name=".home.adapter.SearchUserActivity"
+
             android:exported="true">
 
         </activity>
@@ -93,10 +98,10 @@
 
         </activity>
      
+
         <activity
             android:name=".ChangeInfoUserActivity"
-            android:exported="true"></activity> <!-- Service -->
-
+            android:exported="true" /> <!-- Service -->
         <service android:name="services.InternetCheckService" />
     </application>
 

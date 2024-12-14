@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import modules.LocalStorageManager;
 import services.AccountService;
+import staffactivity.StaffMainActivity;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     private boolean isUser = true;
@@ -101,7 +102,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onSuccess(String message) {
                         // Chuyển sang screen cho staff
-
+                        runOnUiThread(()->{
+                            Intent intent = new Intent(getApplicationContext(), StaffMainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        });
                     }
 
                     @Override
@@ -170,7 +175,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         // Lưu token vào SharedPreferences thông qua LocalStorageManager
                         localStorageManager.saveLoginToken(token); // Lưu token
                         loginToken = token;
-
+                        runOnUiThread(()->{
+                            Intent intent = new Intent(getApplicationContext(), StaffMainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        });
                         // Chuyển sang Screen cho staff
 //                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 //                        intent.putExtra("login-token", token);
