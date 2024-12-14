@@ -37,4 +37,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnDiscount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="40dp"
+        android:backgroundTint="@color/blue"
+        android:src="@drawable/ic_discount"
+        android:layout_width="60dp"
+        app:tint="@null"
+        android:layout_height="50dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

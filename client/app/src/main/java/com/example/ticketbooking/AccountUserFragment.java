@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.example.ticketbooking.coupon.CouponActivity;
 
 import org.json.JSONObject;
 
@@ -24,7 +25,7 @@ import services.EventService;
 import services.HomeService;
 
 public class AccountUserFragment extends Fragment {
-    private TextView txt_logout,txt_Name,txt_Point,txt_Email,txt_delhistory,txt_PaymentHistory;
+    private TextView txt_logout,txt_Name,txt_Point,txt_Email,txt_delhistory,txt_PaymentHistory , tvPoint;
     private ImageView imgUser;
     private Button button_edit;
 
@@ -43,6 +44,11 @@ public class AccountUserFragment extends Fragment {
         txt_delhistory = view.findViewById(R.id.txt_delhistory);
         txt_PaymentHistory = view.findViewById(R.id.txt_PaymentHistory);
         button_edit = view.findViewById(R.id.button_edit);
+        tvPoint = view.findViewById(R.id.txt_exchangePoints);
+        tvPoint.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), CouponActivity.class);
+            startActivity(intent);
+        });
 
         fetchAccountData();
 

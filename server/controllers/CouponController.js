@@ -140,8 +140,9 @@ module.exports.ChangeCoupon = async (req,res)=>{
             await User.save()
             return res.status(200).json({
                 point: User?.point??0,
+                length: 1,
                 message: "Đổi mã giảm giá thành công",
-                data: Coupon
+                data: [Coupon]
             })
 
         }

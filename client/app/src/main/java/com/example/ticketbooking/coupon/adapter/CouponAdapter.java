@@ -1,10 +1,13 @@
 package com.example.ticketbooking.coupon.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,6 +44,17 @@ public class CouponAdapter extends RecyclerView.Adapter<CouponAdapter.CouponView
         holder.tvDiscount.setText(coupon.getPercentDiscount() + "%");
         holder.tvMaxDiscount.setText(coupon.getMaxDiscount() != -1 ? coupon.getMaxDiscount() + "đ" : "Không giới hạn");
         holder.tvCount.setText(String.valueOf(coupon.getCount()));
+
+        // Set click listener cho từng item
+        holder.itemView.setOnClickListener(v -> {
+            // Sao chép mã giảm giá vào clipboard
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Coupon Code", coupon.getCode());
+            clipboard.setPrimaryClip(clip);
+
+            // Thông báo cho người dùng
+            Toast.makeText(context, "Đã sao chép mã: " + coupon.getCode(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override

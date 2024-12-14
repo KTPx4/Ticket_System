@@ -6,8 +6,9 @@
     tools:context=".coupon.fragment.MyCouponFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/listMyCoupon"
+        android:padding="15dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
