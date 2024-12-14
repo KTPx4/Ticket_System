@@ -68,6 +68,7 @@ public class TicketFragment extends Fragment{
     private TicketService ticketService;
     private static final int SEARCH_DELAY = 300; // Delay 300ms
     private PendingAdapter.OnUpdateUI mainCallBack;
+    private PendingAdapter.OnUpdateUI clearCallBack;
 
     public TicketFragment( ) {
 
@@ -104,6 +105,7 @@ public class TicketFragment extends Fragment{
                     if (updatedTicketId != null) {
                         // Gọi hàm cập nhật adapter với ID vé đã được thay đổi
                         updateTicketData(updatedTicketId);
+                        clearCallBack.update();
                     }
 //                    if(isDelete == true)
 //                    {
@@ -266,6 +268,11 @@ public class TicketFragment extends Fragment{
                                         });
                                     }
                                 });
+                            }
+
+                            @Override
+                            public void onClearInfo(PendingAdapter.OnUpdateUI callback) {
+                                clearCallBack = callback;
                             }
 
                         });

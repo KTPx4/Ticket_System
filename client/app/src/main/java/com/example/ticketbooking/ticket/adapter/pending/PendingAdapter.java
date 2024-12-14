@@ -52,6 +52,8 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
         void onEditTicket(String buyTicketId, OnUpdateUI callback);
         void onCheckOutTicket(String ticketId, List<String> lisInfo);
         void onDeleteBuyTicket(String buyTicketId);
+        void onClearInfo(OnUpdateUI callback);
+
     }
 
     public interface OnUpdateUI{
@@ -123,7 +125,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
             }
 
             @Override
-            public void onDelTicket(String infoId) {
+            public void onDelTicket(String infoId , TicketPendingAdapter.CallbackDel callbackDel) {
                 // delete ticket from other list
                 Log.d("ID INFO DEL" , "id: "+ infoId);
                 // Tạo AlertDialog
@@ -136,7 +138,8 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
 
                             for(int i =0 ; i < arrMyListIfo.size(); i++)
                             {
-                                String idInf = arrMyListIfo.get(i).get_id();
+                                TicketInfo tk = arrMyListIfo.get(i);
+                                String idInf = tk.get_id();
                                 if(idInf.equals(infoId))
                                 {
                                     int finalI = i;
@@ -154,9 +157,10 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                                                 }
 
                                                 ticketItemAdapter.notifyDataSetChanged();
+                                                String nameTicket = tk.getTicket().getInfo().getTypeTicket() + "-" + tk.getTicket().getInfo().getLocation() + "-" + tk.getTicket().getPosition();
+                                                Toast.makeText(context, "Đã xóa vé: " + nameTicket, Toast.LENGTH_SHORT).show();
+                                                callbackDel.onSuccess();
 
-
-                                                Toast.makeText(context, "Đã xóa vé: " + infoId, Toast.LENGTH_SHORT).show();
                                             });
                                         }
 
@@ -185,6 +189,11 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
 
 
         });
+        if (listener != null) {
+            listener.onClearInfo(() -> {
+                listInfo.clear();
+            });
+        }
 
         holder.btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,6 +219,7 @@ public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.EventVie
                 if (listener != null) {
                     listener.onCheckOutTicket(myPending.get_id(), listCheckoutInfo);
                 }
+
 
             }
         });

@@ -545,7 +545,7 @@ module.exports.StripeCheckout = async (req, res) => {
                 orderId: order._id.toString(),
                 userId: User._id.toString(),
                 typePayment: BuyTicket.typePayment,
-                couponId: Coupon?._id??"",
+                couponId: Coupon?._id.toString()??"",
                 FinalPrice: FinalMoney
             },
         });
@@ -725,7 +725,7 @@ module.exports.StripeSuccess = async (req, res)=>{
             User.point = (User.point ?? 0) + point
             await User.save()
         }
-        
+
         var Coupon = await CouponModel.findById(couponId)
 
         if(Coupon)

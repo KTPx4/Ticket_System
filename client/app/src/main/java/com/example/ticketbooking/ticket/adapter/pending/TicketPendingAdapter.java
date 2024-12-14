@@ -26,7 +26,15 @@ import modules.MoneyFormatter;
 public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdapter.TicketViewHolder> {
     public interface OnTicketClickListener {
         void onTicketClick(String ticketId);
-        void onDelTicket(String infoId);
+        void onDelTicket(String infoId, CallbackDel callbackDel);
+    }
+    public  interface CallbackDel
+    {
+        void onSuccess();
+    }
+    public  interface CallbackRemoveFromList
+    {
+        void onSuccess(TicketInfo info);
     }
 
 
@@ -54,7 +62,11 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
         TicketInfo info = listInfo.get(position);
         Log.d("onBindViewHolder", "Position: "+ position + " \nInfo: "+ info.toString());
 
-        holder.bind(context, info, listener);
+        holder.bind(context, info, listener, (infoCallBack) -> {
+
+            listInfo.remove(infoCallBack);
+            notifyDataSetChanged();
+        });
 
     }
 
@@ -90,7 +102,7 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
 
         }
 
-        public void bind(Context context, TicketInfo info, OnTicketClickListener listener) {
+        public void bind(Context context, TicketInfo info, OnTicketClickListener listener, CallbackRemoveFromList callbackDel) {
 
             Ticket ticket = info.getTicket();
             // Gắn dữ liệu vào View
@@ -144,7 +156,11 @@ public class TicketPendingAdapter extends RecyclerView.Adapter<TicketPendingAdap
                 public void onClick(View v) {
                     // Notify parent via callback
                     if (listener != null) {
-                        listener.onDelTicket(info.get_id());
+                        listener.onDelTicket(info.get_id(), () -> {
+                            callbackDel.onSuccess(info );
+                            Log.d("DELETE TICKET", "onClick: " + info.get_id());
+
+                        });
                     }
                 }
             });
