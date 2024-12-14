@@ -1,5 +1,6 @@
 package com.example.ticketbooking;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.coupon.CouponActivity;
 import com.example.ticketbooking.ticket.adapter.ViewPagerAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -20,6 +23,7 @@ public class TicketsUserFragment extends Fragment {
     TabLayout tabLayout;
     ViewPager2 viewPager;
     ViewPagerAdapter viewPagerAdapter;
+    FloatingActionButton btnDiscount;
 
     @Nullable
     @Override
@@ -29,7 +33,12 @@ public class TicketsUserFragment extends Fragment {
         // Khởi tạo ViewPager2 và TabLayout
         tabLayout = rootView.findViewById(R.id.tabLayout);
         viewPager = rootView.findViewById(R.id.viewPager);
+        btnDiscount = rootView.findViewById(R.id.btnDiscount);
 
+        btnDiscount.setOnClickListener((v)->{
+            Intent intent = new Intent(getContext(), CouponActivity.class);
+            startActivity(intent);
+        });
         // Khởi tạo adapter và gán vào ViewPager2
         viewPagerAdapter = new ViewPagerAdapter(requireActivity());
         viewPager.setAdapter(viewPagerAdapter);

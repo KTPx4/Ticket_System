@@ -75,6 +75,9 @@ public class ExchangeFragment extends Fragment implements View.OnClickListener{
         }
         couponService = new CouponService(getContext());
     }
+    public void reloadData() {
+        initData();
+    }
     void initData() {
         couponService.GetPublicCoupon(new CouponService.CouponCallBack() {
             @Override
@@ -122,6 +125,7 @@ public class ExchangeFragment extends Fragment implements View.OnClickListener{
         lvPubCoupon.setLayoutManager(new LinearLayoutManager(getContext()));
         couponAdapter = new CouponAdapter(getContext(), listCoupon);
         lvPubCoupon.setAdapter(couponAdapter);
+
         btn2.setOnClickListener(this);
         btn3.setOnClickListener(this);
         btn4.setOnClickListener(this);
@@ -157,6 +161,25 @@ public class ExchangeFragment extends Fragment implements View.OnClickListener{
         {
             Toast.makeText(getContext(), "Điểm bạn không đủ đổi", Toast.LENGTH_SHORT).show();
             return;
+        }
+        else{
+            couponService.ExchangeCoupon(point, new CouponService.CouponCallBack() {
+                @Override
+                public void onSuccess(List<Coupon> coupon, long point) {
+                    getActivity().runOnUiThread(()->{
+                        myPoint = point;
+                        tvPoint.setText("Điểm của bạn: " + point +" pts");
+                        Toast.makeText(getContext(), "Đổi mã giảm giá thành công!", Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    getActivity().runOnUiThread(()->{
+                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
         }
 
     }

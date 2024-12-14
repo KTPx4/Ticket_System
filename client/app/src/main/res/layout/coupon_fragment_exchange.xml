@@ -199,6 +199,7 @@
             android:visibility="gone"
             android:id="@+id/listPublicCoupon"
             android:layout_weight="1"
+            android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
 

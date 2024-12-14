@@ -102,9 +102,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Hỗ trợ"
-                android:textSize="18dp"
+                android:textSize="20dp"
                 android:textStyle="bold"/>
             <TextView
+                android:textSize="18dp"
+                android:padding="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Thay đổi mật khẩu"
@@ -114,6 +116,8 @@
 
             <TextView
                 android:id="@+id/txt_delhistory"
+                android:textSize="18dp"
+                android:padding="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Xoá lịch sử tìm kiếm"
@@ -122,6 +126,8 @@
                 android:drawablePadding="8dp"/>
 
             <TextView
+                android:textSize="18dp"
+                android:padding="5dp"
                 android:id="@+id/txt_PaymentHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -131,6 +137,8 @@
                 android:drawablePadding="8dp"/>
 
             <TextView
+                android:textSize="18dp"
+                android:padding="5dp"
                 android:id="@+id/txt_exchangePoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -140,6 +148,8 @@
                 android:drawablePadding="8dp"/>
 
             <TextView
+                android:textSize="18dp"
+                android:padding="5dp"
                 android:id="@+id/txt_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
