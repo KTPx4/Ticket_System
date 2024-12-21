@@ -406,21 +406,43 @@ module.exports.DeleteByID= async(req, res)=>{
         })
     }
 }
-module.exports.getNews = async(req, res)=>{
-    try{
-        var {Event} = req.vars
+module.exports.getNews = async (req, res) => {
+    try {
+        const { Event } = req.vars;
+        const eventId = Event._id;
+        let { quan } = req.query;
+
+        // Kiểm tra và chuyển đổi giá trị của quan
+        quan = parseInt(quan, 10); // Chuyển sang số nguyên
+        if (isNaN(quan) || quan <= 0) {
+            quan = -1; // Nếu không hợp lệ hoặc quan = -1, lấy tất cả
+        }
+
+        // Tạo truy vấn cơ bản
+        let query = NewsModel.find({ event: eventId }).sort({ createdAt: -1 });
+
+        // Nếu quan > 0, giới hạn số lượng kết quả trả về
+        if (quan > 0) {
+            query = query.limit(quan);
+        }
+
+        // Thực thi truy vấn
+        const news = await query.exec();
+
+        // Trả về kết quả
         return res.status(200).json({
             message: "Lấy dữ liệu thành công",
-            data: Event.news
-        })
-    }
-    catch (e) {
-        console.log("Error at EventController - GetAll: ", e)
+            data: news,
+        });
+    } catch (e) {
+        console.error("Error at EventController - GetAll: ", e);
         return res.status(500).json({
-            message: "Lấy thông tin thất bại, thử lại sau"
-        })
+            message: "Lấy thông tin thất bại, thử lại sau",
+        });
     }
-}
+};
+
+
 module.exports.ScanTicket = async(req, res)=>{
     try{
         var {token} = req.body

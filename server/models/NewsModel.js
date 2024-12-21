@@ -23,6 +23,7 @@ const NewsSchema = new mongoose.Schema({
         default: Date.now(),
         get: (v) => moment(v).format('DD/MM/YYYY HH:mm'), // Getter định dạng
     }
+
 },
     {
         toJSON: { getters: true }, // Bật chế độ getter khi convert sang JSON

@@ -92,6 +92,7 @@ public class TicketFragment extends Fragment{
         if (getArguments() != null) {
             optionFragment = getArguments().getInt(ARG_OPTION);
         }
+        ticketService =  new TicketService(getContext());
     }
 
     private ActivityResultLauncher<Intent> ActivityLauncher = registerForActivityResult(
@@ -163,6 +164,10 @@ public class TicketFragment extends Fragment{
 
 
     }
+    public void reloadData(int opt)
+    {
+        initData(opt);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -178,9 +183,55 @@ public class TicketFragment extends Fragment{
         ticketAdapter = new MyTicketAdapter(getContext(), new ArrayList<>());
         pendingAdapter = new PendingAdapter(getContext(), new ArrayList<>());
 
+        initData(optionFragment);
 
-        TicketService ticketService = new TicketService(getContext());
-        if(optionFragment == 0)
+//        if(optionFragment == 0)
+//        {
+//
+//        }
+//        else if(optionFragment == 1)
+//        {
+//
+//        }
+        // Add TextWatcher to the search EditText
+        edSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int after) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Cancel the previous search if it's still waiting
+                handler.removeCallbacks(searchRunnable);
+
+                // Schedule the search after 300ms
+                searchRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String query = editable.toString().toLowerCase().trim();
+                        if(optionFragment == 0)
+                        {
+                            filterTickets(query);
+                        }
+                        else if(optionFragment == 1)
+                        {
+                            filterPendings(query);
+                        }
+                    }
+                };
+                handler.postDelayed(searchRunnable, SEARCH_DELAY);
+            }
+        });
+
+
+
+        return view;
+    }
+    private void initData(int opt)
+    {
+        if(opt == 0)
         {
             ticketService.GetMyTicket( new TicketService.MyTicketCallback() {
                 @Override
@@ -190,6 +241,7 @@ public class TicketFragment extends Fragment{
                     getActivity().runOnUiThread(() -> {
                         allTickets.clear();
                         allTickets.addAll(MyTicket);
+                        filteredTickets.clear();
                         filteredTickets.addAll(MyTicket);
                         ticketAdapter = new MyTicketAdapter(getContext(), filteredTickets); // Không cần final
                         listEvent.setAdapter(ticketAdapter);
@@ -205,7 +257,7 @@ public class TicketFragment extends Fragment{
                 }
             });
         }
-        else if(optionFragment == 1)
+        else if(opt == 1)
         {
             ticketService.GetMyPending( new TicketService.MyPendingCallback() {
                 @Override
@@ -215,6 +267,7 @@ public class TicketFragment extends Fragment{
                     getActivity().runOnUiThread(() -> {
                         allPendings.clear();
                         allPendings.addAll(MyPending);
+                        filteredPendings.clear();
                         filteredPendings.addAll(MyPending);
 
                         pendingAdapter = new PendingAdapter(getContext(), filteredPendings, new PendingAdapter.OnEditTicketListener() {
@@ -291,44 +344,7 @@ public class TicketFragment extends Fragment{
                 }
             });
         }
-
-        // Add TextWatcher to the search EditText
-        edSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int after) {}
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                // Cancel the previous search if it's still waiting
-                handler.removeCallbacks(searchRunnable);
-
-                // Schedule the search after 300ms
-                searchRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        String query = editable.toString().toLowerCase().trim();
-                        if(optionFragment == 0)
-                        {
-                            filterTickets(query);
-                        }
-                        else if(optionFragment == 1)
-                        {
-                            filterPendings(query);
-                        }
-                    }
-                };
-                handler.postDelayed(searchRunnable, SEARCH_DELAY);
-            }
-        });
-
-
-
-        return view;
     }
-
     private void filterTickets(String query) {
         filteredTickets.clear();
         if (query.isEmpty()) {
