@@ -2,7 +2,6 @@ package com.example.ticketbooking;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +11,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.ticketbooking.coupon.CouponActivity;
+import com.example.ticketbooking.home.adapter.ChangePasswordActivity;
 
 import org.json.JSONObject;
 
 import modules.LocalStorageManager;
 import services.AccountHomeService;
-import services.EventService;
-import services.HomeService;
 
 public class AccountUserFragment extends Fragment {
-    private TextView txt_logout,txt_Name,txt_Point,txt_Email,txt_delhistory,txt_PaymentHistory , tvPoint;
+    private TextView txt_logout,txt_Name,txt_Point,txt_Email,txt_delhistory,txt_PaymentHistory , tvPoint,txt_changepassword;
     private ImageView imgUser;
     private Button button_edit;
 
@@ -33,7 +30,7 @@ public class AccountUserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the fragment layout
-        View view = inflater.inflate(R.layout.fragment_account_user, container, false);
+        View view = inflater.inflate(R.layout.account_fragment_user, container, false);
 
         // Initialize the logout TextView
         txt_logout = view.findViewById(R.id.txt_logout);
@@ -43,6 +40,7 @@ public class AccountUserFragment extends Fragment {
         txt_Email = view.findViewById(R.id.txt_Email);
         txt_delhistory = view.findViewById(R.id.txt_delhistory);
         txt_PaymentHistory = view.findViewById(R.id.txt_PaymentHistory);
+        txt_changepassword = view.findViewById(R.id.txt_changepassword);
         button_edit = view.findViewById(R.id.button_edit);
         tvPoint = view.findViewById(R.id.txt_exchangePoints);
         tvPoint.setOnClickListener(v -> {
@@ -59,6 +57,10 @@ public class AccountUserFragment extends Fragment {
             startActivity(intent);
         });
 
+        txt_changepassword.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+            startActivity(intent);
+        });
 
         txt_delhistory.setOnClickListener(v -> DeleteHistory());
 

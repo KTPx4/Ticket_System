@@ -291,58 +291,48 @@ public class AccountHomeService {
         }).start();
     }
 
-    public void updateImage(File imageFile, final ResponseCallback callback) {
-        String url = SERVER + "/api/v1/account/image"; // API endpoint for updating the image
+    public void updatePassword(String oldPass, String newPass, final ResponseCallback callback) {
+        String url = SERVER + "/api/v1/account/password"; // API endpoint for updating password
 
-        // Create the request body for the image
-        RequestBody imageBody = RequestBody.create(imageFile, MediaType.parse("image/*"));
+        // Create the FormBody for the POST request
+        RequestBody formBody = new FormBody.Builder()
+                .add("oldPass", oldPass)
+                .add("newPass", newPass)
+                .build();
 
-        // Create the multipart form body, which includes the image
-        MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), imageBody);
-
-        // If you need additional fields in the form data, you can add them here
-        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        builder.addPart(imagePart);
-
-        // Create a multipart request body
-        RequestBody requestBody = builder.build();
-
-        // Create the request with Authorization header and the multipart body
+        // Create the request with Authorization header
         Request request = new Request.Builder()
                 .url(url)
+                .put(formBody) // Specify PUT method with form body
                 .addHeader("Authorization", "Bearer " + token) // Add Bearer token
-                .post(requestBody) // Use POST for multipart data
                 .build();
 
         // Perform the request in a background thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Execute the request
-                    Response response = client.newCall(request).execute();
-                    if (response.isSuccessful()) {
-                        String responseBody = response.body().string();
-                        JSONObject jsonResponse = new JSONObject(responseBody);
+        new Thread(() -> {
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    JSONObject jsonResponse = new JSONObject(responseBody);
 
-                        String message = jsonResponse.optString("message");
-                        if (message != null && message.equals("Thay đổi thông tin thành công")) {
-                            // Handle the successful response
-                            callback.onSuccess(responseBody);
-                        } else {
-                            // If message is not successful
-                            callback.onFailure("Failed to update image");
-                        }
+                    String message = jsonResponse.optString("message");
+                    if (message != null && message.equals("Cập nhật mật khẩu thành công")) {
+                        // Handle the successful response
+                        callback.onSuccess(responseBody);
                     } else {
-                        callback.onFailure("Request failed: " + response.message());
+                        // If message is not successful
+                        callback.onFailure("Failed to update password");
                     }
-                } catch (Exception e) {
-                    Log.e("AccountHomeService", "Error updating image", e);
-                    callback.onFailure("Error: " + e.getMessage());
+                } else {
+                    callback.onFailure("Request failed: " + response.message());
                 }
+            } catch (Exception e) {
+                Log.e("AccountHomeService", "Error updating password", e);
+                callback.onFailure("Error: " + e.getMessage());
             }
         }).start();
     }
+
 
     public interface ResponseCallback {
         void onSuccess(String success);

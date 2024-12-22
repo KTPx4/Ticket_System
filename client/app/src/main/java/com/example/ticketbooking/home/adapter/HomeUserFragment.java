@@ -28,7 +28,7 @@ public class HomeUserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_home_user, container, false);
+        View rootView = inflater.inflate(R.layout.event_fragment_home, container, false);
 
         // Set up the toolbar
         Toolbar toolbar = rootView.findViewById(R.id.toolbar);

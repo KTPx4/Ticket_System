@@ -36,7 +36,7 @@ public class FilterBottomSheetFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_filter_bottom_sheet, container, false);
+        View view = inflater.inflate(R.layout.event_fragment_filter_bottom_sheet, container, false);
 
         btnApplyFilters = view.findViewById(R.id.btnApplyFilters);
         btnCancelFilters = view.findViewById(R.id.btnCancelFilters);

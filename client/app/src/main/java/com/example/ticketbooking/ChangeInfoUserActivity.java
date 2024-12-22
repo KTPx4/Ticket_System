@@ -1,14 +1,9 @@
 package com.example.ticketbooking;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -35,7 +30,7 @@ public class ChangeInfoUserActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.change_info_user_activity);
+        setContentView(R.layout.account_change_info_activity);
 
         edt_Name = findViewById(R.id.edt_Name);
         tv_Email = findViewById(R.id.tv_Email);

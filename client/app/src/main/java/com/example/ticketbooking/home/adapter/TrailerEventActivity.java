@@ -9,13 +9,9 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
 import com.example.ticketbooking.R;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import services.AccountHomeService;
 
@@ -27,7 +23,7 @@ public class TrailerEventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ativity_video_event);
+        setContentView(R.layout.event_ativity_video);
         String eventId = getIntent().getStringExtra("idEvent");
 
         accountHomeService = new AccountHomeService(this);

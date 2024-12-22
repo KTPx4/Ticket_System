@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import modules.LocalStorageManager;
 import services.AccountHomeService;
 
 public class InfoArtistActivity extends Activity {
@@ -24,10 +25,12 @@ public class InfoArtistActivity extends Activity {
     private TextView tv_originName, tv_birthDay, tv_duration, tv_more;
     private Button btn_follow;
     private AccountHomeService accountHomeService;
+    private LocalStorageManager localStorageManager;
+    private String userId = "";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info_artist);
+        setContentView(R.layout.artist_activity_info);
 
         img_artist = findViewById(R.id.img_artist);
         tv_originName = findViewById(R.id.tv_originName);
@@ -37,23 +40,18 @@ public class InfoArtistActivity extends Activity {
         btn_follow = findViewById(R.id.btn_follow);
         btn_back = findViewById(R.id.btn_back);
 
+        localStorageManager = new LocalStorageManager(this);
+        userId = localStorageManager.getIdUser();
+        Log.d("InfoArtistActivity", "User ID: " + userId);
+
         String artistId = getIntent().getStringExtra("artistId");
 
         Log.d("InfoArtistActivity", "Artist ID: " + artistId);
 
-        btn_follow.setOnClickListener(v -> {
-            if (btn_follow.getText().toString().equals("Follow")) {
-                btn_follow.setText("Unfollow");
-                btn_follow.setBackgroundTintList(getResources().getColorStateList(R.color.Wine_Red));  // Đổi màu nền thành màu xám
-
-            } else {
-                btn_follow.setText("Follow");
-                btn_follow.setBackgroundTintList(getResources().getColorStateList(R.color.Blush_Pink));  // Đổi lại màu nền khi là Follow
-                // Thực hiện các hành động khác nếu cần
-            }
-        });
-
         fetchArtistsByID(artistId);
+
+        btn_follow.setOnClickListener(v -> {
+        });
 
         accountHomeService = new AccountHomeService(this);
 
@@ -78,6 +76,13 @@ public class InfoArtistActivity extends Activity {
                             String duration = desc.optString("duration");
                             String more = desc.optString("more");
 
+                            List<String> followersList = new ArrayList<>();
+                            for (int i = 0; i < data.optJSONArray("followers").length(); i++) {
+                                followersList.add(data.optJSONArray("followers").optString(i));
+                            }
+
+                            boolean isFollowing = followersList.contains(userId);
+
                             // Sử dụng runOnUiThread để đảm bảo cập nhật UI trên luồng chính
                             runOnUiThread(() -> {
                                 // Cập nhật dữ liệu lên các thành phần UI
@@ -96,6 +101,12 @@ public class InfoArtistActivity extends Activity {
                                 Glide.with(InfoArtistActivity.this)
                                         .load(imageUrl)
                                         .into(img_artist);
+
+                                if (isFollowing) {
+                                    btn_follow.setText("Unfollow");
+                                } else {
+                                    btn_follow.setText("Follow");
+                                }
                             });
                         }
                     }
