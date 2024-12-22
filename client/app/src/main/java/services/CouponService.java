@@ -70,6 +70,7 @@ public class CouponService {
             }
         }).start();
     }
+
     public void GetMyCoupon(CouponCallBack callback)
     {
         new Thread(() -> {

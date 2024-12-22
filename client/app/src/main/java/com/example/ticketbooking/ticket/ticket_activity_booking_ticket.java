@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -19,7 +18,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ticketbooking.R;
-import com.example.ticketbooking.order.CheckOutActivity;
 import com.example.ticketbooking.ticket.viewcustom.ZoomableView;
 
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ public class ticket_activity_booking_ticket extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_ticket_booking_ticket);
+        setContentView(R.layout.ticket_activity_booking_ticket);
         eventService = new EventService(this);
         orderService = new OrderService(this);
 

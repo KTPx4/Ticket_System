@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.history.HistoryActivity;
 import com.example.ticketbooking.news.NewsActivity;
 import com.example.ticketbooking.news.NewsDetailsActivity;
 import com.example.ticketbooking.ticket.ticket_activity_booking_ticket;
@@ -38,7 +39,7 @@ public class DetailsEventActivity extends AppCompatActivity {
     private RecyclerView recycler_artist;
     private ArtistAdapter artistAdapter;
     private AccountHomeService accountHomeService;
-    private Button btnBookingTicket;
+    private Button btnBookingTicket, btnAfterEvent;
     private String EventID = "";
     private TextView btnMore;
     private HorizontalScrollView listNews;
@@ -69,12 +70,13 @@ public class DetailsEventActivity extends AppCompatActivity {
         imgBack.setOnClickListener(v -> onBackPressed());
         eventId = getIntent().getStringExtra("eventId");
         Log.d("DetailsEventActivity", "Event ID: " + eventId);
-
+        btnAfterEvent = findViewById(R.id.btnAfterEvent);
         btnMore = findViewById(R.id.btnMore);
         listNews = findViewById(R.id.listNews);
         linearListNews = findViewById(R.id.linearListNews);
 
         accountHomeService = new AccountHomeService(this);
+
         eventService = new EventService(this);
         fetchEvenByID();
         loadNews();
@@ -108,7 +110,14 @@ public class DetailsEventActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        btnAfterEvent.setOnClickListener((v)->{
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
+        });
+
     }
+
     private void loadNews(){
 
         eventService.GetNews(eventId, 4, new EventService.CallBackGetAllNews() {
@@ -170,6 +179,7 @@ public class DetailsEventActivity extends AppCompatActivity {
             }
         });
     }
+
     private void fetchEvenByID(){
 
         EventID= eventId;

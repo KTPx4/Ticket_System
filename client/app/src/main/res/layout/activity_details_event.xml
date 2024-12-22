@@ -193,6 +193,48 @@
 
             </LinearLayout>
 
+<!--            after event-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/linear_border"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="Sau sự kiện"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:text="@string/detail_after_event_desc"
+                    android:textColor="@color/text_hint"
+                    android:textSize="15dp"
+                    android:textAlignment="textStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/btnAfterEvent"
+                    android:layout_marginTop="10dp"
+                    android:text="Xem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
