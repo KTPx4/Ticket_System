@@ -194,6 +194,7 @@ public class DetailsEventActivity extends AppCompatActivity {
         });
     }
 
+
     private void UnFollowEvent(String eventId){
         accountHomeService.UnFollowEvent(eventId, new EventService.ResponseCallback() {
             @Override
