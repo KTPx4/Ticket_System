@@ -333,6 +333,163 @@ public class AccountHomeService {
         }).start();
     }
 
+    public void FollowArtist(String artistId, ResponseCallback callback) {
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/artist/" + artistId + "/follow";
+
+                // Create request with Bearer token, no body is added
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .post(RequestBody.create(null, new byte[0])) // Empty body
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+
+                try {
+                    String responseBody = response.body() != null ? response.body().string() : "";
+                    Log.d("FollowArtist", "Response Body: " + responseBody);
+
+                    // Handle the response
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String message = jsonResponse.optString("message", "Theo dõi thất bại!");
+
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(message);
+                    } else {
+                        callback.onFailure("Failed: " + message);
+                    }
+                } finally {
+                    // Ensure response is closed
+                    response.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Theo dõi nghệ sĩ thất bại: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    public void UnFollowArtist(String artistId, ResponseCallback callback) {
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/artist/" + artistId + "/follow";
+
+                // Create request with Bearer token, no body is added
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .delete()
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+
+                try {
+                    String responseBody = response.body() != null ? response.body().string() : "";
+                    Log.d("FollowArtist", "Response Body: " + responseBody);
+
+                    // Handle the response
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String message = jsonResponse.optString("message", "Bỏ Theo dõi thất bại!");
+
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(message);
+                    } else {
+                        callback.onFailure("Failed: " + message);
+                    }
+                } finally {
+                    // Ensure response is closed
+                    response.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Bỏ Theo dõi nghệ sĩ thất bại: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    public void FollowEvent(String eventId, EventService.ResponseCallback callback) {
+        new Thread(() -> {
+            try {
+                // Construct the URL for following the event
+                String url = SERVER + "/api/v1/event/" + eventId + "/follow";
+
+                // Create a POST request with Bearer token, but no body
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .post(RequestBody.create(null, new byte[0])) // Empty body
+                        .build();
+
+                // Send the request and get the response
+                Response response = client.newCall(request).execute();
+
+                try {
+                    String responseBody = response.body() != null ? response.body().string() : "";
+                    Log.d("FollowEvent", "Response Body: " + responseBody);
+
+                    // Process the response
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String message = jsonResponse.optString("message", "Follow event failed!");
+
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(message); // Notify success
+                    } else {
+                        callback.onFailure("Failed: " + message); // Notify failure
+                    }
+                } finally {
+                    // Ensure the response is closed
+                    response.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("Follow event failed: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    public void UnFollowEvent(String eventId, EventService.ResponseCallback callback) {
+        new Thread(() -> {
+            try {
+                // Construct the URL for following the event
+                String url = SERVER + "/api/v1/event/" + eventId + "/follow";
+
+                // Create a POST request with Bearer token, but no body
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .delete()
+                        .build();
+
+                // Send the request and get the response
+                Response response = client.newCall(request).execute();
+
+                try {
+                    String responseBody = response.body() != null ? response.body().string() : "";
+                    Log.d("FollowEvent", "Response Body: " + responseBody);
+
+                    // Process the response
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String message = jsonResponse.optString("message", "UnFollow event failed!");
+
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(message); // Notify success
+                    } else {
+                        callback.onFailure("Failed: " + message); // Notify failure
+                    }
+                } finally {
+                    // Ensure the response is closed
+                    response.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFailure("UnFollow event failed: " + e.getMessage());
+            }
+        }).start();
+    }
 
     public interface ResponseCallback {
         void onSuccess(String success);

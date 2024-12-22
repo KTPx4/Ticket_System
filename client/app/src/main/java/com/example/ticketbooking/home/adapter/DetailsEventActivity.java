@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,17 +22,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import modules.LocalStorageManager;
 import services.AccountHomeService;
+import services.EventService;
 
 public class DetailsEventActivity extends AppCompatActivity {
 
-    private ImageView imgBack, img_banner;
+    private ImageView imgBack, img_banner,img_follow;
     private TextView tv_event_name, tv_event_time, tv_event_location, tv_description, tv_price,tv_trailer;
     private RecyclerView recycler_artist;
     private ArtistAdapter artistAdapter;
     private AccountHomeService accountHomeService;
     private Button btnBookingTicket;
     private String EventID = "";
+    private String userId = "";
+    private boolean isFollowing = false;
+    private LocalStorageManager localStorageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +53,16 @@ public class DetailsEventActivity extends AppCompatActivity {
         img_banner = findViewById(R.id.img_banner);
         tv_trailer = findViewById(R.id.tv_trailer);
         tv_price = findViewById(R.id.tv_price);
+        img_follow = findViewById(R.id.img_follow);
         recycler_artist = findViewById(R.id.recycler_artist);
         btnBookingTicket = findViewById(R.id.btn_select_schedule);
         // Handle back button click
         imgBack.setOnClickListener(v -> onBackPressed());
+
+        localStorageManager = new LocalStorageManager(this);
+        userId = localStorageManager.getIdUser();
+        Log.d("InfoArtistActivity", "User ID: " + userId);
+
         String eventId = getIntent().getStringExtra("eventId");
         Log.d("DetailsEventActivity", "Event ID: " + eventId);
 
@@ -81,6 +93,14 @@ public class DetailsEventActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        img_follow.setOnClickListener(v -> {
+            if (isFollowing) {
+                UnFollowEvent(eventId);
+            } else {
+                FollowEvent(eventId);
+            }
+        });
+
     }
 
     private void fetchEvenByID(){
@@ -104,10 +124,21 @@ public class DetailsEventActivity extends AppCompatActivity {
                         String formattedTime = timeStart + " Đến " + timeEnd;
                         String formattedPrice = "Từ " + formatPrice(priceMin) + "đ";
 
+                        List<String> followersList = new ArrayList<>();
+                        for (int i = 0; i < data.optJSONArray("followers").length(); i++) {
+                            followersList.add(data.optJSONArray("followers").optString(i));
+                        }
+
+                        isFollowing = followersList.contains(userId); // Update follow status
+
+                        Log.d("InfoArtistActivity", "isFollowing " + isFollowing);
+
+
                         List<String> artistIds = new ArrayList<>();
                         for (int i = 0; i < data.optJSONArray("artists").length(); i++) {
                             artistIds.add(data.optJSONArray("artists").optString(i));
                         }
+
 
                         fetchArtists(artistIds);
 
@@ -122,6 +153,12 @@ public class DetailsEventActivity extends AppCompatActivity {
                             Glide.with(DetailsEventActivity.this)
                                     .load(imageUrl)
                                     .into(img_banner);
+
+                            if (isFollowing) {
+                                img_follow.setColorFilter(ContextCompat.getColor(DetailsEventActivity.this, R.color.Blush_Pink));
+                            } else {
+                                img_follow.setColorFilter(ContextCompat.getColor(DetailsEventActivity.this, R.color.white));
+                            }
                         });
 
                     }
@@ -134,6 +171,44 @@ public class DetailsEventActivity extends AppCompatActivity {
             public void onFailure(String message) {
                 // Xử lý khi có lỗi
                 Log.e("DetailsEventActivity", "Error: " + message);
+            }
+        });
+    }
+
+    private void FollowEvent(String eventId){
+        accountHomeService.FollowEvent(eventId, new EventService.ResponseCallback() {
+            @Override
+            public void onSuccess(String success) {
+                Log.d("DetailsEventActivity", "Success: " + success);
+                runOnUiThread(() -> {
+                    img_follow.setColorFilter(ContextCompat.getColor(DetailsEventActivity.this, R.color.Blush_Pink));
+                    Toast.makeText(DetailsEventActivity.this, "Đã theo dõi sự kiện!", Toast.LENGTH_SHORT).show();  // Show toast
+                });
+                fetchEvenByID();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d("DetailsEventActivity", "Error: " + error);
+            }
+        });
+    }
+
+    private void UnFollowEvent(String eventId){
+        accountHomeService.UnFollowEvent(eventId, new EventService.ResponseCallback() {
+            @Override
+            public void onSuccess(String success) {
+                Log.d("DetailsEventActivity", "Success: " + success);
+                runOnUiThread(() -> {
+                    img_follow.setColorFilter(ContextCompat.getColor(DetailsEventActivity.this, R.color.white));
+                    Toast.makeText(DetailsEventActivity.this, "Đã bỏ theo dõi sự kiện!", Toast.LENGTH_SHORT).show();  // Show toast
+                });
+                fetchEvenByID();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d("DetailsEventActivity", "Error: " + error);
             }
         });
     }
@@ -191,5 +266,6 @@ public class DetailsEventActivity extends AppCompatActivity {
             return price;
         }
     }
+
 }
 

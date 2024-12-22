@@ -8,6 +8,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.bumptech.glide.Glide;
 import com.example.ticketbooking.R;
 
@@ -22,11 +24,13 @@ import services.AccountHomeService;
 public class InfoArtistActivity extends Activity {
     private ImageView img_artist;
     private ImageButton btn_back;
-    private TextView tv_originName, tv_birthDay, tv_duration, tv_more;
+    private TextView tv_originName, tv_birthDay, tv_duration, tv_more,tv_artistName;
     private Button btn_follow;
     private AccountHomeService accountHomeService;
     private LocalStorageManager localStorageManager;
     private String userId = "";
+    private String artistId = "";
+    private boolean isFollowing = false; // To store the follow status
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,28 +43,33 @@ public class InfoArtistActivity extends Activity {
         tv_more = findViewById(R.id.tv_more);
         btn_follow = findViewById(R.id.btn_follow);
         btn_back = findViewById(R.id.btn_back);
+        tv_artistName = findViewById(R.id.tv_artistName);
 
         localStorageManager = new LocalStorageManager(this);
         userId = localStorageManager.getIdUser();
         Log.d("InfoArtistActivity", "User ID: " + userId);
 
-        String artistId = getIntent().getStringExtra("artistId");
-
+        artistId = getIntent().getStringExtra("artistId");
         Log.d("InfoArtistActivity", "Artist ID: " + artistId);
 
-        fetchArtistsByID(artistId);
-
-        btn_follow.setOnClickListener(v -> {
-        });
-
         accountHomeService = new AccountHomeService(this);
 
+        // Set up the back button
         btn_back.setOnClickListener(v -> onBackPressed());
 
-    }
-    private void fetchArtistsByID(String artistId) {
-        accountHomeService = new AccountHomeService(this);
+        // Set up the follow/unfollow button listener (this will be updated after fetching artist data)
+        btn_follow.setOnClickListener(v -> {
+            if (isFollowing) {
+                UnfollowArtist(artistId);
+            } else {
+                followArtist(artistId);
+            }
+        });
 
+        fetchArtistsByID(artistId);
+    }
+
+    private void fetchArtistsByID(String artistId) {
         accountHomeService.getArtistById(artistId, new AccountHomeService.ResponseCallback() {
             @Override
             public void onSuccess(String response) {
@@ -72,6 +81,7 @@ public class InfoArtistActivity extends Activity {
                         if (desc != null) {
                             // Lấy thông tin nghệ sĩ
                             String originName = desc.optString("originName");
+                            String artistName = desc.optString("artistName");
                             String birthDay = desc.optString("birthDay");
                             String duration = desc.optString("duration");
                             String more = desc.optString("more");
@@ -81,7 +91,9 @@ public class InfoArtistActivity extends Activity {
                                 followersList.add(data.optJSONArray("followers").optString(i));
                             }
 
-                            boolean isFollowing = followersList.contains(userId);
+                            isFollowing = followersList.contains(userId); // Update follow status
+
+                            Log.d("InfoArtistActivity", "isFollowing " + isFollowing);
 
                             // Sử dụng runOnUiThread để đảm bảo cập nhật UI trên luồng chính
                             runOnUiThread(() -> {
@@ -89,6 +101,7 @@ public class InfoArtistActivity extends Activity {
                                 tv_originName.setText(originName);
                                 tv_birthDay.setText(birthDay);
                                 tv_duration.setText(duration);
+                                tv_artistName.setText(artistName);
                                 tv_more.setText(more);
 
                                 // Tạo URL của hình ảnh
@@ -102,10 +115,13 @@ public class InfoArtistActivity extends Activity {
                                         .load(imageUrl)
                                         .into(img_artist);
 
+                                // Update follow button text based on follow status
                                 if (isFollowing) {
-                                    btn_follow.setText("Unfollow");
+                                    btn_follow.setText("Bỏ theo dõi");
+                                    btn_follow.setBackgroundTintList(ContextCompat.getColorStateList(InfoArtistActivity.this, R.color.gray));
                                 } else {
-                                    btn_follow.setText("Follow");
+                                    btn_follow.setText("Theo dõi");
+                                    btn_follow.setBackgroundTintList(ContextCompat.getColorStateList(InfoArtistActivity.this, R.color.Blush_Pink));
                                 }
                             });
                         }
@@ -123,4 +139,33 @@ public class InfoArtistActivity extends Activity {
         });
     }
 
+    private void followArtist(String artistId) {
+        accountHomeService.FollowArtist(artistId, new AccountHomeService.ResponseCallback() {
+            @Override
+            public void onSuccess(String success) {
+                Log.d("InfoArtistActivity", "Follow artist success: " + success);
+                fetchArtistsByID(artistId); // Refresh the artist data
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d("InfoArtistActivity", "Follow artist failed: " + error);
+            }
+        });
+    }
+
+    private void UnfollowArtist(String artistId) {
+        accountHomeService.UnFollowArtist(artistId, new AccountHomeService.ResponseCallback() {
+            @Override
+            public void onSuccess(String success) {
+                Log.d("InfoArtistActivity", "UnFollow artist success: " + success);
+                fetchArtistsByID(artistId); // Refresh the artist data
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.d("InfoArtistActivity", "UnFollow artist failed: " + error);
+            }
+        });
+    }
 }
