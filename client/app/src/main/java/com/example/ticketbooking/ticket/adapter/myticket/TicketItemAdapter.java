@@ -2,6 +2,7 @@ package com.example.ticketbooking.ticket.adapter.myticket;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,16 +95,27 @@ public class TicketItemAdapter extends RecyclerView.Adapter<TicketItemAdapter.Ti
                     }
                     Intent intent = new Intent(context, TicketInfoActivity.class);
 
-                    // Truyền dữ liệu qua Intent
-                    intent.putExtra("ticketId", ticket.get_id());
-                    intent.putExtra("type", ticket.getInfo().getTypeTicket());
-                    intent.putExtra("location", ticket.getInfo().getLocation());
-                    intent.putExtra("position", ticket.getPosition() + "");
-                    intent.putExtra("desc", ticket.getDesc());
-                    intent.putExtra("name", ticket.getEventDetails().getName());
+                    try{
+                        String name =  "";
+                        if(ticket.getEventDetails() != null && ticket.getEventDetails().getName() != null)
+                        {
+                            name = ticket.getEventDetails().getName();
+                        }
 
-                    // Khởi chạy Activity
-                    context.startActivity(intent);
+                        // Truyền dữ liệu qua Intent
+                        intent.putExtra("ticketId", ticket.get_id());
+                        intent.putExtra("type", ticket.getInfo().getTypeTicket());
+                        intent.putExtra("location", ticket.getInfo().getLocation());
+                        intent.putExtra("position", ticket.getPosition() + "");
+                        intent.putExtra("desc", ticket.getDesc());
+                        intent.putExtra("name", name);
+
+                        // Khởi chạy Activity
+                        context.startActivity(intent);
+                    } catch (Exception e) {
+                        Log.d("ERROR", "  " + e.getMessage());
+                        Toast.makeText(context, "Lỗi! Hãy thử lại sau", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }

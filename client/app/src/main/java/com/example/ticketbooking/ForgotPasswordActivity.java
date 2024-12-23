@@ -2,6 +2,7 @@ package com.example.ticketbooking;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,21 +40,33 @@ public class ForgotPasswordActivity extends Activity {
             if (email.isEmpty()) {
                 Toast.makeText(ForgotPasswordActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
             } else {
-                // Call resetAccount method
-                accountHomeService.resetAccount(email, new AccountHomeService.ResponseCallback() {
-                    @Override
-                    public void onSuccess(String success) {
-                        // Show success message and make the TextView visible
-                        successMessage.setVisibility(View.VISIBLE);  // Show the success message
-                        Toast.makeText(ForgotPasswordActivity.this, "Password reset email sent", Toast.LENGTH_SHORT).show();
-                    }
+                try{
+                    // Call resetAccount method
+                    accountHomeService.resetAccount(email, new AccountHomeService.ResponseCallback() {
+                        @Override
+                        public void onSuccess(String success) {
+                            // Show success message and make the TextView visible
+                            successMessage.setVisibility(View.VISIBLE);  // Show the success message
+                            runOnUiThread(()->{
+                                Toast.makeText(ForgotPasswordActivity.this, "Đã gửi email khôi phục mật khẩu", Toast.LENGTH_SHORT).show();
+                            });
+                        }
 
-                    @Override
-                    public void onFailure(String error) {
-                        // Handle failure response
-                        Toast.makeText(ForgotPasswordActivity.this, "Failed to reset password: " + error, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(String error) {
+                            // Handle failure response
+                            runOnUiThread(()->{
+                                Toast.makeText(ForgotPasswordActivity.this, "" + error, Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(getApplicationContext(), "Có chút lỗi! Hãy thử lại sau", Toast.LENGTH_SHORT).show();
+                    Log.d("Forgot pass", "onCreate: " + e.getMessage());
+                }
+
             }
         });
 

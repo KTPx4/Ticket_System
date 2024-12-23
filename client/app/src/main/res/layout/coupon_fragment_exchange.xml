@@ -14,10 +14,21 @@
         <TextView
             android:id="@+id/tvMyPoint"
             android:layout_marginStart="10dp"
-            android:text="Điểm của bạn: 1.600 pts"
+            android:text="Điểm của bạn:  0 pts"
             android:textSize="17dp"
             android:fontFamily="sans-serif-medium"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvDesc"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:text="Mỗi hóa đơn thanh toán được 1% điểm của tổng tiền thanh toán. Ví dụ sau khi thanh toán hóa đơn 100k bạn được 1.000 điểm thưởng"
+            android:textSize="14dp"
+            android:textColor="@color/text_hint"
+            android:fontFamily="sans-serif-light"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -60,6 +71,11 @@
                         android:fontFamily="sans-serif-condensed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+                    <TextView
+                        android:text="7%"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
                     <Button
                         android:id="@+id/btn2"
@@ -84,7 +100,11 @@
                         android:fontFamily="sans-serif-condensed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
+                    <TextView
+                        android:text="9%"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <Button
                         android:id="@+id/btn3"
                         android:layout_marginTop="10dp"
@@ -108,7 +128,11 @@
                         android:fontFamily="sans-serif-condensed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
+                    <TextView
+                        android:text="10%"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <Button
                         android:id="@+id/btn4"
                         android:layout_marginTop="10dp"
@@ -132,7 +156,11 @@
                         android:fontFamily="sans-serif-condensed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
+                    <TextView
+                        android:text="11%"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <Button
                         android:id="@+id/btn5"
                         android:layout_marginTop="10dp"
@@ -156,7 +184,11 @@
                         android:fontFamily="sans-serif-condensed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
+                    <TextView
+                        android:text="25%"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <Button
                         android:id="@+id/btn10"
                         android:layout_marginTop="10dp"

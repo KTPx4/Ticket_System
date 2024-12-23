@@ -3,12 +3,14 @@ package com.example.ticketbooking.home.adapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.MediaController;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.ticketbooking.R;
+import com.example.ticketbooking.history.HistoryActivity;
+import com.example.ticketbooking.news.NewsActivity;
+import com.example.ticketbooking.news.NewsDetailsActivity;
 import com.example.ticketbooking.ticket.ticket_activity_booking_ticket;
 
 import org.json.JSONObject;
@@ -23,7 +28,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.event.News;
 import services.AccountHomeService;
+import services.EventService;
 
 public class DetailsEventActivity extends AppCompatActivity {
 
@@ -32,8 +39,16 @@ public class DetailsEventActivity extends AppCompatActivity {
     private RecyclerView recycler_artist;
     private ArtistAdapter artistAdapter;
     private AccountHomeService accountHomeService;
-    private Button btnBookingTicket;
+    private Button btnBookingTicket, btnAfterEvent;
     private String EventID = "";
+    private TextView btnMore;
+    private HorizontalScrollView listNews;
+    private LinearLayout linearListNews;
+    private String eventId = "";
+    private String eventName = "";
+
+    private EventService eventService;
+    private List<News> dataListNews = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +68,18 @@ public class DetailsEventActivity extends AppCompatActivity {
         btnBookingTicket = findViewById(R.id.btn_select_schedule);
         // Handle back button click
         imgBack.setOnClickListener(v -> onBackPressed());
-        String eventId = getIntent().getStringExtra("eventId");
+        eventId = getIntent().getStringExtra("eventId");
         Log.d("DetailsEventActivity", "Event ID: " + eventId);
-
+        btnAfterEvent = findViewById(R.id.btnAfterEvent);
+        btnMore = findViewById(R.id.btnMore);
+        listNews = findViewById(R.id.listNews);
+        linearListNews = findViewById(R.id.linearListNews);
 
         accountHomeService = new AccountHomeService(this);
 
+        eventService = new EventService(this);
         fetchEvenByID();
+        loadNews();
 
         tv_trailer.setOnClickListener((v)->{
             if(EventID == null || EventID.isEmpty())
@@ -83,10 +103,85 @@ public class DetailsEventActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        btnMore.setOnClickListener((v)->{
+            Intent intent = new Intent(this, NewsActivity.class);
+            intent.putExtra("idEvent", eventId);
+            intent.putExtra("name", eventName);
+            startActivity(intent);
+        });
+
+        btnAfterEvent.setOnClickListener((v)->{
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
+        });
+
+    }
+
+    private void loadNews(){
+
+        eventService.GetNews(eventId, 4, new EventService.CallBackGetAllNews() {
+            @Override
+            public void onSuccess(List<News> listNews) {
+                if (listNews == null || listNews.isEmpty()) {
+                    return;
+                }
+                try{
+                    runOnUiThread(()->{
+//                    dataListNews.clear();
+//                    dataListNews.addAll(listNews);
+                        linearListNews.removeAllViews();
+                        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+                        for (News news : listNews) {
+
+                            View itemView = inflater.inflate(R.layout.event_item_news, linearListNews, false);
+
+                            // Thiết lập dữ liệu cho item
+                            ImageView btnImage = itemView.findViewById(R.id.btnImage);
+                            TextView textView = itemView.findViewById(R.id.textView);
+                            TextView textViewDate = itemView.findViewById(R.id.tvDate);
+
+                            textView.setText(news.getTitle());
+                            textViewDate.setText(news.getCreatedAt());
+                            btnImage.setImageResource(R.drawable.img_news);
+                            // Nếu bạn cần load ảnh
+//                        Glide.with(this).load(news.getImageUrl()).into(btnImage);
+
+                            // to activity news
+                            textView.setOnClickListener(v -> {
+                                Intent intent = new Intent(getApplicationContext(), NewsDetailsActivity.class);
+                                intent.putExtra("id",news.get_id() );
+                                startActivity(intent);
+                            });
+
+                            btnImage.setOnClickListener(v -> {
+                                Intent intent = new Intent(getApplicationContext(), NewsDetailsActivity.class);
+                                intent.putExtra("id",news.get_id() );
+                                startActivity(intent);
+                            });
+
+                            // Thêm view vào LinearLayout
+                            linearListNews.addView(itemView);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(()->{
+                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private void fetchEvenByID(){
-        String eventId = getIntent().getStringExtra("eventId");
+
         EventID= eventId;
         accountHomeService.getEventById(eventId, new AccountHomeService.ResponseCallback() {
             @Override
@@ -97,6 +192,7 @@ public class DetailsEventActivity extends AppCompatActivity {
                     JSONObject data = jsonResponse.optJSONObject("data");
                     if(data != null){
                         String name = data.optString("name");
+                        eventName = name;
                         String description = data.optString("desc");
                         String location = data.optString("location");
                         String timeStart = data.optJSONObject("date").optString("start");

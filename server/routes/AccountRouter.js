@@ -5,7 +5,7 @@ const AccountModel = require('../models/AccountModel')
 
 
 const multer = require("multer");
-const ImageValidator = require('../middlewares/ImageValidator');
+const ImageValidator = require('../middlewares/UploadValidator');
 const AccountValidator = require('../middlewares/account/Account')
 const AccountController = require('../controllers/AccountController')
 
@@ -16,6 +16,10 @@ _APP.patch('/', AccountValidator.AuthAccount, AccountValidator.Update, AccountCo
 _APP.put('/password', AccountValidator.AuthAccount, AccountValidator.Password, AccountController.ChangePass)
 _APP.post('/login',  AccountValidator.Login, AccountController.Login)
 
+// After event
+_APP.get('/event', AccountValidator.AuthAccount, AccountController.GetJoinEvent)
+
+// research history
 _APP.post('/history' , AccountValidator.AuthAccount, AccountValidator.History, AccountController.AddHistory )
 _APP.delete('/history' , AccountValidator.AuthAccount, AccountController.DeleteHistory )
 

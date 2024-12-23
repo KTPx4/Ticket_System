@@ -28,9 +28,20 @@
         tools:replace="android:theme"
         tools:targetApi="31">
         <activity
+            android:name=".history.PostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".history.HistoryActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".news.NewsDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".news.NewsActivity"
+            android:exported="false" />
+        <activity
             android:name=".coupon.CouponActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name="staffactivity.SelectEventActivity"
             android:exported="false" />
@@ -86,22 +97,19 @@
             android:exported="true" />
         <activity
             android:name=".home.adapter.SearchUserActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".home.adapter.DetailsEventActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".home.adapter.TrailerEventActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".home.adapter.InfoArtistActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".ForgotPasswordActivity"
-
-            android:exported="true">
-
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".ChangeInfoUserActivity"
             android:exported="true" /> <!-- Service -->

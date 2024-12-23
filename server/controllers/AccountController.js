@@ -15,6 +15,25 @@ const SECRET_LOGIN = process.env.KEY_SECRET_LOGIN || 'px4-secret-key-login-app'
 const JWT_SECRET = process.env.JWT_SECRET || "jwt_secret_reset"; // Khóa bí mật cho JWT
 const SERVER = process.env.SERVER
 
+module.exports.GetJoinEvent = async (req, res)=>{
+    try{
+        var {User} = req.vars
+        var Acc = await AccountModel.findById(User._id)
+            .populate('joinEvent')
+
+        return res.status(200).json({
+            message: "Lấy dữ liệu thành công",
+            data: Acc.joinEvent
+        })
+    }
+    catch (e) {
+        console.log("AccountController - GetJoinEvent: ",e)
+        return res.status(500).json({
+            message: "Lấy thông tin thất bại, thử lại sau"
+        })
+    }
+}
+
 module.exports.GetMyAccount= async (req, res)=>{
     try{
         var {User} = req.vars

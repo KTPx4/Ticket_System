@@ -1,5 +1,7 @@
 package com.example.ticketbooking.coupon.fragment;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -146,15 +148,13 @@ public class ExchangeFragment extends Fragment implements View.OnClickListener{
         }
 
         int id  = v.getId();
-        int point = 0;
-        if(id == R.id.btn2)
-        {
-            point = 2000;
-        }
+        int point;
+        if(id == R.id.btn2) {point = 2000;}
         else if(id == R.id.btn3){ point = 3000;}
         else if(id == R.id.btn4){ point = 4000;}
         else if(id == R.id.btn5){ point = 5000;}
         else if(id == R.id.btn10){ point = 10000;}
+        else { point = 0;}
 
         if(point == 0) return;
         if(point > myPoint)
@@ -163,23 +163,39 @@ public class ExchangeFragment extends Fragment implements View.OnClickListener{
             return;
         }
         else{
-            couponService.ExchangeCoupon(point, new CouponService.CouponCallBack() {
-                @Override
-                public void onSuccess(List<Coupon> coupon, long point) {
-                    getActivity().runOnUiThread(()->{
-                        myPoint = point;
-                        tvPoint.setText("Điểm của bạn: " + point +" pts");
-                        Toast.makeText(getContext(), "Đổi mã giảm giá thành công!", Toast.LENGTH_SHORT).show();
-                    });
-                }
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle("Đổi mã giảm giá")
+                    .setMessage("Bạn có muốn đổi mã giảm giá " + point +" điểm")
+                    .setPositiveButton("Hủy", (dia, which)->{
+                        dia.dismiss();
+                    })
+                    .setNegativeButton("Đổi", (dialog2, which) -> {
+                        couponService.ExchangeCoupon(point, new CouponService.CouponCallBack() {
+                            @Override
+                            public void onSuccess(List<Coupon> coupon, long point) {
+                                getActivity().runOnUiThread(()->{
+                                    myPoint = point;
+                                    tvPoint.setText("Điểm của bạn: " + point +" pts");
+                                    Toast.makeText(getContext(), "Đổi mã giảm giá thành công!", Toast.LENGTH_SHORT).show();
+                                });
+                            }
 
-                @Override
-                public void onFailure(String error) {
-                    getActivity().runOnUiThread(()->{
-                        Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
+                            @Override
+                            public void onFailure(String error) {
+                                getActivity().runOnUiThread(()->{
+                                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        });
+                        dialog2.dismiss();
+                    }).create();
+
+            dialog.show();
+            // Tùy chỉnh màu văn bản của các nút
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK); // Màu cho nút "Hủy"
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.inValid_Ticket));  // Màu cho nút "Xóa"
+
+
         }
 
     }

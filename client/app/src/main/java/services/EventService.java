@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import model.event.Event;
+import model.event.News;
 import modules.LocalStorageManager;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -19,6 +19,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import services.response.event.RSGetAllEvent;
 import services.response.event.RSGetAllTicket;
+import services.response.event.RSGetAllNews;
+import services.response.event.RSGetNews;
 
 public class EventService {
     private Context context;
@@ -35,6 +37,95 @@ public class EventService {
         localStorageManager = new LocalStorageManager(context);
         this.token = localStorageManager.getLoginToken();
     }
+
+    public void GetNews(String idEvent, int quan, CallBackGetAllNews callBack)
+    {
+        if(idEvent == null || idEvent.isEmpty())
+        {
+            callBack.onFailure("Thiếu id sự kiện");
+            return;
+        }
+        new Thread(()->{
+            try{
+                String url = SERVER + "/api/v1/event/" + idEvent + "/news?quan=" + quan;
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+                Response response = client.newCall(request).execute();
+
+                try{
+                    String responeBody = response.body() != null ? response.body().string() : "";
+                    Log.d("GetNews", "Response Body: " + responeBody);
+                    Gson gson = new Gson();
+                    RSGetAllNews rs = gson.fromJson(responeBody, RSGetAllNews.class);
+                    if(response.isSuccessful())
+                    {
+                        callBack.onSuccess(rs.getData());
+                    }
+                    else{
+                        callBack.onFailure(rs.getMessage());
+                    }
+
+                }
+                finally {
+                    // Đảm bảo đóng response trong mọi trường hợp
+                    response.close();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                callBack.onFailure("Tải tin tức thất bại: " + e.getMessage());
+
+            }
+        }).start();
+    }
+
+    public void GetNewsById(String idNews,  CallBackGetNews callBack)
+    {
+        if(idNews == null || idNews.isEmpty())
+        {
+            callBack.onFailure("Thiếu id tin tức");
+            return;
+        }
+        new Thread(()->{
+            try{
+                String url = SERVER + "/api/v1/news/" + idNews  ;
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+                Response response = client.newCall(request).execute();
+
+                try{
+                    String responeBody = response.body() != null ? response.body().string() : "";
+                    Log.d("GetNews", "Response Body: " + responeBody);
+                    Gson gson = new Gson();
+                    RSGetNews rs = gson.fromJson(responeBody, RSGetNews.class);
+                    if(response.isSuccessful())
+                    {
+                        callBack.onSuccess(rs.getData(), rs.getEventName());
+                    }
+                    else{
+                        callBack.onFailure(rs.getMessage());
+                    }
+
+                }
+                finally {
+                    // Đảm bảo đóng response trong mọi trường hợp
+                    response.close();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                callBack.onFailure("Tải tin tức thất bại: " + e.getMessage());
+
+            }
+        }).start();
+    }
+
     public void ScanTicket(String idEvent, String ticketCode, ResponseCallback callback) {
         new Thread(() -> {
             try {
@@ -171,4 +262,12 @@ public class EventService {
         void onFailure(String error);
     }
 
+    public interface CallBackGetAllNews {
+        void onSuccess(List<News> listNews);
+        void onFailure(String error);
+    }
+    public interface CallBackGetNews{
+        void onSuccess(News news, String eventName);
+        void onFailure(String error);
+    }
 }

@@ -62,7 +62,7 @@ public class ScanTicketActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_ticket);
+        setContentView(R.layout.staff_activity_scan_ticket);
 
         // Kiểm tra quyền camera
         if (!hasCameraPermission()) {
@@ -89,7 +89,7 @@ public class ScanTicketActivity extends AppCompatActivity {
 
     }
     private void initializeScanner() {
-        setContentView(R.layout.activity_scan_ticket);
+        setContentView(R.layout.staff_activity_scan_ticket);
         eventService = new EventService(getApplicationContext());
         // Khởi tạo RecyclerView
         scannedTickets = new ArrayList<>();

@@ -6,7 +6,7 @@ const StaffAuth = require('../middlewares/staffs/Staff')
 const AuthAccount = require('../middlewares/account/Account')
 const ArtistValidator = require('../middlewares/artist/Artist')
 const ArtisController = require('../controllers/ArtistController')
-const ImageValidator = require('../middlewares/ImageValidator')
+const ImageValidator = require('../middlewares/UploadValidator')
 
 _APP.get('/', ArtisController.GetAll)
 _APP.get('/:id', ArtisController.GetByID)

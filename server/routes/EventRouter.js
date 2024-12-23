@@ -3,7 +3,7 @@ const _APP = express.Router()
 const multer = require('multer')
 
 const StaffAuth = require("../middlewares/staffs/Staff");
-const ImageValidator = require("../middlewares/ImageValidator");
+const ImageValidator = require("../middlewares/UploadValidator");
 const EventValidator = require('../middlewares/event/EventValidator')
 const AccountAuth = require('../middlewares/account/Account')
 const AccountController = require('../controllers/AccountController')

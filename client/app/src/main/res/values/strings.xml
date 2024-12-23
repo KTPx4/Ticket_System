@@ -2,8 +2,8 @@
     <string name="app_name">Ticket Booking</string>
     <string name="JWT_SECRET_KEY">jwtToken-valid-ticket-user</string>
     <string name="ORDER_SECRET_START">secret-key-</string>
-            <string name="server_url">http://localhost:3001</string>
-<!--    <string name="server_url">https://ticket-system-l5j0.onrender.com</string>-->
+    <string name="server_url">http://localhost:3001</string>
+    <!--    <string name="server_url">https://ticket-system-l5j0.onrender.com</string>-->
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -13,6 +13,7 @@
     <string name="ex_text_types">Loại vé: Vip 1</string>
     <string name="ex_text_position">Số ghế: 25</string>
     <string name="ex_text_location">Vị trí: A</string>
+    <string name="detail_after_event_desc">Sau sự kiện, nơi mà mọi người có thể đánh giá, đăng tải các hình ảnh và video mà mọi người yêu thích sau khi tham gia sự kiện.</string>
 
     <string name="ex_text_desc">Anh trai "say hi" là một chương trình truyền hình thực tế về âm nhạc được phát sóng trên HTV2 - Vie Channel, ON Vie Giải Trí, ứng dụng VieON từ ngày 15 tháng 6 năm 2024. Chương trình có sự tham gia của 30 "anh trai" là những nam nghệ sĩ đang hoạt động trong lĩnh vực nghệ thuật.</string>
     <!--    <string name="server_url">http://10.0.2.2:3001</string>-->

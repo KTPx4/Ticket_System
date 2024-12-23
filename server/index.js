@@ -16,6 +16,7 @@ require('./models/DiscountModel')
 require('./models/PaymentModel')
 require('./models/TicketInfoModel')
 require('./models/BuyTicket')
+
 // Router
 const StaffRouter = require('./routes/StaffRouter')
 const ArtistRouter = require('./routes/ArtistRouter')
@@ -26,6 +27,7 @@ const TicketRouter = require('./routes/TicketRouter')
 const StaffAuth = require("./middlewares/staffs/Staff");
 const NewsRouter = require('./routes/NewsRouter')
 const CouponRouter = require('./routes/CouponRouter')
+const HistoryRouter = require('./routes/HistoryRouter')
 
 const fs = require("fs");
 const Generate = require('./modules/Generate')
@@ -68,6 +70,7 @@ _APP.use('/api/v1/account', AccountRouter(__dirname))
 _APP.use('/api/v1/order', OrderRouter)
 _APP.use('/api/v1/ticket', TicketRouter)
 _APP.use('/api/v1/coupon', CouponRouter)
+_APP.use('/api/v1/history', HistoryRouter)
 _APP.use("/*",(req, res)=>{
     return res.status(404).json({
         status: "notfound",
@@ -83,6 +86,7 @@ const createFolder = async()=>{
         `${root}/account`,
         `${root}/artist`,
         `${root}/event`,
+        `${root}/history`,
     ]
 
     listFolder.forEach(path=>{
