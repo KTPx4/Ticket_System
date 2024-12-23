@@ -41,6 +41,7 @@ public class TrailerEventActivity extends AppCompatActivity {
     }
 
     private void fetchEvenByID(){
+        String serverUrl = getString(R.string.server_url);
         String eventId = getIntent().getStringExtra("idEvent");
         EventID= eventId;
         accountHomeService.getEventById(eventId, new AccountHomeService.ResponseCallback() {
@@ -52,7 +53,7 @@ public class TrailerEventActivity extends AppCompatActivity {
                     JSONObject data = jsonResponse.optJSONObject("data");
                     if(data != null){
                         runOnUiThread(() -> {
-                            String trailerUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/trailer/" + data.optString("trailer");
+                            String trailerUrl = serverUrl + "/public/event/" + eventId + "/trailer/" + data.optString("trailer");
                             Log.d("TrailerEventActivity", "Trailer URL: " + trailerUrl);
 
                             Uri videoUri = Uri.parse(trailerUrl);

@@ -202,6 +202,7 @@ public class DetailsEventActivity extends AppCompatActivity {
     private void fetchEvenByID(){
         String eventId = getIntent().getStringExtra("eventId");
         EventID= eventId;
+        String serverUrl = getString(R.string.server_url);
         accountHomeService.getEventById(eventId, new AccountHomeService.ResponseCallback() {
             @Override
             public void onSuccess(String response) {
@@ -244,8 +245,8 @@ public class DetailsEventActivity extends AppCompatActivity {
                             tv_event_location.setText(location);
                             tv_event_time.setText(formattedTime);
                             tv_price.setText(formattedPrice);
-                            String imageUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/" + data.optString("image");
-                            String trailerUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + eventId + "/trailer" + "/" + data.optString("trailer");
+                            String imageUrl = serverUrl + "/public/event/" + eventId + "/" + data.optString("image");
+                            String trailerUrl = serverUrl + "/public/event/" + eventId + "/trailer" + "/" + data.optString("trailer");
                             Glide.with(DetailsEventActivity.this)
                                     .load(imageUrl)
                                     .into(img_banner);

@@ -108,6 +108,7 @@ public class AccountUserFragment extends Fragment {
     }
 
     private void fetchAccountData() {
+        String serverUrl = getString(R.string.server_url);
         AccountHomeService accountHomeService = new AccountHomeService(getContext());
         accountHomeService.getAccountInfo(new AccountHomeService.ResponseCallback() {
             @Override
@@ -120,7 +121,7 @@ public class AccountUserFragment extends Fragment {
                     String name = data.getString("name");
                     int points = data.getInt("point");
                     String email = data.getString("email");
-                    String imageUrl = "https://ticket-system-l5j0.onrender.com/public/account/" + data.getString("_id") + "/" + data.getString("image");
+                    String imageUrl = serverUrl + "/public/account/" + data.getString("_id") + "/" + data.getString("image");
 
                     // Ensure UI changes happen on the main thread
                     getActivity().runOnUiThread(new Runnable() {

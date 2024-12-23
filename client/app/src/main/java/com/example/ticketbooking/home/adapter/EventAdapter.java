@@ -1,4 +1,5 @@
 package com.example.ticketbooking.home.adapter;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
@@ -21,12 +22,17 @@ import services.AccountHomeService;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private List<Event> eventList;
+    private Context context;
+    private static String SERVER;
     private int nameTextColor = Color.BLACK;
     private AccountHomeService accountHomeService;
 
-    public EventAdapter(List<Event> eventList) {
+    public EventAdapter(List<Event> eventList, Context context) {
         this.eventList = eventList;
+        this.context = context;
+        this.SERVER = context.getString(R.string.server_url);
     }
+
 
     @NonNull
     @Override
@@ -49,7 +55,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         holder.eventName.setTextColor(nameTextColor);
 
-        String imageUrl = "https://ticket-system-l5j0.onrender.com/public/event/" + event.getId() + "/" + event.getImage();
+        String imageUrl = SERVER + "/public/event/" + event.getId() + "/" + event.getImage();
 
         // Load the image using Glide
         Glide.with(holder.eventImage.getContext())

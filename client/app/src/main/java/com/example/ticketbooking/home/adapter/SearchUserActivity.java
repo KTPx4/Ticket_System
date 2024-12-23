@@ -95,7 +95,7 @@ public class SearchUserActivity extends AppCompatActivity {
             public void onEventsLoaded(List<Event> specialEvents, List<Event> musicEvents, List<Event> artEvents, List<Event> comedyEvents) {
                 // If specialEvents is not empty, update the adapter with the filtered events
                 if (specialEvents != null && !specialEvents.isEmpty()) {
-                    eventAdapter = new EventAdapter(specialEvents);
+                    eventAdapter = new EventAdapter(specialEvents, SearchUserActivity.this);
                     recyclerSearchResults.setAdapter(eventAdapter);
                     eventAdapter.setNameTextColor(Color.WHITE);
                     recyclerSearchResults.setVisibility(View.VISIBLE); // Show RecyclerView if results exist
@@ -116,7 +116,7 @@ public class SearchUserActivity extends AppCompatActivity {
             public void onEventsLoaded(List<Event> specialEvents, List<Event> musicEvents, List<Event> artEvents, List<Event> comedyEvents) {
                 // Nếu tìm thấy kết quả, hiển thị lên RecyclerView
                 if (specialEvents != null && !specialEvents.isEmpty()) {
-                    eventAdapter = new EventAdapter(specialEvents);
+                    eventAdapter = new EventAdapter(specialEvents, SearchUserActivity.this);
                     recyclerSearchResults.setAdapter(eventAdapter);
                     eventAdapter.setNameTextColor(Color.WHITE);
                     recyclerSearchResults.setVisibility(View.VISIBLE);
@@ -174,7 +174,7 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public void onEventsLoaded(List<Event> specialEvents, List<Event> musicEvents, List<Event> artEvents, List<Event> comedyEvents) {
                 // Set the adapter with the result list filtered by date
-                eventAdapter = new EventAdapter(specialEvents);
+                eventAdapter = new EventAdapter(specialEvents, SearchUserActivity.this);
                 recyclerSearchResults.setAdapter(eventAdapter);
                 eventAdapter.setNameTextColor(Color.WHITE);
                 recyclerSearchResults.setVisibility(View.VISIBLE); // Show RecyclerView with date-filtered results
