@@ -146,6 +146,16 @@
                 android:drawableLeft="@drawable/trash_can"
                 android:drawableTint="@android:color/black"
                 android:drawablePadding="8dp"/>
+            <TextView
+                android:textSize="18dp"
+                android:padding="5dp"
+                android:id="@+id/tvAfterEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sự kiện đã tham gia"
+                android:drawableLeft="@drawable/ic_date"
+                android:drawableTint="@android:color/black"
+                android:drawablePadding="8dp"/>
 
             <TextView
                 android:textSize="18dp"
