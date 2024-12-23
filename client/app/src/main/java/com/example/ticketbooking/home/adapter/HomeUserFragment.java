@@ -87,16 +87,16 @@ public class HomeUserFragment extends Fragment {
             @Override
             public void onEventsLoaded(List<Event> specialEvents, List<Event> musicEvents, List<Event> artEvents, List<Event> comedyEvents) {
                 // Set data in RecyclerViews
-                specialEventAdapter = new EventAdapter(specialEvents);
+                specialEventAdapter = new EventAdapter(specialEvents, getActivity());
                 recyclerSpecialEvents.setAdapter(specialEventAdapter);
 
-                musicEventAdapter = new EventAdapter(musicEvents);
+                musicEventAdapter = new EventAdapter(musicEvents,getActivity());
                 recyclerMusicEvents.setAdapter(musicEventAdapter);
 
-                artEventAdapter = new EventAdapter(artEvents);
+                artEventAdapter = new EventAdapter(artEvents,getActivity());
                 recyclerArtEvents.setAdapter(artEventAdapter);
 
-                comedyEventAdapter = new EventAdapter(comedyEvents);
+                comedyEventAdapter = new EventAdapter(comedyEvents,getActivity());
                 recyclerComedyEvents.setAdapter(comedyEventAdapter);
             }
 

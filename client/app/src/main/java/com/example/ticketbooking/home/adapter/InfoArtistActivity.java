@@ -70,6 +70,7 @@ public class InfoArtistActivity extends Activity {
     }
 
     private void fetchArtistsByID(String artistId) {
+        String serverUrl = getString(R.string.server_url);
         accountHomeService.getArtistById(artistId, new AccountHomeService.ResponseCallback() {
             @Override
             public void onSuccess(String response) {
@@ -105,7 +106,7 @@ public class InfoArtistActivity extends Activity {
                                 tv_more.setText(more);
 
                                 // Tạo URL của hình ảnh
-                                String imageUrl = "https://ticket-system-l5j0.onrender.com/public/artist/" + artistId + "/" + data.optString("image");
+                                String imageUrl = serverUrl + "/public/artist/" + artistId + "/" + data.optString("image");
 
                                 // Ghi log URL hình ảnh để kiểm tra
                                 Log.d("InfoArtistActivity", "Image URL: " + imageUrl);

@@ -65,6 +65,7 @@ public class ChangeInfoUserActivity extends Activity {
     }
 
     private void fetchAccountInfo() {
+        String serverUrl = getString(R.string.server_url);
         accountHomeService.getAccountInfo(new AccountHomeService.ResponseCallback() {
             @Override
             public void onSuccess(String success) {
@@ -76,7 +77,7 @@ public class ChangeInfoUserActivity extends Activity {
                         String name = data.optString("name", "");
                         String email = data.optString("email", "");
                         String address = data.optString("address", "");
-                        String image = "https://ticket-system-l5j0.onrender.com/public/account/" + data.optString("_id") + "/" + data.optString("image");
+                        String image = serverUrl + "/public/account/" + data.optString("_id") + "/" + data.optString("image");
 
                         // Update the UI on the main thread
                         runOnUiThread(() -> {
