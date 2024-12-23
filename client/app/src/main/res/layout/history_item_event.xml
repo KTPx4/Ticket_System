@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/layoutMain"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    android:layout_marginVertical="20dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:src="@drawable/img_event"
+        android:id="@+id/imgEvent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="100dp"
+        android:layout_height="80dp" />
+
+    <TextView
+        android:id="@+id/tvName"
+       android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="@+id/imgEvent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="17dp"
+        android:maxLines="1"
+        android:fontFamily="sans-serif-medium"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@+id/imgEvent"
+        android:text="Su kien"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        app:layout_constraintTop_toBottomOf="@+id/tvName"
+        app:layout_constraintStart_toStartOf="@+id/tvName"
+        app:layout_constraintBottom_toTopOf="@+id/layout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <TextView
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/text_hint"
+            android:textSize="14dp"
+            android:text="Id: "
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tvId"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/text_hint"
+            android:textSize="14dp"
+            android:text="12345"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout2"
+       app:layout_constraintBottom_toBottomOf="@+id/imgEvent"
+        app:layout_constraintStart_toStartOf="@+id/layout1"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <TextView
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/text_hint"
+            android:textSize="14dp"
+            android:text="Thời gian: "
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tvDate"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/text_hint"
+            android:textSize="14dp"
+            android:text="22/12/2024 12:12"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

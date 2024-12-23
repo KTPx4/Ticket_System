@@ -9,14 +9,19 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import model.account.Account;
+import model.event.Event;
 import modules.LocalStorageManager;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import services.response.account.RSGetJoin;
 import services.response.account.ResponseAccount;
+import services.response.ticket.ResponseMyTicket;
 import services.response.ticket.ResponsePending;
 
 public class AccountService {
@@ -349,7 +354,51 @@ public class AccountService {
             }
         }).start();
     }
+
+    public void GetJoinEvent(GetJoiCallBack callBack)
+    {
+        new Thread(() -> {
+            try {
+                String url = SERVER + "/api/v1/account/event";
+
+                // Create request with Bearer token
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("Authorization", "Bearer " + myToken)
+                        .build();
+
+                // Send request and get response
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+
+                Log.d("GetJoinEvent", "Response Body: " + responseBody);
+
+                Gson gson = new Gson();
+                RSGetJoin responseData = gson.fromJson(responseBody, RSGetJoin.class);
+
+                Log.d("ParsedData", gson.toJson(responseData));
+
+                if (response.isSuccessful()) {
+                    callBack.onSuccess(responseData.getData());
+                }
+                else {
+                    callBack.onFailure(responseData.getMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callBack.onFailure("Tải dữ liệu thất bại" + e.getMessage());
+            }
+        }).start();
+    }
+
+
+
     // Interface callback để xử lý kết quả
+    public interface GetJoiCallBack{
+        public void onSuccess(List<Event> listData);
+        public void onFailure(String err);
+    }
+
     public interface ResponseCallback {
         void onSuccess(String message);
 
