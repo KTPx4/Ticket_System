@@ -82,7 +82,7 @@ AccountSchema.pre('save', function (next) {
     // Nếu giá trị của 'NameAvt' là null hoặc không được xác định, đặt giá trị mặc định là '_id.png'
     if (!this.image || this.image === null) {
         this.image = this._id + '.png';
-    }on
+    }
     next();
 });
 module.exports = mongoose.model('accounts', AccountSchema)

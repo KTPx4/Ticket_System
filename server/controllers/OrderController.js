@@ -331,13 +331,12 @@ module.exports.ValidOrder = async(req, res)=>{
                 status: "done"
             })
 
-            var BuyTicket = await BuyTicketModel.findById(BuyTicket)         
 
 
 
             if(Type === "all")
             {
-                BuyTicket = await BuyTicketModel.findByIdAndUpdate(BuyTicket,
+                var BuyTicketM = await BuyTicketModel.findByIdAndUpdate(BuyTicket,
                     {
                         status: "done",
                         accPay: User
@@ -365,7 +364,7 @@ module.exports.ValidOrder = async(req, res)=>{
                 // console.log(BuyTicket);
 
                 
-                var listInfos = BuyTicket.ticketInfo
+                var listInfos = BuyTicketM.ticketInfo
                 
                 // update list info
                 var listId = listInfos
@@ -385,7 +384,7 @@ module.exports.ValidOrder = async(req, res)=>{
 
                 // update ticket in info
                 var listTicketId =  listInfos
-                    .filter(inf => inf.accPay === null) // Lọc những phần tử có accPay = null
+                    .filter(inf => inf.ticket.accBuy === null) // Lọc những phần tử có accPay = null
                     .map((inf)=> inf.ticket._id.toString())
 
                 await TicketModel.updateMany(
@@ -416,7 +415,7 @@ module.exports.ValidOrder = async(req, res)=>{
                 })
 
                 var listTicketId = listInfo.map(inf=> inf.ticket._id.toString())
-
+                console.log(listTicketId)
                 await TicketModel.updateMany(
                     {
                         _id: {$in: listTicketId},
@@ -459,7 +458,7 @@ module.exports.ValidOrder = async(req, res)=>{
     }
     catch(e)
     {
-        console.log("Error at OrderController - ValidOrder: ", err);
+        console.log("Error at OrderController - ValidOrder: ", e);
         return res.status(500).json({
             status: "Error Server",
             message: "Thanh toán thất bại. Vui lòng thử lại sau"
@@ -669,8 +668,10 @@ module.exports.StripeSuccess = async (req, res)=>{
 
             // update ticket in info
             var listTicketId =  listInfos
-                .filter(inf => inf.accPay === null) // Lọc những phần tử có accPay = null
+                .filter(inf => inf.ticket.accBuy === null) // Lọc những phần tử có accPay = null
                 .map((inf)=> inf.ticket._id.toString())
+
+            console.log(listTicketId)
 
             await TicketModel.updateMany(
             {
