@@ -47,12 +47,29 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/img_banner"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="Event Banner" />
+                android:layout_height="200dp">
+
+                <ImageView
+                    android:id="@+id/img_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Event Banner" />
+
+                <ImageButton
+                    android:id="@+id/img_follow"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/heart_background"
+                    android:src="@drawable/ic_heart"/>
+
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
