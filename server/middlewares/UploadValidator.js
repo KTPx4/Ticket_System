@@ -122,6 +122,7 @@ module.exports.ArrayFile = async(req, res, next)=>{
         else {
             // Kiểm tra từng file trong danh sách
             for (const file of req.files) {
+                console.log("\n----------"+file.mimetype)
                 if (!allowedMimeTypes.includes(file.mimetype)) {
                     return res.status(400).json({
                         message: `File không hợp lệ: ${file.originalname}. Chỉ chấp nhận ảnh (jpeg, png, gif, webp) hoặc video (mp4, mpeg).`,

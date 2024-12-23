@@ -12,7 +12,7 @@ const EventValidator = require('../middlewares/event/EventValidator')
 const Controller = require('../controllers/HistoryController')
 
 // get all history of event
-_APP.get('/' ,AuthAccount.AuthAccount, Controller.GetMyPost)
+_APP.get('/:id/me' ,AuthAccount.AuthAccount,EventValidator.IsExistEvent, Controller.GetMyPost)
 
 _APP.get('/:id', AuthAccount.AuthAccount, EventValidator.IsExistEvent, Controller.GetAll)
 

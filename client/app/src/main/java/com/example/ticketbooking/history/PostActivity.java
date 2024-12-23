@@ -7,8 +7,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,12 +32,16 @@ import com.example.ticketbooking.history.adapter.FileAdapter;
 
 import java.util.ArrayList;
 
+import services.HistoryService;
+import services.response.history.RSMyPost;
+
 public class PostActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private TextView ratingValue;
     private EditText commentInput;
     private Button btnUploadFile, btnSubmit;
     private TextView fileCount;
+    private ProgressBar loading;
 
     private RecyclerView recyclerViewFiles;
     private FileAdapter fileAdapter;
@@ -46,7 +52,7 @@ public class PostActivity extends AppCompatActivity {
     private String eventId = "";
 
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
-
+    private HistoryService historyService;
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -75,6 +81,7 @@ public class PostActivity extends AppCompatActivity {
             this.finish();
             return;
         }
+        historyService = new HistoryService(this);
 
         // Initialize UI elements
         ratingBar = findViewById(R.id.ratingBar);
@@ -85,6 +92,7 @@ public class PostActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         fileCount = findViewById(R.id.fileCount);
         recyclerViewFiles = findViewById(R.id.recyclerViewFiles);
+        loading = findViewById(R.id.loading);
 
         // Setup RecyclerView
 //        recyclerViewFiles.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -130,9 +138,39 @@ public class PostActivity extends AppCompatActivity {
             Log.d("CreateCommentActivity", "Files: " + selectedFiles.size());
 
             // TODO: Upload data to server
-            Toast.makeText(this, "Comment submitted successfully!", Toast.LENGTH_SHORT).show();
+            loading.setVisibility(View.VISIBLE);
+            btnSubmit.setVisibility(View.GONE);
+            SendPost(rating, comment);
         });
     }
+
+    private void SendPost(int rating, String comment)
+    {
+        historyService.Post(eventId, rating, comment, selectedFiles, new HistoryService.GetMyPostCallBack() {
+            @Override
+            public void onSuccess(RSMyPost result) {
+                runOnUiThread(()->{
+                    loading.setVisibility(View.GONE);
+                    btnSubmit.setVisibility(View.VISIBLE);
+                    Toast.makeText(getApplicationContext(), "Đăng bài thành công", Toast.LENGTH_SHORT).show();
+                    Intent resultIntent = new Intent();
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
+
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(()->{
+                    loading.setVisibility(View.GONE);
+                    btnSubmit.setVisibility(View.VISIBLE);
+                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
     private void OpenUpload()
     {
         if (selectedFiles.size() >= MAX_FILES) {

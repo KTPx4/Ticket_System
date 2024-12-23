@@ -476,9 +476,10 @@ module.exports.ScanTicket = async(req, res)=>{
 
             var Ticket = await TicketModel.findOne({
                 _id: idTicket,
-                accBuy: idUser,
+
                 isValid: true
             })
+
             var Account = await AccountModel.findOne({
                 _id: idUser
             })
@@ -508,6 +509,12 @@ module.exports.ScanTicket = async(req, res)=>{
                 { _id: idEvent },
                 { $addToSet: { accJoins: idUser } }
             );
+
+            // thêm sự kiện join vao account
+            await AccountModel.updateOne(
+                {_id: idUser},
+                {$addToSet: {joinEvent: idEvent}}
+            )
 
             return res.status(200).json({
                 message: "Quét thành công"

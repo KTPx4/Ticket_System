@@ -1,7 +1,10 @@
 package com.example.ticketbooking.history;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +19,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -31,14 +36,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Coupon;
 import model.Rating;
+import services.CouponService;
 import services.HistoryService;
 import services.response.history.RSGetAll;
 import services.response.history.RSMyPost;
 
 public class HistoryActivity extends AppCompatActivity implements View.OnClickListener{
 
-    TextView tvId, tvName, tvDate, tvLocation, tvRating,tvPage, userNameTextView, commentDateTextView, commentTextView;
+    TextView tvId, tvName, tvDate, tvLocation, tvRating,tvPage, userNameTextView, commentDateTextView, commentTextView, count;
 
     RecyclerView listPost;
 
@@ -82,7 +89,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         btnAddPost = findViewById(R.id.btnAdd);
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
-
+        count = findViewById(R.id.count);
 
         listPost = findViewById(R.id.listPost);
         listPost.setLayoutManager(new LinearLayoutManager(this));
@@ -111,8 +118,12 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         LoadData();
 
     }
+
     private void LoadData()
     {
+        isWaiting = true;
+        loading.setVisibility(View.VISIBLE);
+        listPost.setVisibility(View.GONE);
         GetFromIntent();
         GetMyPost();
     }
@@ -130,89 +141,91 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         GetAllPost();
     }
 
+    private void updateMyPost(Rating rating)
+    {
+        canPost = false;
+
+        myPostId = rating.get_id();
+        myPost.setVisibility(View.VISIBLE);
+        userNameTextView.setText(rating.getAccount().getName());
+        commentDateTextView.setText(rating.getCreatedAt());
+        commentTextView.setText(rating.getComment());
+        ratingBar.setRating((float)rating.getRating());
+        List<Rating.FileRating> listFile = rating.getFile();
+
+        String rootURL = URL_HISTORY + "/" + rating.get_id();
+
+        String myAVT = URL_ACCOUNT + "/" + rating.getAccount().get_id() + "/" + rating.getAccount().getImage();
+
+        Glide.with(getApplicationContext())
+                .load(myAVT)
+                .error(R.drawable.ic_avatar_placeholder)
+                .into(avatarImageView);
+
+
+        for (Rating.FileRating file : listFile) {
+            boolean isVideo = file.getTypeFile().equalsIgnoreCase("video");
+            String fileUrl = rootURL + "/" + file.getName(); // URL của ảnh/video
+
+            // Tạo ImageView hoặc VideoView
+            if (isVideo) {
+                // Tạo VideoView
+                VideoView videoView = new VideoView(getApplicationContext());
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.width = dpToPx(50); // Convert dp to pixels
+                params.height = dpToPx(60);
+
+                params.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+                videoView.setLayoutParams(params);
+                videoView.setVideoPath(fileUrl);
+                videoView.seekTo(100); // Load một khung hình để hiển thị
+                mediaGridLayout.addView(videoView);
+
+                // Xử lý phóng to
+                videoView.setOnClickListener(v -> {
+                    showMediaDialog(fileUrl, true); // true: là video
+                });
+
+            } else {
+                // Tạo ImageView
+                ImageView imageView = new ImageView(getApplicationContext());
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.width = dpToPx(50); // Convert dp to pixels
+                params.height = dpToPx(60);
+                params.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+                imageView.setLayoutParams(params);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                // Tải ảnh (sử dụng thư viện Glide hoặc Picasso)
+                Glide.with(getApplicationContext()).load(fileUrl).into(imageView);
+
+                mediaGridLayout.addView(imageView);
+
+                // Xử lý phóng to
+                imageView.setOnClickListener(v -> {
+                    showMediaDialog(fileUrl, false); // false: là ảnh
+                });
+            }
+        }
+    }
 
     private void GetMyPost()
     {
         try{
 
-            historyService.GetMyPost(new HistoryService.GetMyPostCallBack() {
+            historyService.GetMyPost(eventId, new HistoryService.GetMyPostCallBack() {
                 @Override
                 public void onSuccess(RSMyPost result) {
                     Rating rating = result.getData();
                     if(rating != null)
                     {
                         runOnUiThread(()->{
-                            canPost = false;
-
-                            myPostId = rating.get_id();
-                            myPost.setVisibility(View.VISIBLE);
-                            userNameTextView.setText(rating.getAccount().getName());
-                            commentDateTextView.setText(rating.getCreatedAt());
-                            commentTextView.setText(rating.getComment());
-                            ratingBar.setRating((float)rating.getRating());
-                            List<Rating.FileRating> listFile = rating.getFile();
-
-                            String rootURL = URL_HISTORY + "/" + rating.get_id();
-
-                            String myAVT = URL_ACCOUNT + "/" + rating.getAccount().get_id() + "/" + rating.getAccount().getImage();
-
-                            Glide.with(getApplicationContext())
-                                    .load(myAVT)
-                                    .error(R.drawable.ic_avatar_placeholder)
-                                    .into(avatarImageView);
-
-
-                            for (Rating.FileRating file : listFile) {
-                                boolean isVideo = file.getTypeFile().equalsIgnoreCase("video");
-                                String fileUrl = rootURL + "/" + file.getName(); // URL của ảnh/video
-
-                                // Tạo ImageView hoặc VideoView
-                                if (isVideo) {
-                                    // Tạo VideoView
-                                    VideoView videoView = new VideoView(getApplicationContext());
-                                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                                    params.width = dpToPx(50); // Convert dp to pixels
-                                    params.height = dpToPx(60);
-
-                                    params.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
-                                    videoView.setLayoutParams(params);
-                                    videoView.setVideoPath(fileUrl);
-                                    videoView.seekTo(100); // Load một khung hình để hiển thị
-                                    mediaGridLayout.addView(videoView);
-
-                                    // Xử lý phóng to
-                                    videoView.setOnClickListener(v -> {
-                                        showMediaDialog(fileUrl, true); // true: là video
-                                    });
-
-                                } else {
-                                    // Tạo ImageView
-                                    ImageView imageView = new ImageView(getApplicationContext());
-                                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                                    params.width = dpToPx(50); // Convert dp to pixels
-                                    params.height = dpToPx(60);
-                                    params.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
-                                    imageView.setLayoutParams(params);
-                                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                                    // Tải ảnh (sử dụng thư viện Glide hoặc Picasso)
-                                    Glide.with(getApplicationContext()).load(fileUrl).into(imageView);
-
-                                    mediaGridLayout.addView(imageView);
-
-                                    // Xử lý phóng to
-                                    imageView.setOnClickListener(v -> {
-                                        showMediaDialog(fileUrl, false); // false: là ảnh
-                                    });
-                                }
-                            }
+                            updateMyPost(rating);
                         });
                     }
                     else{
                         canPost = true;
                     }
-
-
 
                 }
 
@@ -250,7 +263,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
                         int visibleBack = canBack ? View.VISIBLE : View.INVISIBLE;
 
                         isWaiting = false;
-
+                        count.setText(Pagination.getTotalCount() + "");
                         tvId.setText(Event.get_id());
                         tvName.setText(Event.getName());
                         tvLocation.setText(Event.getLocation());
@@ -263,12 +276,12 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
                         loading.setVisibility(View.GONE);
                         listPost.setVisibility(View.VISIBLE);
 
+                        dataListRating.clear();
                         if(listRating != null && listRating.size() > 0)
                         {
-                            dataListRating.clear();
                             dataListRating.addAll(listRating);
-                            adapter.notifyDataSetChanged();
                         }
+                        adapter.notifyDataSetChanged();
 
                     });
 
@@ -290,6 +303,14 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    private ActivityResultLauncher<Intent> ActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    LoadData();
+                }
+            }
+    );
     @Override
     public void onClick(View view) {
         int idv = view.getId();
@@ -299,6 +320,40 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         if(idv == R.id.btnDelete)
         {
             Log.d("DELETE", "onClick: " + myPostId);
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Xóa bài viết")
+                    .setMessage("Bạn có muốn xóa bài viết này")
+                    .setPositiveButton("Hủy", (dia, which)->{
+                        dia.dismiss();
+                    })
+                    .setNegativeButton("Xóa", (dialog2, which) -> {
+                        historyService.DelMyPost(myPostId, new HistoryService.GetMyPostCallBack() {
+                            @Override
+                            public void onSuccess(RSMyPost result) {
+                                runOnUiThread(()->{
+                                    Toast.makeText(getApplicationContext(), "Đã xóa bài viết", Toast.LENGTH_SHORT).show();
+                                    myPost.setVisibility(View.GONE);
+                                    LoadData();
+                                    dialog2.dismiss();
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(String error) {
+                                runOnUiThread(()->{
+                                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                                    dialog2.dismiss();
+                                });
+                            }
+                        });
+
+                    }).create();
+
+            dialog.show();
+            // Tùy chỉnh màu văn bản của các nút
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK); // Màu cho nút "Hủy"
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.inValid_Ticket));  // Màu cho nút "Xóa"
+
         }
         else if(idv == R.id.btnAdd)
         {
@@ -309,7 +364,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 //            }
             Intent intent = new Intent(this, PostActivity.class);
             intent.putExtra("eventId", eventId);
-            startActivity(intent);
+            ActivityLauncher.launch(intent);
         }
     }
 

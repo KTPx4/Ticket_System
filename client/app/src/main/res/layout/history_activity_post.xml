@@ -89,7 +89,20 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/loading"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:indeterminateTint="@color/Dark_Rose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <Button
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/btnSubmit"
         android:layout_width="match_parent"

@@ -3,7 +3,8 @@ const AccountModel = require('../models/AccountModel')
 const EventModel = require('../models/EventModel')
 const HistoryModel = require('../models/HistoryEventModel')
 const UploadFile = require('../controllers/Upload')
-const LIMIT_PAGE = 10; // Số lượng item mỗi trang
+
+const LIMIT_PAGE = 5; // Số lượng item mỗi trang
 
 const mongoose = require('mongoose')
 const {populate} = require("dotenv");
@@ -12,9 +13,10 @@ module.exports.GetMyPost = async (req, res)=>{
     try{
         var {User} = req.vars
         var userId = User._id
-
+        const { id } = req.params;
         var his = await HistoryModel.findOne({
-            account: userId
+            account: userId,
+            event: id
         })
             .populate({
                 path: "account",
@@ -121,7 +123,8 @@ module.exports.PostHistory = async (req, res)=>{
         });
 
         // Lưu history để lấy _id
-        const savedHistory = await newHistory.save();
+        const savedHistory = await newHistory.save()
+
 
         // Di chuyển file vào thư mục tương ứng
         const rootPath = req.vars.root // Thư mục gốc của project
@@ -132,11 +135,16 @@ module.exports.PostHistory = async (req, res)=>{
         // Cập nhật thông tin file trong History Event
         savedHistory.file = fileData;
 
-        await savedHistory.save();
+        await savedHistory.save()
+
+        // Populate trường account trước khi trả về
+        const populatedHistory = await HistoryModel.findById(savedHistory._id)
+            .populate('account', 'name email image'); // Chỉ chọn các trường cần thiết
+
 
         return res.status(201).json({
-            message: 'Tạo lịch sử thành công.',
-            data: savedHistory,
+            message: 'Tạo thành công.',
+            data: populatedHistory,
         });
 
     }
@@ -145,6 +153,7 @@ module.exports.PostHistory = async (req, res)=>{
         res.status(500).json({ message: 'Vui lòng thử lại sau'});
     }
 }
+
 module.exports.DeleteById = async(req, res)=>{
     try {
         var {id} = req.params
@@ -153,8 +162,10 @@ module.exports.DeleteById = async(req, res)=>{
         const currPath =  path.join(rootPath, 'public', 'history', id);
         await UploadFile.DeleteFolder(currPath);
         var his = await HistoryModel.findByIdAndDelete(id)
+            .populate('account', 'name email image')
+
         return res.status(200).json({
-            message: 'Xóa thư mục thành công.' ,
+            message: 'Xóa thành công.' ,
             data: his
         });
 
