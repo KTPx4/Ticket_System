@@ -113,8 +113,11 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         btnDelete.setVisibility(View.VISIBLE);
         btnDelete.setOnClickListener(this);
         btnAddPost.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
 
         mediaGridLayout = myPost.findViewById(R.id.mediaGridLayout);
+
         LoadData();
 
     }
@@ -144,7 +147,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     private void updateMyPost(Rating rating)
     {
         canPost = false;
-
+        // Clear existing media in the GridLayout
+        mediaGridLayout.removeAllViews();
         myPostId = rating.get_id();
         myPost.setVisibility(View.VISIBLE);
         userNameTextView.setText(rating.getAccount().getName());
@@ -366,6 +370,19 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             intent.putExtra("eventId", eventId);
             ActivityLauncher.launch(intent);
         }
+        else if(idv == R.id.btnNext)
+        {
+            isWaiting= true;
+            page += 1;
+            LoadData();
+        }
+        else if(idv == R.id.btnBack)
+        {
+            isWaiting= true;
+            page -= 1;
+            LoadData();
+        }
+
     }
 
 

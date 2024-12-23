@@ -8,7 +8,7 @@ const TicketType = new mongoose.Schema({
     },
     typeTicket:{type: String, default:"Vip 1"}, // Vip 1, Vip 2, Normal
     location: {type: String, default: "A"}, // A, B, C
-    price: {type: Number, default: 0},
+    price: {type: Number, default: 90000},
 })
 
 TicketType.pre('save', function (next) {
@@ -25,7 +25,7 @@ TicketType.pre('save', function (next) {
                 this.price = 70000;
                 break;
             default:
-                this.price = 0; // Hoặc bạn có thể throw lỗi nếu typeTicket không hợp lệ
+                this.price = 70000; // Hoặc bạn có thể throw lỗi nếu typeTicket không hợp lệ
         }
     }
     next();

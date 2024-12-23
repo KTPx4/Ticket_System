@@ -61,6 +61,12 @@ _APP.get('/checkout/payment-cancel', (req, res)=>{
     })
 });
 
+_APP.get('/', (req, res)=>{
+    return res.status(200)
+})
+_APP.post('/', (req, res)=>{
+    return res.status(200)
+})
 
 _APP.use('/api/v1/staff', StaffRouter(__dirname))
 _APP.use('/api/v1/artist',  ArtistRouter(__dirname))
@@ -103,6 +109,7 @@ const createFolder = async()=>{
     })
 
 }
+
 const StartProgram = async()=>{
     await createFolder()
 

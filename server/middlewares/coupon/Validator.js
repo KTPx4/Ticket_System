@@ -54,3 +54,7 @@ module.exports.ChangeCoupon = async (req, res, next)=>{
         })
     }
 }
+
+module.exports.DiscountAll = async (req, res, next)=>{
+    return next()
+}
