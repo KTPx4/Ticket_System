@@ -47,10 +47,7 @@ module.exports.GetAll = async (req, res) => {
 
         // Tính toán số bản ghi cần bỏ qua dựa trên page và limit
         const skip = page * limit;
-
-
-
-
+        
         // Lấy tổng số bản ghi
         const totalCount = await HistoryModel.countDocuments({ event: id });
 
