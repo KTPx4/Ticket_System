@@ -74,6 +74,11 @@ public class HomeUserFragment extends Fragment {
             startActivity(intent);
             return true;
         }
+        else if (id == R.id.follow) {
+            Intent intent = new Intent(getActivity(), FollowListActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
