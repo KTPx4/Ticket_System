@@ -38,7 +38,7 @@ public class ticket_activity_booking_ticket extends AppCompatActivity {
     ZoomableView zoomableView;
     ProgressBar loading;
     boolean isLoading = true;
-    String idEvent = "675c36e019aa03318c988626";
+    String idEvent = "";
     List<String> listTicketId = new ArrayList<>();
     long finalMoney = 0;
 
