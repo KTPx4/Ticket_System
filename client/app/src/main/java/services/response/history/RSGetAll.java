@@ -57,13 +57,13 @@ public class RSGetAll {
         private String name;
         private String location;
         private String date;
-        private int rating;
+        private float rating;
         private boolean hasPost;
 
         public RSRatingEvent() {
         }
 
-        public RSRatingEvent(String _id, String name, String location, String date, int rating, boolean hasPost) {
+        public RSRatingEvent(String _id, String name, String location, String date, float rating, boolean hasPost) {
             this._id = _id;
             this.name = name;
             this.location = location;
@@ -104,8 +104,8 @@ public class RSGetAll {
             this.date = date;
         }
 
-        public int getRating() {
-            return rating;
+        public float getRating() {
+            return Math.round(rating * 10) / 10.0f;
         }
 
         public void setRating(int rating) {

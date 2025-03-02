@@ -1,4 +1,8 @@
 const CouponModel = require('../models/CouponModel')
+const EventModel = require("../models/EventModel");
+const Ticket = require("../models/TicketModel");
+const EventController = require("./EventController");
+const DiscountModel = require('../models/DiscountModel')
 
 module.exports.Create = async (req, res)=>{
 
@@ -74,7 +78,43 @@ module.exports.GetMyCoupon = async(req, res)=>{
         })
     }
 }
+module.exports.CreateDiscount = async (req, res)=>{
+    try{
+        var listEvent = await EventModel.find()
 
+        for(const event of listEvent)
+        {
+            var eventId = event._id
+            // console.log("Event: ",event)
+            var listDiscount = await DiscountModel.find({
+                event: eventId
+            })
+
+            if(!listDiscount || listDiscount.length < 1 )
+            {
+                // Danh sách các tài liệu cần tạo
+                const discounts = [
+                    { event: eventId, memberRange: 1, percentDiscount: 5 },
+                    { event: eventId, memberRange: 2, percentDiscount: 10 },
+                    { event: eventId, memberRange: 3, percentDiscount: 15 },
+                    { event: eventId, memberRange: 4, percentDiscount: 20 },
+                ];
+
+                // Sử dụng insertMany để lưu cả ba bản ghi một lần
+                const result = await DiscountModel.insertMany(discounts);
+            }
+        }
+        return  res.status(200).json({
+            message: "Đã tạo xong list discount cho tất cả event"
+        })
+    }
+    catch (e) {
+        console.log("Coupon Controller - CreateDiscount", e)
+        return res.status(500).json({
+            message: "Vui lòng thử lại sau!"
+        })
+    }
+}
 module.exports.ChangeCoupon = async (req,res)=>{
     try{
         var {User} = req.vars

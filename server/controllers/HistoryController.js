@@ -173,3 +173,35 @@ module.exports.DeleteById = async(req, res)=>{
 
 
 }
+
+module.exports.CreateExample = async (req, res)=>{
+    try{
+        var listEvent = await EventModel.find()
+        for(const event of listEvent)
+        {
+            var eventId = event._id
+            var comments = await HistoryModel.find({event: eventId})
+            if(!comments || comments.length < 2)
+            {
+                const listComment = [
+                    {account: "674dbb2725fe9b5bc9639895", event: eventId, rating: 3, comment: `Ok lắm nha - ${Date.now()}`},
+                    {account: "674dbe8625fe9b5bc963989c", event: eventId, rating: 4, comment: `Toẹt cà là vời - ${Date.now()}`},
+                    {account: "675e3003b84676d9291dc798", event: eventId, rating: 5, comment: `Đỉnh chóp - ${Date.now()}`},
+                    {account: "676964a7bad5500999ccd108", event: eventId, rating: 3, comment: `Qúa tuyệt vời - ${Date.now()}`},
+                    {account: "676964afbad5500999ccd10b", event: eventId, rating: 5, comment: `Thật bất ngờ hihi - ${Date.now()}`},
+                    {account: "6769649dbad5500999ccd105", event: eventId, rating: 5, comment: `Trời ơi đỉnh - ${Date.now()}`},
+                    {account: "67696495bad5500999ccd102", event: eventId, rating: 5, comment: `Nổ rồi các cháu ơi- ${Date.now()}`},
+                ]
+                await HistoryModel.insertMany(listComment)
+            }
+        }
+
+        return  res.status(200).json({
+            message: "Đã tạo xong comment cho tất cả event"
+        })
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Vui lòng thử lại sau.' });
+    }
+}

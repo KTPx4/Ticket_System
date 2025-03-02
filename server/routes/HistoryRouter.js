@@ -10,6 +10,7 @@ const UploadValidator = require('../middlewares/UploadValidator')
 const EventValidator = require('../middlewares/event/EventValidator')
 
 const Controller = require('../controllers/HistoryController')
+const {AuthStaff} = require("../middlewares/staffs/Staff");
 
 // get all history of event
 _APP.get('/:id/me' ,AuthAccount.AuthAccount,EventValidator.IsExistEvent, Controller.GetMyPost)
@@ -25,5 +26,6 @@ _APP.post('/',
 )
 _APP.delete('/:id', AuthAccount.AuthAccount, HistoryMid.CanDelete, Controller.DeleteById)
 
+_APP.post('/example', AuthStaff, Controller.CreateExample)
 
 module.exports = _APP

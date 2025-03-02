@@ -21,6 +21,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import modules.JwtTokenHelper;
 import modules.LocalStorageManager;
+import modules.QRcode;
 
 public class TicketInfoActivity extends AppCompatActivity implements View.OnClickListener {
     private static String idUser;
@@ -32,6 +33,7 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
     private JwtTokenHelper jwtTokenHelper;
     LocalStorageManager localStorageManager;
     private CountDownTimer countDownTimer;
+    String url_image = "";
 
     private Button btnGenerate, btnClose;
     private TextView txtType, txtPosition, txtLocation,txtId, txtTime, ticket_tvName, ticket_tvDesc;
@@ -72,6 +74,7 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
         posTicket = intent.getStringExtra("position");
         String nameEvent = intent.getStringExtra("name");
         String desc = intent.getStringExtra("desc");
+          url_image = intent.getStringExtra("img");
 
         idUser = localStorageManager.getIdUser();
         if(idTicket.isEmpty() || idUser.isEmpty())
@@ -91,6 +94,10 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
 
     private void displayQrCode() {
         try {
+
+            ImageView qrCodeImageView = findViewById(R.id.ticket_ivQrCode);
+            Bitmap finalBitmap = QRcode.displayQrCodeWithLogo(this, idUser, idTicket);
+        /*
             ImageView qrCodeImageView = findViewById(R.id.ticket_ivQrCode);
             token = jwtTokenHelper.createToken(idUser, idTicket);
             // Tạo mã QR
@@ -99,7 +106,12 @@ public class TicketInfoActivity extends AppCompatActivity implements View.OnClic
 
             // Hiển thị mã QR
             qrCodeImageView.setImageBitmap(bitmap);
+
+         */
+            // Hiển thị mã QR với logo
+            qrCodeImageView.setImageBitmap(finalBitmap);
             startCountdown(); // Reset đếm ngược 60 giây
+
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), "Không thể tạo mã QR", Toast.LENGTH_SHORT).show();

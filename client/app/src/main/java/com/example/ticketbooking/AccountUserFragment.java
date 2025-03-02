@@ -152,7 +152,10 @@ public class AccountUserFragment extends Fragment {
 
             @Override
             public void onFailure(String error) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                getActivity().runOnUiThread(()->{
+                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+
+                });
             }
         });
     }

@@ -88,7 +88,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.RatingView
 
                 if(rating != null)
                 {
-
+                    mediaGridLayout.removeAllViews();
                     userNameTextView.setText(rating.getAccount().getName());
                     commentDateTextView.setText(rating.getCreatedAt());
                     commentTextView.setText(rating.getComment());

@@ -476,7 +476,6 @@ module.exports.ScanTicket = async(req, res)=>{
 
             var Ticket = await TicketModel.findOne({
                 _id: idTicket,
-
                 isValid: true
             })
 
