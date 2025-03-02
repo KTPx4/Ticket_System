@@ -105,7 +105,7 @@ public class RSGetAll {
         }
 
         public float getRating() {
-            return rating;
+            return Math.round(rating * 10) / 10.0f;
         }
 
         public void setRating(int rating) {
